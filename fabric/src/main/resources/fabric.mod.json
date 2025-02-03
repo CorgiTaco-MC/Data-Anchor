@@ -11,7 +11,7 @@
     "homepage": "https://fabricmc.net/",
     "sources": ""
   },
-  "license": "Insert License Here",
+  "license": "All Rights Reserved",
   "icon": "assets/examplemod/icon.png",
   "environment": "*",
   "entrypoints": {
@@ -20,6 +20,10 @@
     ],
     "fabric-datagen": [
         "com.example.examplemod.fabric.datagen.FabricDatagen"
+    ],
+    "client": ["com.example.examplemod.fabric.server.ExampleModFabricClientModInit"],
+    "server": [
+      "com.example.examplemod.fabric.client.ExampleModFabricDedicatedServerModInit"
     ]
   },
   "mixins": [
