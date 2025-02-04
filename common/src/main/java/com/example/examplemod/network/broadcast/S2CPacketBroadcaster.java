@@ -1,5 +1,6 @@
-package com.example.examplemod.network;
+package com.example.examplemod.network.broadcast;
 
+import com.example.examplemod.network.Packet;
 import com.example.examplemod.util.ServiceUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Position;
@@ -9,13 +10,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 
-public interface PacketBroadcaster {
+public interface S2CPacketBroadcaster extends PacketBroadcaster {
 
-    PacketBroadcaster INSTANCE = ServiceUtil.load(PacketBroadcaster.class);
-
-    void registerPackets();
-
-    <MSG extends Packet> void sendToServer(MSG msg);
+    S2CPacketBroadcaster INSTANCE = ServiceUtil.load(S2CPacketBroadcaster.class);
 
     <MSG extends Packet> void sendToPlayer(MSG msg, ServerPlayer player);
 

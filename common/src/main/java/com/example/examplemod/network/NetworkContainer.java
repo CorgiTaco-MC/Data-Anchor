@@ -6,28 +6,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-public class NetworkContainer {
-    public static final Map<String, NetworkContainer> NAMESPACED_CONTAINERS = new HashMap<>();
+public abstract class NetworkContainer {
 
     private final Map<ResourceLocation, Packet.Handler<? extends Packet>> packets = new HashMap<>();
     private final String nameSpace;
     private boolean locked = false;
 
-    private NetworkContainer(String namespace) {
+    public NetworkContainer(String namespace) {
         this.nameSpace = namespace;
     }
-
-    public static NetworkContainer of(String namespace) {
-        NetworkContainer networkContainer = NAMESPACED_CONTAINERS.get(namespace);
-        if (networkContainer != null) {
-            return networkContainer;
-        }
-
-        NetworkContainer networkContainer1 = new NetworkContainer(namespace);
-        NAMESPACED_CONTAINERS.put(namespace, networkContainer1);
-        return networkContainer1;
-    }
-
 
     public <T extends Packet> void registerPacketHandler(String name, Packet.Handler<T> packetHandle) {
         if (!locked) {

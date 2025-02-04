@@ -1,11 +1,11 @@
 package com.example.examplemod.fabric.client;
 
-import com.example.examplemod.network.PacketBroadcaster;
+import com.example.examplemod.network.broadcast.S2CPacketBroadcaster;
 import net.fabricmc.api.DedicatedServerModInitializer;
 
 public class ExampleModFabricDedicatedServerModInit implements DedicatedServerModInitializer {
     @Override
     public void onInitializeServer() {
-        PacketBroadcaster.INSTANCE.registerPackets();
+        S2CPacketBroadcaster.INSTANCE.registerPackets();
     }
 }

@@ -1,10 +1,10 @@
 package com.example.examplemod.fabric.network;
 
 import com.example.examplemod.ExampleMod;
+import com.example.examplemod.client.S2CNetworkContainer;
 import com.example.examplemod.fabric.ExampleModFabric;
-import com.example.examplemod.network.NetworkContainer;
 import com.example.examplemod.network.Packet;
-import com.example.examplemod.network.PacketBroadcaster;
+import com.example.examplemod.network.broadcast.S2CPacketBroadcaster;
 import com.google.auto.service.AutoService;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.EnvType;
@@ -26,57 +26,29 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-@AutoService(PacketBroadcaster.class)
-public class FabricNetworkHandler implements PacketBroadcaster {
-
-    private final Map<Class<? extends Packet>, BiConsumer<?, FriendlyByteBuf>> ENCODERS = new ConcurrentHashMap<>();
-    private final Map<Class<? extends Packet>, ResourceLocation> PACKET_IDS = new ConcurrentHashMap<>();
-
-    private <T extends Packet> void register(ResourceLocation path, Packet.Handler<T> handler) {
-        registerMessage(path, handler.clazz(), handler.direction(), handler.write(), handler.read(), handler.handle());
-    }
-
-    private <T extends Packet> void registerMessage(ResourceLocation id,
-                                                    Class<T> clazz,
-                                                    Packet.PacketDirection direction,
-                                                    BiConsumer<T, FriendlyByteBuf> encode,
-                                                    Function<FriendlyByteBuf, T> decode,
-                                                    Packet.Handle<T> handler) {
-        ENCODERS.put(clazz, encode);
-        PACKET_IDS.put(clazz, id);
-
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && direction == Packet.PacketDirection.SERVER_TO_CLIENT) {
-            ClientProxy.registerClientReceiver(id, decode, handler);
-        }
-        if (direction == Packet.PacketDirection.CLIENT_TO_SERVER) {
-            ServerProxy.registerServerReceiver(id, decode, handler);
-        }
-    }
+@AutoService(S2CPacketBroadcaster.class)
+public class S2CFabricPacketBroadcaster extends FabricPacketBroadcaster implements S2CPacketBroadcaster {
 
     @Override
     public void registerPackets() {
-        NetworkContainer.NAMESPACED_CONTAINERS.forEach((modId, networkContainer) -> networkContainer.registerMessages(this::register));
+        S2CNetworkContainer.S2C_NAMESPACED_CONTAINERS.forEach((modId, networkContainer) -> networkContainer.registerMessages(this::register));
     }
 
-    public <MSG extends Packet> void sendToServer(MSG packet) {
-        ResourceLocation packetId = PACKET_IDS.get(packet.getClass());
-        @SuppressWarnings("unchecked")
-        BiConsumer<MSG, FriendlyByteBuf> encoder = (BiConsumer<MSG, FriendlyByteBuf>) ENCODERS.get(packet.getClass());
-        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-        encoder.accept(packet, buf);
-        ClientPlayNetworking.send(packetId, buf);
+    @Override
+    public <T extends Packet> void registerReceiver(ResourceLocation id, Function<FriendlyByteBuf, T> decode, Packet.Handle<T> handler) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            ClientProxy.registerClientReceiver(id, decode, handler);
+        }
     }
 
     @Override
     public <MSG extends Packet> void sendToPlayer(MSG msg, ServerPlayer player) {
-        ResourceLocation packetId = PACKET_IDS.get(msg.getClass());
+        ResourceLocation packetId = packetIds.get(msg.getClass());
         @SuppressWarnings("unchecked")
-        BiConsumer<MSG, FriendlyByteBuf> encoder = (BiConsumer<MSG, FriendlyByteBuf>) ENCODERS.get(msg.getClass());
+        BiConsumer<MSG, FriendlyByteBuf> encoder = (BiConsumer<MSG, FriendlyByteBuf>) encoders.get(msg.getClass());
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         encoder.accept(msg, buf);
         ServerPlayNetworking.send(player, packetId, buf);
@@ -96,7 +68,6 @@ public class FabricNetworkHandler implements PacketBroadcaster {
         for (ServerPlayer player : server.getLevel(dimensionKey).players()) {
             sendToPlayer(msg, player);
         }
-
     }
 
     @Override
@@ -107,7 +78,6 @@ public class FabricNetworkHandler implements PacketBroadcaster {
                 sendToPlayer(msg, player);
             }
         }
-
     }
 
     @Override
@@ -122,8 +92,6 @@ public class FabricNetworkHandler implements PacketBroadcaster {
                 sendToPlayer(msg, player);
             }
         }
-
-
     }
 
     @Override
@@ -140,9 +108,7 @@ public class FabricNetworkHandler implements PacketBroadcaster {
             if (trackedEntity.entity instanceof ServerPlayer serverPlayer) {
                 sendToPlayer(msg, serverPlayer);
             }
-
         }
-
     }
 
     @Override
@@ -170,25 +136,6 @@ public class FabricNetworkHandler implements PacketBroadcaster {
                             ExampleMod.LOGGER.error("Packet \"%s\" failed: ".formatted(id.toString()), throwable);
                             throw throwable;
                         }
-                    }
-                    buf.release();
-                });
-            });
-        }
-    }
-
-    public static class ServerProxy {
-        private static <T extends Packet> void registerServerReceiver(ResourceLocation id, Function<FriendlyByteBuf, T> decode, Packet.Handle<T> handler) {
-            ServerPlayNetworking.registerGlobalReceiver(id, (server, player, handler1, buf, responseSender) -> {
-                buf.retain();
-                server.execute(() -> {
-                    T packet = decode.apply(buf);
-                    Level level = player.level();
-                    try {
-                        handler.handle(packet, level, player);
-                    } catch (Throwable throwable) {
-                        ExampleMod.LOGGER.error("Packet \"%s\" failed: ".formatted(id.toString()), throwable);
-                        throw throwable;
                     }
                     buf.release();
                 });

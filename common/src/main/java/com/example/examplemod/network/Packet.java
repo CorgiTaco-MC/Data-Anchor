@@ -14,16 +14,11 @@ public interface Packet {
 
     void handle(@Nullable Level level, @Nullable Player player);
 
-    record Handler<T extends Packet>(Class<T> clazz, PacketDirection direction, BiConsumer<T, FriendlyByteBuf> write,
+    record Handler<T extends Packet>(Class<T> clazz, BiConsumer<T, FriendlyByteBuf> write,
                                      Function<FriendlyByteBuf, T> read,
                                      Handle<T> handle) {
     }
 
-    enum PacketDirection {
-        SERVER_TO_CLIENT,
-        CLIENT_TO_SERVER,
-        BIDIRECTIONAL
-    }
 
     @FunctionalInterface
     interface Handle<T extends Packet> {

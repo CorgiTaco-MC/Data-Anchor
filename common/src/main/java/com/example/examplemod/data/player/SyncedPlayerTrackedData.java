@@ -3,7 +3,7 @@ package com.example.examplemod.data.player;
 import com.example.examplemod.data.SyncedTrackedData;
 import com.example.examplemod.data.TrackedDataKey;
 import com.example.examplemod.data.player.network.SyncPlayerTrackedDataS2C;
-import com.example.examplemod.network.PacketBroadcaster;
+import com.example.examplemod.network.broadcast.S2CPacketBroadcaster;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -15,7 +15,7 @@ public abstract non-sealed class SyncedPlayerTrackedData extends PlayerTrackedDa
     @Override
     public void sync() {
         if (player instanceof ServerPlayer) {
-            PacketBroadcaster.INSTANCE.trackingEntityAndSelf(new SyncPlayerTrackedDataS2C((TrackedDataKey<SyncedPlayerTrackedData>) trackedDataKey, writeToNetwork()), player);
+            S2CPacketBroadcaster.INSTANCE.trackingEntityAndSelf(new SyncPlayerTrackedDataS2C((TrackedDataKey<SyncedPlayerTrackedData>) trackedDataKey, writeToNetwork()), player);
         }
     }
 }

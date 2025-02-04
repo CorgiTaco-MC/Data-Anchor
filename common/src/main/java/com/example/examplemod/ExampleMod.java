@@ -3,8 +3,8 @@ package com.example.examplemod;
 import com.example.examplemod.data.TrackedDataKey;
 import com.example.examplemod.data.player.PlayerTrackedDataRegistry;
 import com.example.examplemod.data.player.network.SyncPlayerTrackedDataS2C;
-import com.example.examplemod.network.NetworkContainer;
 import com.example.examplemod.network.Packet;
+import com.example.examplemod.client.S2CNetworkContainer;
 import com.example.examplemod.test.data.player.TestSyncedPlayerTrackedData;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -22,7 +22,7 @@ public class ExampleMod {
      */
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final NetworkContainer NETWORK_CONTAINER = NetworkContainer.of(MOD_ID);
+    public static final S2CNetworkContainer NETWORK_CONTAINER = S2CNetworkContainer.of(MOD_ID);
 
 
     /**
@@ -43,7 +43,6 @@ public class ExampleMod {
         NETWORK_CONTAINER.registerPacketHandler("player_tracked_data",
                 new Packet.Handler<>(
                         SyncPlayerTrackedDataS2C.class,
-                        Packet.PacketDirection.SERVER_TO_CLIENT,
                         SyncPlayerTrackedDataS2C::write,
                         SyncPlayerTrackedDataS2C::new,
                         SyncPlayerTrackedDataS2C::handle)

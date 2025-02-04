@@ -1,8 +1,9 @@
 package com.example.examplemod.forge.network;
 
+import com.example.examplemod.client.S2CNetworkContainer;
 import com.example.examplemod.network.NetworkContainer;
 import com.example.examplemod.network.Packet;
-import com.example.examplemod.network.PacketBroadcaster;
+import com.example.examplemod.network.broadcast.S2CPacketBroadcaster;
 import com.google.auto.service.AutoService;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
@@ -20,18 +21,18 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-@AutoService(PacketBroadcaster.class)
-public class ForgeNetworkHandler implements PacketBroadcaster {
+@AutoService(S2CPacketBroadcaster.class)
+public class S2CForgeNetworkHandler implements S2CPacketBroadcaster {
     private static final String PROTOCOL_VERSION = "1";
 
     private final Map<Class<? extends Packet>, SimpleChannel> channels = new ConcurrentHashMap<>();
 
-    private ForgeNetworkHandler() {
+    private S2CForgeNetworkHandler() {
     }
 
     @Override
     public void registerPackets() {
-        NetworkContainer.NAMESPACED_CONTAINERS.forEach((s, networkContainer) -> networkContainer.registerMessages(this::registerMessage));
+        S2CNetworkContainer.S2C_NAMESPACED_CONTAINERS.forEach((s, networkContainer) -> networkContainer.registerMessages(this::registerMessage));
     }
 
     public <T extends Packet> void registerMessage(ResourceLocation location, Packet.Handler<T> handler) {
