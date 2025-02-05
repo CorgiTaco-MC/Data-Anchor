@@ -1,7 +1,9 @@
 package com.example.examplemod.mixin;
 
+import com.example.examplemod.data.TickableTrackedData;
 import com.example.examplemod.data.TrackedDataContainer;
 import com.example.examplemod.data.TrackedDataKey;
+import com.example.examplemod.data.chunk.ChunkTrackedData;
 import com.example.examplemod.data.level.LevelTrackedData;
 import com.example.examplemod.data.level.SyncedLevelTrackedData;
 import com.example.examplemod.data.player.PlayerTrackedData;
@@ -16,6 +18,7 @@ import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -44,6 +47,20 @@ public abstract class ServerLevelMixin extends Level {
             access.create();
         }
     }
+
+    @Inject(method = "tickChunk", at = @At("RETURN"))
+    private void onTickChunk(LevelChunk chunk, int randomTickSpeed, CallbackInfo ci) {
+        if (chunk instanceof TrackedDataContainer access) {
+            Collection<TrackedDataKey<ChunkTrackedData>> keys = access.getKeys();
+            for (TrackedDataKey<ChunkTrackedData> key : keys) {
+                ChunkTrackedData data = (ChunkTrackedData) access.get(key);
+                if(data instanceof TickableTrackedData tickableData) {
+                    tickableData.tick();
+                }
+            }
+        }
+    }
+
 
     @Inject(method = "addRespawnedPlayer", at = @At("RETURN"))
     private void addRespawnTeleport(ServerPlayer player, CallbackInfo ci) {
@@ -92,11 +109,11 @@ public abstract class ServerLevelMixin extends Level {
                 }
             }
         }
-        if(this instanceof TrackedDataContainer access) {
+        if (this instanceof TrackedDataContainer access) {
             Collection<TrackedDataKey<LevelTrackedData>> keys = access.getKeys();
             for (TrackedDataKey<LevelTrackedData> key : keys) {
                 LevelTrackedData data = (LevelTrackedData) access.get(key);
-                if(data instanceof SyncedLevelTrackedData syncedData) {
+                if (data instanceof SyncedLevelTrackedData syncedData) {
                     syncedData.syncToPlayer(player);
                 }
             }

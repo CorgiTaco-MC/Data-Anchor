@@ -1,11 +1,13 @@
 package com.example.examplemod.data;
 
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
 
 public interface TrackedDataContainer<O, T extends TrackedData<O>> {
+    @Nullable
     <E extends T> E get(TrackedDataKey<E> key);
 
     void create();
@@ -13,6 +15,10 @@ public interface TrackedDataContainer<O, T extends TrackedData<O>> {
     Collection<TrackedDataKey<T>> getKeys();
 
     static <O, T extends TrackedData<O>> TrackedDataContainer<O, T> makeBasicContainer(TrackedDataRegistry<O, T> registry, O o) {
+        return makeBasicContainer(registry, o, false);
+    }
+
+    static <O, T extends TrackedData<O>> TrackedDataContainer<O, T> makeBasicContainer(TrackedDataRegistry<O, T> registry, O o, boolean allowNulls) {
         return new TrackedDataContainer<>() {
             private final Map<TrackedDataKey<T>, T> trackedDataMap = new Reference2ReferenceOpenHashMap<>();
 
@@ -26,7 +32,7 @@ public interface TrackedDataContainer<O, T extends TrackedData<O>> {
             public void create() {
                 registry.factories().forEach((key, factory) -> {
                     T trackedData = factory.create(key, o);
-                    if (trackedData == null) {
+                    if (trackedData == null && !allowNulls) {
                         throw new IllegalArgumentException("Null TrackedData factories are NOT allowed. Found null TrackedData for key \"%s\"".formatted(key.getId()));
                     }
 

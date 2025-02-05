@@ -7,6 +7,9 @@
     "client.IntegratedPlayerListMixin"
   ],
   "mixins": [
+    "ChunkAccessMixin",
+    "ChunkMapMixin",
+    "ChunkSerializerMixin",
     "LevelMixin",
     "PlayerDataStorageMixin",
     "PlayerListMixin",

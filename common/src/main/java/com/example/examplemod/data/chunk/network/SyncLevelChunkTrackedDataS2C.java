@@ -23,6 +23,8 @@ public record SyncLevelChunkTrackedDataS2C(TrackedDataKey<SyncedLevelChunkTracke
     @Override
     public void write(FriendlyByteBuf buf) {
         buf.writeResourceLocation(dataKey.getId());
+        buf.writeInt(pos.x);
+        buf.writeInt(pos.z);
         buf.writeNbt(this.tag);
     }
 

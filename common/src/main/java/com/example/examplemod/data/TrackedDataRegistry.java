@@ -75,6 +75,6 @@ public class TrackedDataRegistry<O, T extends TrackedData<O>> {
 
     @FunctionalInterface
     public interface TrackedDataFactory<T, D extends TrackedData<T>> {
-        @NotNull D create(TrackedDataKey<D> key, T obj);
+        @Nullable D create(TrackedDataKey<D> key, T obj);
     }
 }

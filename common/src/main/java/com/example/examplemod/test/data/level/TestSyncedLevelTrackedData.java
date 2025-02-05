@@ -3,7 +3,6 @@ package com.example.examplemod.test.data.level;
 import com.example.examplemod.ExampleMod;
 import com.example.examplemod.data.TickableTrackedData;
 import com.example.examplemod.data.TrackedDataKey;
-import com.example.examplemod.data.level.LevelTrackedData;
 import com.example.examplemod.data.level.SyncedLevelTrackedData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
@@ -27,7 +26,7 @@ public class TestSyncedLevelTrackedData extends SyncedLevelTrackedData implement
     @Override
     public void load(CompoundTag tag) {
         if (tag.contains("yum")) {
-            setYum(tag.getInt("yum"));
+            setYum(tag.getInt("yum"), false);
         }
     }
 
@@ -43,8 +42,14 @@ public class TestSyncedLevelTrackedData extends SyncedLevelTrackedData implement
     }
 
     public void setYum(int yum) {
+        setYum(yum, true);
+    }
+
+    public void setYum(int yum, boolean markDirty) {
         this.yum = yum;
         sync();
-        markDirty();
+        if (markDirty) {
+            markDirty();
+        }
     }
 }

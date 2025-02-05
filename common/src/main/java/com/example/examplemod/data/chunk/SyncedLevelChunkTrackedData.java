@@ -4,6 +4,7 @@ import com.example.examplemod.data.SyncedTrackedData;
 import com.example.examplemod.data.TrackedDataKey;
 import com.example.examplemod.data.chunk.network.SyncLevelChunkTrackedDataS2C;
 import com.example.examplemod.network.broadcast.S2CPacketBroadcaster;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 
@@ -19,5 +20,10 @@ public abstract class SyncedLevelChunkTrackedData extends LevelChunkTrackedData 
         if (!level.isClientSide) {
             S2CPacketBroadcaster.S2C.trackingChunk(new SyncLevelChunkTrackedDataS2C((TrackedDataKey<SyncedLevelChunkTrackedData>) trackedDataKey, chunk.getPos(), writeToNetwork()), get());
         }
+    }
+
+    @Override
+    public void syncToPlayer(ServerPlayer player) {
+        S2CPacketBroadcaster.S2C.sendToPlayer(new SyncLevelChunkTrackedDataS2C((TrackedDataKey<SyncedLevelChunkTrackedData>) this.trackedDataKey, chunk.getPos(), writeToNetwork()), player);
     }
 }

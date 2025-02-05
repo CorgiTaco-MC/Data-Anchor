@@ -23,6 +23,14 @@ public class LevelMixin implements TrackedDataContainer<Level, LevelTrackedData>
     @Unique
     private final List<TickableTrackedData> exampleMod$tickableLevelData = new ArrayList<>();
 
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void onInit(CallbackInfo ci) {
+        if (((Level) (Object) this instanceof ServerLevel)) {
+            return;
+        }
+        this.create();
+    }
+
     @Override
     public <E extends LevelTrackedData> E get(TrackedDataKey<E> key) {
         return this.exampleMod$trackedDataContainer.get(key);
@@ -30,7 +38,9 @@ public class LevelMixin implements TrackedDataContainer<Level, LevelTrackedData>
 
     @Override
     public void create() {
-        this.exampleMod$trackedDataContainer = (Object) this instanceof ServerLevel serverLevel ? TrackedLevelSavedData.get(serverLevel) : TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.LEVEL, (Level) (Object) this);
+        if ((Object) this instanceof ServerLevel serverLevel) {
+            this.exampleMod$trackedDataContainer = TrackedLevelSavedData.get(serverLevel);
+        }
 
         this.exampleMod$trackedDataContainer.create();
 
