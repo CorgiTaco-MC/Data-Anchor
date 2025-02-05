@@ -1,8 +1,9 @@
 package com.example.examplemod.forge.network;
 
 import com.example.examplemod.client.S2CNetworkContainer;
-import com.example.examplemod.network.NetworkContainer;
 import com.example.examplemod.network.Packet;
+import com.example.examplemod.network.broadcast.BiDirectionalPacketBroadcaster;
+import com.example.examplemod.network.broadcast.C2SPacketBroadcaster;
 import com.example.examplemod.network.broadcast.S2CPacketBroadcaster;
 import com.google.auto.service.AutoService;
 import net.minecraft.client.Minecraft;
@@ -21,13 +22,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-@AutoService(S2CPacketBroadcaster.class)
-public class S2CForgeNetworkHandler implements S2CPacketBroadcaster {
+@AutoService({S2CPacketBroadcaster.class, C2SPacketBroadcaster.class, BiDirectionalPacketBroadcaster.class})
+public class ForgeNetworkHandler implements S2CPacketBroadcaster, BiDirectionalPacketBroadcaster {
     private static final String PROTOCOL_VERSION = "1";
 
     private final Map<Class<? extends Packet>, SimpleChannel> channels = new ConcurrentHashMap<>();
 
-    private S2CForgeNetworkHandler() {
+    public ForgeNetworkHandler() {
+
     }
 
     @Override
@@ -44,6 +46,7 @@ public class S2CForgeNetworkHandler implements S2CPacketBroadcaster {
         )).registerMessage(0, handler.clazz(), handler.write(), handler.read(), (t, contextSupplier) -> handle(t, contextSupplier, handler.handle()));
     }
 
+    @Override
     public <T extends Packet> void sendToServer(T packet) {
         channels.get(packet.getClass()).sendToServer(packet);
     }
