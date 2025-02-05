@@ -4,7 +4,7 @@ import com.example.examplemod.data.TrackedDataKey;
 import com.example.examplemod.data.player.PlayerTrackedDataRegistry;
 import com.example.examplemod.data.player.network.SyncPlayerTrackedDataS2C;
 import com.example.examplemod.network.Packet;
-import com.example.examplemod.client.S2CNetworkContainer;
+import com.example.examplemod.network.S2CNetworkContainer;
 import com.example.examplemod.test.data.player.TestSyncedPlayerTrackedData;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;

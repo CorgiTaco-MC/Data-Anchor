@@ -1,7 +1,7 @@
 package com.example.examplemod.fabric.network;
 
 import com.example.examplemod.ExampleMod;
-import com.example.examplemod.client.S2CNetworkContainer;
+import com.example.examplemod.network.S2CNetworkContainer;
 import com.example.examplemod.fabric.ExampleModFabric;
 import com.example.examplemod.network.Packet;
 import com.example.examplemod.network.broadcast.S2CPacketBroadcaster;

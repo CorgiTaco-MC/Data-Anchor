@@ -1,6 +1,6 @@
 package com.example.examplemod.forge.network;
 
-import com.example.examplemod.client.S2CNetworkContainer;
+import com.example.examplemod.network.S2CNetworkContainer;
 import com.example.examplemod.network.Packet;
 import com.example.examplemod.network.broadcast.BiDirectionalPacketBroadcaster;
 import com.example.examplemod.network.broadcast.C2SPacketBroadcaster;

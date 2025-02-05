@@ -1,6 +1,4 @@
-package com.example.examplemod.client;
-
-import com.example.examplemod.network.NetworkContainer;
+package com.example.examplemod.network;
 
 import java.util.HashMap;
 import java.util.Map;
