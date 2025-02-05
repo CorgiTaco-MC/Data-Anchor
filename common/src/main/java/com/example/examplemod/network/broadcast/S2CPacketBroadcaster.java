@@ -11,8 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 
 public interface S2CPacketBroadcaster extends PacketBroadcaster {
-
-    S2CPacketBroadcaster INSTANCE = ServiceUtil.load(S2CPacketBroadcaster.class);
+    S2CPacketBroadcaster INSTANCE = S2C;
 
     <MSG extends Packet> void sendToPlayer(MSG msg, ServerPlayer player);
 

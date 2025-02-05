@@ -15,7 +15,12 @@ public abstract non-sealed class SyncedPlayerTrackedData extends PlayerTrackedDa
     @Override
     public void sync() {
         if (player instanceof ServerPlayer) {
-            S2CPacketBroadcaster.INSTANCE.trackingEntityAndSelf(new SyncPlayerTrackedDataS2C((TrackedDataKey<SyncedPlayerTrackedData>) trackedDataKey, writeToNetwork()), player);
+            S2CPacketBroadcaster.S2C.trackingEntityAndSelf(new SyncPlayerTrackedDataS2C((TrackedDataKey<SyncedPlayerTrackedData>) trackedDataKey, writeToNetwork()), player);
         }
+    }
+
+    @Override
+    public void syncToPlayer(ServerPlayer player) {
+        S2CPacketBroadcaster.S2C.sendToPlayer(new SyncPlayerTrackedDataS2C((TrackedDataKey<SyncedPlayerTrackedData>) trackedDataKey, writeToNetwork()), player);
     }
 }

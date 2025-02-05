@@ -37,7 +37,7 @@ public class C2SFabricPacketBroadcaster extends FabricPacketBroadcaster implemen
         ClientPlayNetworking.send(packetId, buf);
     }
 
-    private static <T extends Packet> void registerServerReceiver(ResourceLocation id, Function<FriendlyByteBuf, T> decode, Packet.Handle<T> handler) {
+    protected static <T extends Packet> void registerServerReceiver(ResourceLocation id, Function<FriendlyByteBuf, T> decode, Packet.Handle<T> handler) {
         ServerPlayNetworking.registerGlobalReceiver(id, (server, player, handler1, buf, responseSender) -> {
             buf.retain();
             server.execute(() -> {

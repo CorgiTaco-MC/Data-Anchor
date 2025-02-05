@@ -1,9 +1,7 @@
 package com.example.examplemod.forge;
 
 import com.example.examplemod.ExampleMod;
-import com.example.examplemod.network.broadcast.BiDirectionalPacketBroadcaster;
-import com.example.examplemod.network.broadcast.C2SPacketBroadcaster;
-import com.example.examplemod.network.broadcast.S2CPacketBroadcaster;
+import com.example.examplemod.network.broadcast.PacketBroadcaster;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -21,8 +19,6 @@ public class ExampleModForge {
     }
 
     public void commonSetup(final FMLCommonSetupEvent fmlCommonSetupEvent) {
-        S2CPacketBroadcaster.INSTANCE.registerPackets();
-        C2SPacketBroadcaster.INSTANCE.registerPackets();
-        BiDirectionalPacketBroadcaster.INSTANCE.registerPackets();
+        PacketBroadcaster.ALL.forEach(PacketBroadcaster::registerPackets);
     }
 }

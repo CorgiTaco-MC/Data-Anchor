@@ -5,7 +5,7 @@ import com.example.examplemod.data.TrackedDataKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
-public sealed abstract class PlayerTrackedData implements TrackedData permits ServerPlayerTrackedData, SyncedPlayerTrackedData {
+public sealed abstract class PlayerTrackedData implements TrackedData<Player> permits ServerPlayerTrackedData, SyncedPlayerTrackedData {
 
     protected final TrackedDataKey<? extends PlayerTrackedData> trackedDataKey;
     protected final Player player;
@@ -15,7 +15,7 @@ public sealed abstract class PlayerTrackedData implements TrackedData permits Se
         this.player = player;
     }
 
-    public void onCopy(ServerPlayer oldPlayer) {
+    public void copy(ServerPlayer oldPlayer, boolean keepEverything) {
         // Do something when the player dies
     }
 
@@ -37,5 +37,10 @@ public sealed abstract class PlayerTrackedData implements TrackedData permits Se
 
     public void addRespawnedPlayer() {
         // Do something when the player is respawned
+    }
+
+    @Override
+    public Player get() {
+        return this.player;
     }
 }

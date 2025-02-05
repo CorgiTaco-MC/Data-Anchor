@@ -22,19 +22,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-@AutoService({S2CPacketBroadcaster.class, C2SPacketBroadcaster.class, BiDirectionalPacketBroadcaster.class})
-public class ForgeNetworkHandler implements S2CPacketBroadcaster, BiDirectionalPacketBroadcaster {
+public abstract class ForgeNetworkHandler {
     private static final String PROTOCOL_VERSION = "1";
 
-    private final Map<Class<? extends Packet>, SimpleChannel> channels = new ConcurrentHashMap<>();
+    protected final Map<Class<? extends Packet>, SimpleChannel> channels = new ConcurrentHashMap<>();
 
     public ForgeNetworkHandler() {
-
-    }
-
-    @Override
-    public void registerPackets() {
-        S2CNetworkContainer.S2C_NAMESPACED_CONTAINERS.forEach((s, networkContainer) -> networkContainer.registerMessages(this::registerMessage));
     }
 
     public <T extends Packet> void registerMessage(ResourceLocation location, Packet.Handler<T> handler) {
@@ -44,46 +37,6 @@ public class ForgeNetworkHandler implements S2CPacketBroadcaster, BiDirectionalP
                 PROTOCOL_VERSION::equals,
                 PROTOCOL_VERSION::equals
         )).registerMessage(0, handler.clazz(), handler.write(), handler.read(), (t, contextSupplier) -> handle(t, contextSupplier, handler.handle()));
-    }
-
-    @Override
-    public <T extends Packet> void sendToServer(T packet) {
-        channels.get(packet.getClass()).sendToServer(packet);
-    }
-
-    @Override
-    public <MSG extends Packet> void sendToPlayer(MSG msg, ServerPlayer player) {
-        channels.get(msg.getClass()).send(PacketDistributor.PLAYER.with(() -> player), msg);
-    }
-
-    @Override
-    public <MSG extends Packet> void sendToAllPlayers(MSG msg) {
-        channels.get(msg.getClass()).send(PacketDistributor.ALL.noArg(), msg);
-    }
-
-    @Override
-    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ResourceKey<Level> dimensionKey) {
-        channels.get(msg.getClass()).send(PacketDistributor.DIMENSION.with(() -> dimensionKey), msg);
-    }
-
-    @Override
-    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ResourceKey<Level> dimensionKey, double x, double y, double z, double radius) {
-        channels.get(msg.getClass()).send(PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(x, y, z, radius, dimensionKey)), msg);
-    }
-
-    @Override
-    public <MSG extends Packet> void trackingEntity(MSG msg, Entity entity) {
-        channels.get(msg.getClass()).send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), msg);
-    }
-
-    @Override
-    public <MSG extends Packet> void trackingEntityAndSelf(MSG msg, Entity entity) {
-        channels.get(msg.getClass()).send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), msg);
-    }
-
-    @Override
-    public <MSG extends Packet> void trackingChunk(MSG msg, LevelChunk chunk) {
-        channels.get(msg.getClass()).send(PacketDistributor.TRACKING_CHUNK.with(() -> chunk), msg);
     }
 
     public <T extends Packet> void handle(T packet, Supplier<NetworkEvent.Context> ctx, Packet.Handle<T> handle) {

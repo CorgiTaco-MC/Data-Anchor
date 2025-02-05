@@ -1,10 +1,10 @@
 package com.example.examplemod.mixin;
 
 import com.example.examplemod.data.TickableTrackedData;
-import com.example.examplemod.data.TrackedDataAccess;
+import com.example.examplemod.data.TrackedDataContainer;
 import com.example.examplemod.data.TrackedDataKey;
+import com.example.examplemod.data.TrackedDataRegistries;
 import com.example.examplemod.data.player.PlayerTrackedData;
-import com.example.examplemod.data.player.PlayerTrackedDataRegistry;
 import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.core.BlockPos;
@@ -22,13 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 @Mixin(Player.class)
-public class PlayerMixin implements TrackedDataAccess<PlayerTrackedData> {
+public class PlayerMixin implements TrackedDataContainer<Player, PlayerTrackedData> {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void createTrackedData(Level level, BlockPos pos, float yRot, GameProfile gameProfile, CallbackInfo ci) {
         create();
     }
-
 
     @Unique
     private final Map<TrackedDataKey<PlayerTrackedData>, PlayerTrackedData> exampleMod$trackedDataKeyPlayerTrackedDataReference2ReferenceOpenHashMap = new Reference2ReferenceOpenHashMap<>();
@@ -38,22 +37,22 @@ public class PlayerMixin implements TrackedDataAccess<PlayerTrackedData> {
 
     @Override
     public <E extends PlayerTrackedData> E get(TrackedDataKey<E> key) {
-        return (E) exampleMod$trackedDataKeyPlayerTrackedDataReference2ReferenceOpenHashMap.get(key);
+        return (E) this.exampleMod$trackedDataKeyPlayerTrackedDataReference2ReferenceOpenHashMap.get(key);
     }
 
     @Override
     public void create() {
-        PlayerTrackedDataRegistry.TRACKED_DATA_FACTORIES.forEach((key, factory) -> {
-            PlayerTrackedData value = factory.create(key, (Player) (Object) this);
-            if (value == null) {
-                throw new IllegalArgumentException("No PlayerTrackedData factories are NOT allowed. Found null player PlayerTrackedData for key \"%s\"".formatted(key.getId()));
+        TrackedDataRegistries.PLAYER.factories().forEach((key, factory) -> {
+            PlayerTrackedData playerTrackedData = factory.create(key, (Player) (Object) this);
+            if (playerTrackedData == null) {
+                throw new IllegalArgumentException("Null PlayerTrackedData factories are NOT allowed. Found null player PlayerTrackedData for key \"%s\"".formatted(key.getId()));
             }
 
-            if (value instanceof TickableTrackedData tickableData) {
+            if (playerTrackedData instanceof TickableTrackedData tickableData) {
                 exampleMod$tickablePlayerData.add(tickableData);
             }
 
-            exampleMod$trackedDataKeyPlayerTrackedDataReference2ReferenceOpenHashMap.put((TrackedDataKey<PlayerTrackedData>) key, value);
+            exampleMod$trackedDataKeyPlayerTrackedDataReference2ReferenceOpenHashMap.put(key, playerTrackedData);
         });
     }
 

@@ -4,8 +4,7 @@ import com.example.examplemod.network.Packet;
 import com.example.examplemod.util.ServiceUtil;
 
 public interface C2SPacketBroadcaster extends PacketBroadcaster {
-
-    C2SPacketBroadcaster INSTANCE = ServiceUtil.load(C2SPacketBroadcaster.class);
+    C2SPacketBroadcaster INSTANCE = C2S;
 
     <MSG extends Packet> void sendToServer(MSG msg);
 }

@@ -35,14 +35,15 @@ public class TestSyncedPlayerTrackedData extends SyncedPlayerTrackedData impleme
         if (!player.level().isClientSide) {
             setYum(this.yum + 1);
 
-            ExampleMod.LOGGER.info("Server yum: %s".formatted(this.yum));
+            ExampleMod.LOGGER.info("Server player yum: %s".formatted(this.yum));
         } else {
-            ExampleMod.LOGGER.info("Client yum: %s".formatted(this.yum));
+            ExampleMod.LOGGER.info("Client player yum: %s".formatted(this.yum));
         }
     }
 
    public void setYum(int yum) {
         this.yum = yum;
         sync();
+
     }
 }

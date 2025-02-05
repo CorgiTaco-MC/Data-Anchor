@@ -1,9 +1,9 @@
-package com.example.examplemod.data.player.network;
+package com.example.examplemod.data.level.network;
 
 import com.example.examplemod.data.TrackedDataContainer;
 import com.example.examplemod.data.TrackedDataKey;
 import com.example.examplemod.data.TrackedDataRegistries;
-import com.example.examplemod.data.player.SyncedPlayerTrackedData;
+import com.example.examplemod.data.level.SyncedLevelTrackedData;
 import com.example.examplemod.network.Packet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -11,10 +11,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public record SyncPlayerTrackedDataS2C(TrackedDataKey<SyncedPlayerTrackedData> dataKey, CompoundTag tag) implements Packet {
+public record SyncLevelTrackedDataS2C(TrackedDataKey<SyncedLevelTrackedData> dataKey, CompoundTag tag) implements Packet {
 
-    public SyncPlayerTrackedDataS2C(FriendlyByteBuf buf) {
-        this((TrackedDataKey) TrackedDataKey.fromID(TrackedDataRegistries.PLAYER, buf.readResourceLocation()), buf.readNbt());
+
+    public SyncLevelTrackedDataS2C(FriendlyByteBuf buf) {
+        this((TrackedDataKey) TrackedDataKey.fromID(TrackedDataRegistries.LEVEL, buf.readResourceLocation()), buf.readNbt());
     }
 
     @Override
@@ -25,9 +26,11 @@ public record SyncPlayerTrackedDataS2C(TrackedDataKey<SyncedPlayerTrackedData> d
 
     @Override
     public void handle(@Nullable Level level, @Nullable Player player) {
-        if (player instanceof TrackedDataContainer access) {
-            SyncedPlayerTrackedData data = (SyncedPlayerTrackedData) access.get(this.dataKey);
-            data.readFromNetwork(tag);
+        if (level != null) {
+            if (level instanceof TrackedDataContainer access) {
+                SyncedLevelTrackedData data = (SyncedLevelTrackedData) access.get(this.dataKey);
+                data.readFromNetwork(tag);
+            }
         }
     }
 }
