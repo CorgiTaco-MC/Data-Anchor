@@ -2,6 +2,7 @@ package com.example.examplemod;
 
 import com.example.examplemod.data.registry.TrackedDataKey;
 import com.example.examplemod.data.registry.TrackedDataRegistries;
+import com.example.examplemod.data.type.blockentity.network.SyncBlockEntityTrackedDataS2C;
 import com.example.examplemod.data.type.chunk.network.SyncLevelChunkTrackedDataS2C;
 import com.example.examplemod.data.type.entity.network.SyncEntityTrackedDataS2C;
 import com.example.examplemod.data.type.level.network.SyncLevelTrackedDataS2C;
@@ -74,6 +75,14 @@ public class ExampleMod {
                         SyncLevelTrackedDataS2C::new,
                         SyncLevelTrackedDataS2C::handle)
         );
+        NETWORK_CONTAINER.registerPacketHandler("block_entity_tracked_data",
+                new Packet.Handler<>(
+                        SyncBlockEntityTrackedDataS2C.class,
+                        SyncBlockEntityTrackedDataS2C::write,
+                        SyncBlockEntityTrackedDataS2C::new,
+                        SyncBlockEntityTrackedDataS2C::handle)
+        );
+
     }
 
     public static ResourceLocation id(String path) {
