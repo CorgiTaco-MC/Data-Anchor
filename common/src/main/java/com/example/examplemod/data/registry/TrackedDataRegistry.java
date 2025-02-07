@@ -1,14 +1,12 @@
-package com.example.examplemod.data;
+package com.example.examplemod.data.registry;
 
+import com.example.examplemod.data.TrackedData;
+import com.example.examplemod.data.TrackedDataContainer;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class TrackedDataRegistry<O, T extends TrackedData<O>> {
 
@@ -42,13 +40,12 @@ public class TrackedDataRegistry<O, T extends TrackedData<O>> {
 
     }
 
-    @Nullable
-    public T get(TrackedDataKey<? extends T> key, O o) {
+    public Optional<T> get(TrackedDataKey<? extends T> key, O o) {
         if (o instanceof TrackedDataContainer trackedDataContainer) {
-            return (T) trackedDataContainer.get(key);
+            return trackedDataContainer.get(key);
         }
 
-        return null;
+        return Optional.empty();
     }
 
     @Nullable

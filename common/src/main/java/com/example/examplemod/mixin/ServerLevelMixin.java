@@ -2,12 +2,12 @@ package com.example.examplemod.mixin;
 
 import com.example.examplemod.data.TickableTrackedData;
 import com.example.examplemod.data.TrackedDataContainer;
-import com.example.examplemod.data.TrackedDataKey;
-import com.example.examplemod.data.chunk.ChunkTrackedData;
-import com.example.examplemod.data.level.LevelTrackedData;
-import com.example.examplemod.data.level.SyncedLevelTrackedData;
-import com.example.examplemod.data.player.PlayerTrackedData;
-import com.example.examplemod.data.player.SyncedPlayerTrackedData;
+import com.example.examplemod.data.registry.TrackedDataKey;
+import com.example.examplemod.data.type.chunk.ChunkTrackedData;
+import com.example.examplemod.data.type.entity.PlayerTrackedData;
+import com.example.examplemod.data.type.entity.SyncedPlayerTrackedData;
+import com.example.examplemod.data.type.level.LevelTrackedData;
+import com.example.examplemod.data.type.level.SyncedLevelTrackedData;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -53,10 +53,11 @@ public abstract class ServerLevelMixin extends Level {
         if (chunk instanceof TrackedDataContainer access) {
             Collection<TrackedDataKey<ChunkTrackedData>> keys = access.getKeys();
             for (TrackedDataKey<ChunkTrackedData> key : keys) {
-                ChunkTrackedData data = (ChunkTrackedData) access.get(key);
-                if(data instanceof TickableTrackedData tickableData) {
-                    tickableData.tick();
-                }
+                access.get(key).ifPresent(data -> {
+                    if (data instanceof TickableTrackedData tickableData) {
+                        tickableData.tick();
+                    }
+                });
             }
         }
     }
@@ -67,8 +68,11 @@ public abstract class ServerLevelMixin extends Level {
         if (player instanceof TrackedDataContainer access) {
             Collection<TrackedDataKey<PlayerTrackedData>> keys = access.getKeys();
             for (TrackedDataKey<PlayerTrackedData> key : keys) {
-                PlayerTrackedData data = (PlayerTrackedData) access.get(key);
-                data.addRespawnedPlayer();
+                access.get(key).ifPresent(trackedData -> {
+                    if (trackedData instanceof PlayerTrackedData data) {
+                        data.addRespawnedPlayer();
+                    }
+                });
             }
         }
     }
@@ -79,8 +83,11 @@ public abstract class ServerLevelMixin extends Level {
         if (player instanceof TrackedDataContainer access) {
             Collection<TrackedDataKey<PlayerTrackedData>> keys = access.getKeys();
             for (TrackedDataKey<PlayerTrackedData> key : keys) {
-                PlayerTrackedData data = (PlayerTrackedData) access.get(key);
-                data.addDuringCommandTeleport();
+                access.get(key).ifPresent(trackedData -> {
+                    if (trackedData instanceof PlayerTrackedData data) {
+                        data.addDuringCommandTeleport();
+                    }
+                });
             }
         }
     }
@@ -91,8 +98,11 @@ public abstract class ServerLevelMixin extends Level {
         if (player instanceof TrackedDataContainer access) {
             Collection<TrackedDataKey<PlayerTrackedData>> keys = access.getKeys();
             for (TrackedDataKey<PlayerTrackedData> key : keys) {
-                PlayerTrackedData data = (PlayerTrackedData) access.get(key);
-                data.addDuringPortalTeleport();
+                access.get(key).ifPresent(trackedData -> {
+                    if (trackedData instanceof PlayerTrackedData data) {
+                        data.addDuringPortalTeleport();
+                    }
+                });
             }
         }
     }
@@ -102,20 +112,25 @@ public abstract class ServerLevelMixin extends Level {
         if (player instanceof TrackedDataContainer access) {
             Collection<TrackedDataKey<PlayerTrackedData>> keys = access.getKeys();
             for (TrackedDataKey<PlayerTrackedData> key : keys) {
-                PlayerTrackedData data = (PlayerTrackedData) access.get(key);
-                data.playerAddedToWorld();
-                if (data instanceof SyncedPlayerTrackedData syncedData) {
-                    syncedData.syncToPlayer(player);
-                }
+                access.get(key).ifPresent(data -> {
+                    if (data instanceof PlayerTrackedData playerTrackedData) {
+                        playerTrackedData.playerAddedToWorld();
+                        if (data instanceof SyncedPlayerTrackedData syncedData) {
+                            syncedData.syncToPlayer(player);
+                        }
+                    }
+                });
             }
         }
         if (this instanceof TrackedDataContainer access) {
             Collection<TrackedDataKey<LevelTrackedData>> keys = access.getKeys();
             for (TrackedDataKey<LevelTrackedData> key : keys) {
-                LevelTrackedData data = (LevelTrackedData) access.get(key);
-                if (data instanceof SyncedLevelTrackedData syncedData) {
-                    syncedData.syncToPlayer(player);
-                }
+                access.get(key).ifPresent(data -> {
+
+                    if (data instanceof SyncedLevelTrackedData syncedData) {
+                        syncedData.syncToPlayer(player);
+                    }
+                });
             }
         }
     }

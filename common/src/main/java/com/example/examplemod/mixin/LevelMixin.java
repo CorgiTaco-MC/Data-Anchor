@@ -1,11 +1,16 @@
 package com.example.examplemod.mixin;
 
-import com.example.examplemod.data.*;
-import com.example.examplemod.data.level.LevelTrackedData;
-import com.example.examplemod.data.level.TrackedLevelSavedData;
+import com.example.examplemod.data.DirtyMarker;
+import com.example.examplemod.data.TickableTrackedData;
+import com.example.examplemod.data.TrackedDataContainer;
+import com.example.examplemod.data.registry.TrackedDataKey;
+import com.example.examplemod.data.registry.TrackedDataRegistries;
+import com.example.examplemod.data.type.level.LevelTrackedData;
+import com.example.examplemod.data.type.level.TrackedLevelSavedData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,11 +19,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Mixin(Level.class)
-public class LevelMixin implements TrackedDataContainer<Level, LevelTrackedData>, DirtyMarker {
+public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTrackedData>, DirtyMarker {
+    @Shadow public abstract boolean isClientSide();
+
     @Unique
-    private TrackedDataContainer<Level, LevelTrackedData> exampleMod$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.LEVEL, (Level) (Object) this);
+    private TrackedDataContainer<Level, LevelTrackedData> exampleMod$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.LEVEL, (Level) (Object) this, isClientSide());
 
     @Unique
     private final List<TickableTrackedData> exampleMod$tickableLevelData = new ArrayList<>();
@@ -32,7 +40,7 @@ public class LevelMixin implements TrackedDataContainer<Level, LevelTrackedData>
     }
 
     @Override
-    public <E extends LevelTrackedData> E get(TrackedDataKey<E> key) {
+    public <E extends LevelTrackedData> Optional<E> get(TrackedDataKey<E> key) {
         return this.exampleMod$trackedDataContainer.get(key);
     }
 
@@ -42,13 +50,12 @@ public class LevelMixin implements TrackedDataContainer<Level, LevelTrackedData>
             this.exampleMod$trackedDataContainer = TrackedLevelSavedData.get(serverLevel);
         }
 
-        this.exampleMod$trackedDataContainer.create();
-
         for (TrackedDataKey<LevelTrackedData> key : this.exampleMod$trackedDataContainer.getKeys()) {
-            LevelTrackedData levelTrackedData = this.exampleMod$trackedDataContainer.get(key);
-            if (levelTrackedData instanceof TickableTrackedData tickableData) {
-                this.exampleMod$tickableLevelData.add(tickableData);
-            }
+            this.exampleMod$trackedDataContainer.get(key).ifPresent(levelTrackedData -> {
+                if (levelTrackedData instanceof TickableTrackedData tickableData) {
+                    this.exampleMod$tickableLevelData.add(tickableData);
+                }
+            });
         }
     }
 
@@ -74,10 +81,11 @@ public class LevelMixin implements TrackedDataContainer<Level, LevelTrackedData>
     @Override
     public void clearDirty() {
         exampleMod$trackedDataContainer.getKeys().forEach(key -> {
-            LevelTrackedData levelTrackedData = exampleMod$trackedDataContainer.get(key);
-            if (levelTrackedData instanceof DirtyMarker dirtyMarker) {
-                dirtyMarker.clearDirty();
-            }
+             exampleMod$trackedDataContainer.get(key).ifPresent(levelTrackedData -> {
+                if (levelTrackedData instanceof DirtyMarker dirtyMarker) {
+                    dirtyMarker.clearDirty();
+                }
+             });
         });
     }
 }

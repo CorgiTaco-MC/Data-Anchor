@@ -1,9 +1,9 @@
 package com.example.examplemod.test.data.chunk;
 
 import com.example.examplemod.data.TickableTrackedData;
-import com.example.examplemod.data.TrackedDataKey;
-import com.example.examplemod.data.chunk.ChunkTrackedData;
-import com.example.examplemod.data.chunk.SyncedLevelChunkTrackedData;
+import com.example.examplemod.data.registry.TrackedDataKey;
+import com.example.examplemod.data.type.chunk.ChunkTrackedData;
+import com.example.examplemod.data.type.chunk.SyncedLevelChunkTrackedData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.jetbrains.annotations.Nullable;

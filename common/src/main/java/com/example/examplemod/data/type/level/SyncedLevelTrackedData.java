@@ -1,14 +1,14 @@
-package com.example.examplemod.data.level;
+package com.example.examplemod.data.type.level;
 
 import com.example.examplemod.data.DirtyMarker;
 import com.example.examplemod.data.SyncedTrackedData;
-import com.example.examplemod.data.TrackedDataKey;
-import com.example.examplemod.data.level.network.SyncLevelTrackedDataS2C;
+import com.example.examplemod.data.registry.TrackedDataKey;
+import com.example.examplemod.data.type.level.network.SyncLevelTrackedDataS2C;
 import com.example.examplemod.network.broadcast.S2CPacketBroadcaster;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
-public abstract class SyncedLevelTrackedData extends LevelTrackedData implements SyncedTrackedData, DirtyMarker {
+public abstract non-sealed class SyncedLevelTrackedData extends LevelTrackedData implements SyncedTrackedData, DirtyMarker {
 
 
     public SyncedLevelTrackedData(TrackedDataKey<? extends SyncedLevelTrackedData> trackedDataKey, Level level) {

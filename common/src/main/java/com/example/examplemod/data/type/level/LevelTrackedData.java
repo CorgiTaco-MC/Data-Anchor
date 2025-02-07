@@ -1,10 +1,10 @@
-package com.example.examplemod.data.level;
+package com.example.examplemod.data.type.level;
 
 import com.example.examplemod.data.TrackedData;
-import com.example.examplemod.data.TrackedDataKey;
+import com.example.examplemod.data.registry.TrackedDataKey;
 import net.minecraft.world.level.Level;
 
-public abstract class LevelTrackedData implements TrackedData<Level> {
+public abstract sealed class LevelTrackedData implements TrackedData<Level> permits ServerLevelTrackedData, SyncedLevelTrackedData {
 
     protected final TrackedDataKey<? extends LevelTrackedData> trackedDataKey;
     protected final Level level;

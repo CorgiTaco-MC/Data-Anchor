@@ -1,11 +1,10 @@
 package com.example.examplemod;
 
-import com.example.examplemod.data.TrackedDataKey;
-import com.example.examplemod.data.TrackedDataRegistries;
-import com.example.examplemod.data.chunk.ChunkTrackedData;
-import com.example.examplemod.data.chunk.network.SyncLevelChunkTrackedDataS2C;
-import com.example.examplemod.data.level.network.SyncLevelTrackedDataS2C;
-import com.example.examplemod.data.player.network.SyncPlayerTrackedDataS2C;
+import com.example.examplemod.data.registry.TrackedDataKey;
+import com.example.examplemod.data.registry.TrackedDataRegistries;
+import com.example.examplemod.data.type.chunk.network.SyncLevelChunkTrackedDataS2C;
+import com.example.examplemod.data.type.entity.network.SyncEntityTrackedDataS2C;
+import com.example.examplemod.data.type.level.network.SyncLevelTrackedDataS2C;
 import com.example.examplemod.network.Packet;
 import com.example.examplemod.network.S2CNetworkContainer;
 import com.example.examplemod.test.data.chunk.TestSyncedLevelChunkTrackedData;
@@ -13,6 +12,7 @@ import com.example.examplemod.test.data.level.TestSyncedLevelTrackedData;
 import com.example.examplemod.test.data.player.TestSyncedPlayerTrackedData;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.slf4j.Logger;
 
@@ -30,9 +30,14 @@ public class ExampleMod {
 
     public static final S2CNetworkContainer NETWORK_CONTAINER = S2CNetworkContainer.of(MOD_ID);
 
-    public static final TrackedDataKey<TestSyncedPlayerTrackedData> TEST_PLAYER_DATA = TrackedDataRegistries.PLAYER.register(ExampleMod.id("test"), TestSyncedPlayerTrackedData.class, TestSyncedPlayerTrackedData::new);
     public static final TrackedDataKey<TestSyncedLevelTrackedData> TEST_LEVEL_DATA = TrackedDataRegistries.LEVEL.register(ExampleMod.id("test"), TestSyncedLevelTrackedData.class, TestSyncedLevelTrackedData::new);
-    public static final TrackedDataKey<TestSyncedLevelChunkTrackedData> TEST_CHUNK_DATA = TrackedDataRegistries.CHUNK.register(ExampleMod.id("test"), TestSyncedLevelChunkTrackedData.class, (key, obj) ->  {
+    public static final TrackedDataKey<TestSyncedPlayerTrackedData> TEST_PLAYER_DATA = TrackedDataRegistries.ENTITY.register(ExampleMod.id("player"), TestSyncedPlayerTrackedData.class, (key, obj) -> {
+        if (obj instanceof Player player) {
+            return new TestSyncedPlayerTrackedData(key, player);
+        }
+        return null;
+    });
+    public static final TrackedDataKey<TestSyncedLevelChunkTrackedData> TEST_CHUNK_DATA = TrackedDataRegistries.CHUNK.register(ExampleMod.id("test"), TestSyncedLevelChunkTrackedData.class, (key, obj) -> {
         if (obj instanceof LevelChunk chunk) {
             return new TestSyncedLevelChunkTrackedData(key, chunk);
         }
@@ -48,12 +53,12 @@ public class ExampleMod {
 
 
     private static void registerPacketHandlers() {
-        NETWORK_CONTAINER.registerPacketHandler("player_tracked_data",
+        NETWORK_CONTAINER.registerPacketHandler("entity_tracked_data",
                 new Packet.Handler<>(
-                        SyncPlayerTrackedDataS2C.class,
-                        SyncPlayerTrackedDataS2C::write,
-                        SyncPlayerTrackedDataS2C::new,
-                        SyncPlayerTrackedDataS2C::handle)
+                        SyncEntityTrackedDataS2C.class,
+                        SyncEntityTrackedDataS2C::write,
+                        SyncEntityTrackedDataS2C::new,
+                        SyncEntityTrackedDataS2C::handle)
         );
         NETWORK_CONTAINER.registerPacketHandler("chunk_tracked_data",
                 new Packet.Handler<>(

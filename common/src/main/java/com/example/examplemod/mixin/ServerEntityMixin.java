@@ -1,10 +1,9 @@
 package com.example.examplemod.mixin;
 
 import com.example.examplemod.data.SyncedTrackedData;
-import com.example.examplemod.data.TrackedData;
 import com.example.examplemod.data.TrackedDataContainer;
-import com.example.examplemod.data.TrackedDataKey;
-import com.example.examplemod.data.player.PlayerTrackedData;
+import com.example.examplemod.data.registry.TrackedDataKey;
+import com.example.examplemod.data.type.entity.PlayerTrackedData;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -20,17 +19,20 @@ import java.util.Collection;
 @Mixin(ServerEntity.class)
 public class ServerEntityMixin {
 
-    @Shadow @Final private Entity entity;
+    @Shadow
+    @Final
+    private Entity entity;
 
     @Inject(method = "addPairing", at = @At("RETURN"))
     private void addPairing(ServerPlayer player, CallbackInfo ci) {
         if (this.entity instanceof TrackedDataContainer trackedDataContainer) {
             Collection<TrackedDataKey<PlayerTrackedData>> keys = trackedDataContainer.getKeys();
             keys.forEach(key -> {
-                TrackedData trackedData = trackedDataContainer.get(key);
-                if (trackedData instanceof SyncedTrackedData syncedTrackedData) {
-                    syncedTrackedData.syncToPlayer(player);
-                }
+                trackedDataContainer.get(key).ifPresent(trackedData -> {
+                    if (trackedData instanceof SyncedTrackedData syncedTrackedData) {
+                        syncedTrackedData.syncToPlayer(player);
+                    }
+                });
             });
         }
     }

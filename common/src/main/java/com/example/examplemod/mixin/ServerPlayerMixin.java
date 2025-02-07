@@ -1,9 +1,9 @@
 package com.example.examplemod.mixin;
 
 import com.example.examplemod.data.TrackedDataContainer;
-import com.example.examplemod.data.TrackedDataKey;
-import com.example.examplemod.data.player.PlayerTrackedData;
-import com.example.examplemod.data.player.ServerPlayerTrackedData;
+import com.example.examplemod.data.registry.TrackedDataKey;
+import com.example.examplemod.data.type.entity.PlayerTrackedData;
+import com.example.examplemod.data.type.entity.ServerPlayerTrackedData;
 import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,8 +21,11 @@ public class ServerPlayerMixin {
         if (this instanceof TrackedDataContainer access) {
             Collection<TrackedDataKey<ServerPlayerTrackedData>> keys = access.getKeys();
             keys.forEach(key -> {
-                PlayerTrackedData playerTrackedData = (PlayerTrackedData) access.get(key);
-                playerTrackedData.copy(oldPlayer, keepEverything);
+                access.get(key).ifPresent(data -> {
+                    if (data instanceof PlayerTrackedData playerTrackedData) {
+                        playerTrackedData.copy(oldPlayer, keepEverything);
+                    }
+                });
             });
         }
     }

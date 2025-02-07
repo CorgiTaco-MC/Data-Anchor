@@ -1,11 +1,11 @@
-package com.example.examplemod.data.chunk;
+package com.example.examplemod.data.type.chunk;
 
 import com.example.examplemod.data.DirtyMarker;
 import com.example.examplemod.data.TrackedData;
-import com.example.examplemod.data.TrackedDataKey;
+import com.example.examplemod.data.registry.TrackedDataKey;
 import net.minecraft.world.level.chunk.ChunkAccess;
 
-public abstract class ChunkTrackedData implements TrackedData<ChunkAccess>, DirtyMarker {
+public abstract sealed class ChunkTrackedData implements TrackedData<ChunkAccess>, DirtyMarker permits LevelChunkTrackedData, ProtoChunkTrackedData {
 
     protected final TrackedDataKey<? extends ChunkTrackedData> trackedDataKey;
     protected final ChunkAccess chunk;

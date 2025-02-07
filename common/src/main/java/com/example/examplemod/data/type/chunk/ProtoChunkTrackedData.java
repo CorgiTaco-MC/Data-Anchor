@@ -1,9 +1,10 @@
-package com.example.examplemod.data.chunk;
+package com.example.examplemod.data.type.chunk;
 
-import com.example.examplemod.data.TrackedDataKey;
+import com.example.examplemod.data.ServerTrackedData;
+import com.example.examplemod.data.registry.TrackedDataKey;
 import net.minecraft.world.level.chunk.ProtoChunk;
 
-public abstract class ProtoChunkTrackedData extends ChunkTrackedData {
+public abstract non-sealed class ProtoChunkTrackedData extends ChunkTrackedData implements ServerTrackedData {
 
     public ProtoChunkTrackedData(TrackedDataKey<? extends ChunkTrackedData> trackedDataKey, ProtoChunk chunk) {
         super(trackedDataKey, chunk);

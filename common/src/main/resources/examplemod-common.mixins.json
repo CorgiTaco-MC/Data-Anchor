@@ -4,19 +4,16 @@
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
-    "client.IntegratedPlayerListMixin"
   ],
   "mixins": [
     "ChunkAccessMixin",
     "ChunkMapMixin",
     "ChunkSerializerMixin",
     "LevelMixin",
-    "PlayerDataStorageMixin",
-    "PlayerListMixin",
-    "PlayerMixin",
     "ServerEntityMixin",
     "ServerLevelMixin",
-    "ServerPlayerMixin"
+    "ServerPlayerMixin",
+    "client.EntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

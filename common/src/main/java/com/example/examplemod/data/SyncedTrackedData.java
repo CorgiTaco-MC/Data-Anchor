@@ -3,7 +3,7 @@ package com.example.examplemod.data;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 
-public interface SyncedTrackedData {
+public interface SyncedTrackedData extends ServerTrackedData, ClientTrackedData {
 
     void sync();
 

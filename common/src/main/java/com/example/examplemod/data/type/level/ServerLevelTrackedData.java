@@ -1,10 +1,11 @@
-package com.example.examplemod.data.level;
+package com.example.examplemod.data.type.level;
 
 import com.example.examplemod.data.DirtyMarker;
-import com.example.examplemod.data.TrackedDataKey;
+import com.example.examplemod.data.ServerTrackedData;
+import com.example.examplemod.data.registry.TrackedDataKey;
 import net.minecraft.server.level.ServerLevel;
 
-public abstract class ServerLevelTrackedData extends LevelTrackedData implements DirtyMarker {
+public abstract non-sealed class ServerLevelTrackedData extends LevelTrackedData implements DirtyMarker, ServerTrackedData {
     private boolean dirty = false;
 
     public ServerLevelTrackedData(TrackedDataKey<ServerLevelTrackedData> trackedDataKey, ServerLevel chunk) {

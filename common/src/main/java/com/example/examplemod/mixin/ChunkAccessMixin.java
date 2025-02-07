@@ -1,9 +1,9 @@
 package com.example.examplemod.mixin;
 
 import com.example.examplemod.data.TrackedDataContainer;
-import com.example.examplemod.data.TrackedDataKey;
-import com.example.examplemod.data.TrackedDataRegistries;
-import com.example.examplemod.data.chunk.ChunkTrackedData;
+import com.example.examplemod.data.registry.TrackedDataKey;
+import com.example.examplemod.data.registry.TrackedDataRegistries;
+import com.example.examplemod.data.type.chunk.ChunkTrackedData;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Mixin(ChunkAccess.class)
 public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, ChunkTrackedData> {
@@ -31,7 +32,7 @@ public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, Chunk
     }
 
     @Override
-    public <E extends ChunkTrackedData> E get(TrackedDataKey<E> key) {
+    public <E extends ChunkTrackedData> Optional<E> get(TrackedDataKey<E> key) {
         return exampleMod$trackedDataContainer.get(key);
     }
 

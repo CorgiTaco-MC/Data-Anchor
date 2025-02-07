@@ -1,9 +1,9 @@
-package com.example.examplemod.data.level.network;
+package com.example.examplemod.data.type.level.network;
 
 import com.example.examplemod.data.TrackedDataContainer;
-import com.example.examplemod.data.TrackedDataKey;
-import com.example.examplemod.data.TrackedDataRegistries;
-import com.example.examplemod.data.level.SyncedLevelTrackedData;
+import com.example.examplemod.data.registry.TrackedDataKey;
+import com.example.examplemod.data.registry.TrackedDataRegistries;
+import com.example.examplemod.data.type.level.SyncedLevelTrackedData;
 import com.example.examplemod.network.Packet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -28,8 +28,11 @@ public record SyncLevelTrackedDataS2C(TrackedDataKey<SyncedLevelTrackedData> dat
     public void handle(@Nullable Level level, @Nullable Player player) {
         if (level != null) {
             if (level instanceof TrackedDataContainer access) {
-                SyncedLevelTrackedData data = (SyncedLevelTrackedData) access.get(this.dataKey);
-                data.readFromNetwork(tag);
+                access.get(this.dataKey).ifPresent(data -> {
+                    if (data instanceof SyncedLevelTrackedData syncedData) {
+                        syncedData.readFromNetwork(tag);
+                    }
+                });
             }
         }
     }

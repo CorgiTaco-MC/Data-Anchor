@@ -1,7 +1,6 @@
 package com.example.examplemod.network.broadcast;
 
 import com.example.examplemod.network.Packet;
-import com.example.examplemod.util.ServiceUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Position;
 import net.minecraft.resources.ResourceKey;

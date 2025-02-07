@@ -1,5 +1,6 @@
-package com.example.examplemod.data;
+package com.example.examplemod.data.registry;
 
+import com.example.examplemod.data.TrackedData;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 

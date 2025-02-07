@@ -1,9 +1,8 @@
 package com.example.examplemod.mixin;
 
 import com.example.examplemod.data.SyncedTrackedData;
-import com.example.examplemod.data.TrackedData;
 import com.example.examplemod.data.TrackedDataContainer;
-import com.example.examplemod.data.TrackedDataKey;
+import com.example.examplemod.data.registry.TrackedDataKey;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,10 +20,11 @@ public class ChunkMapMixin {
     private void onPlayerLoadedChunk(ServerPlayer player, MutableObject<ClientboundLevelChunkWithLightPacket> packetCache, LevelChunk chunk, CallbackInfo ci) {
         if (chunk instanceof TrackedDataContainer<?, ?> trackedDataContainer) {
             for (TrackedDataKey key : trackedDataContainer.getKeys()) {
-                TrackedData trackedData = trackedDataContainer.get(key);
-                if (trackedData instanceof SyncedTrackedData syncedData) {
-                    syncedData.syncToPlayer(player);
-                }
+                trackedDataContainer.get(key).ifPresent(trackedData -> {
+                    if (trackedData instanceof SyncedTrackedData syncedData) {
+                        syncedData.syncToPlayer(player);
+                    }
+                });
             }
         }
     }

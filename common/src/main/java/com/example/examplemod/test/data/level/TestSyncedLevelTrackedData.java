@@ -2,8 +2,8 @@ package com.example.examplemod.test.data.level;
 
 import com.example.examplemod.ExampleMod;
 import com.example.examplemod.data.TickableTrackedData;
-import com.example.examplemod.data.TrackedDataKey;
-import com.example.examplemod.data.level.SyncedLevelTrackedData;
+import com.example.examplemod.data.registry.TrackedDataKey;
+import com.example.examplemod.data.type.level.SyncedLevelTrackedData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -26,30 +26,26 @@ public class TestSyncedLevelTrackedData extends SyncedLevelTrackedData implement
     @Override
     public void load(CompoundTag tag) {
         if (tag.contains("yum")) {
-            setYum(tag.getInt("yum"), false);
+            this.yum = tag.getInt("yum");
         }
     }
 
     @Override
     public void tick() {
-        if (!level.isClientSide) {
-            setYum(this.yum + 1);
+        if (level.dimension() == Level.OVERWORLD) {
+            if (!level.isClientSide) {
+                setYum(this.yum + 1);
 
-            ExampleMod.LOGGER.info("Server level yum: %s".formatted(this.yum));
-        } else {
-            ExampleMod.LOGGER.info("Client level yum: %s".formatted(this.yum));
+                ExampleMod.LOGGER.info("Server level yum: %s".formatted(this.yum));
+            } else {
+                ExampleMod.LOGGER.info("Client level yum: %s".formatted(this.yum));
+            }
         }
     }
 
     public void setYum(int yum) {
-        setYum(yum, true);
-    }
-
-    public void setYum(int yum, boolean markDirty) {
         this.yum = yum;
         sync();
-        if (markDirty) {
-            markDirty();
-        }
+        markDirty();
     }
 }

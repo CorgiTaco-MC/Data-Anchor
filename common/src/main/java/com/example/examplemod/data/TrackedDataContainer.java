@@ -1,48 +1,54 @@
 package com.example.examplemod.data;
 
+import com.example.examplemod.data.registry.TrackedDataKey;
+import com.example.examplemod.data.registry.TrackedDataRegistry;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 public interface TrackedDataContainer<O, T extends TrackedData<O>> {
-    @Nullable
-    <E extends T> E get(TrackedDataKey<E> key);
+
+    <E extends T> Optional<E> get(TrackedDataKey<E> key);
 
     void create();
 
     Collection<TrackedDataKey<T>> getKeys();
 
-    static <O, T extends TrackedData<O>> TrackedDataContainer<O, T> makeBasicContainer(TrackedDataRegistry<O, T> registry, O o) {
-        return makeBasicContainer(registry, o, false);
-    }
-
-    static <O, T extends TrackedData<O>> TrackedDataContainer<O, T> makeBasicContainer(TrackedDataRegistry<O, T> registry, O o, boolean allowNulls) {
+    static <O, T extends TrackedData<O>> TrackedDataContainer<O, T> makeBasicContainer(TrackedDataRegistry<O, T> registry, O o, boolean isClient) {
         return new TrackedDataContainer<>() {
             private final Map<TrackedDataKey<T>, T> trackedDataMap = new Reference2ReferenceOpenHashMap<>();
-
+            private final List<TrackedDataKey<T>> keys = List.copyOf(registry.factories().keySet());
 
             @Override
-            public <E extends T> E get(TrackedDataKey<E> key) {
-                return (E) trackedDataMap.get(key);
+            public <E extends T> Optional<E> get(TrackedDataKey<E> key) {
+                T t = trackedDataMap.get(key);
+                if (t == null) {
+                    return Optional.empty();
+                }
+                return Optional.of((E) t);
             }
 
             @Override
             public void create() {
                 registry.factories().forEach((key, factory) -> {
                     T trackedData = factory.create(key, o);
-                    if (trackedData == null && !allowNulls) {
-                        throw new IllegalArgumentException("Null TrackedData factories are NOT allowed. Found null TrackedData for key \"%s\"".formatted(key.getId()));
+                    if (trackedData != null) {
+                        if (isClient) {
+                            if (trackedData instanceof ClientTrackedData) {
+                                trackedDataMap.put(key, trackedData);
+                            }
+                        } else {
+                            if (trackedData instanceof ServerTrackedData) {
+                                trackedDataMap.put(key, trackedData);
+                            }
+                        }
                     }
-
-                    trackedDataMap.put(key, trackedData);
                 });
             }
 
             @Override
             public Collection<TrackedDataKey<T>> getKeys() {
-                return this.trackedDataMap.keySet();
+                return keys;
             }
         };
     }

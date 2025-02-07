@@ -1,16 +1,16 @@
-package com.example.examplemod.data.player;
+package com.example.examplemod.data.type.entity;
 
-import com.example.examplemod.data.TrackedData;
-import com.example.examplemod.data.TrackedDataKey;
+import com.example.examplemod.data.registry.TrackedDataKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
-public sealed abstract class PlayerTrackedData implements TrackedData<Player> permits ServerPlayerTrackedData, SyncedPlayerTrackedData {
+public sealed abstract class PlayerTrackedData extends EntityTrackedData permits ServerPlayerTrackedData, SyncedPlayerTrackedData {
 
     protected final TrackedDataKey<? extends PlayerTrackedData> trackedDataKey;
     protected final Player player;
 
     public PlayerTrackedData(TrackedDataKey<? extends PlayerTrackedData> trackedDataKey, Player player) {
+        super(trackedDataKey, player);
         this.trackedDataKey = trackedDataKey;
         this.player = player;
     }

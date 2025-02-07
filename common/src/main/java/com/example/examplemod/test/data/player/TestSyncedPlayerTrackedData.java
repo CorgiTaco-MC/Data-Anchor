@@ -2,8 +2,8 @@ package com.example.examplemod.test.data.player;
 
 import com.example.examplemod.ExampleMod;
 import com.example.examplemod.data.TickableTrackedData;
-import com.example.examplemod.data.TrackedDataKey;
-import com.example.examplemod.data.player.SyncedPlayerTrackedData;
+import com.example.examplemod.data.registry.TrackedDataKey;
+import com.example.examplemod.data.type.entity.SyncedPlayerTrackedData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
