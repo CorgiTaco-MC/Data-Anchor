@@ -14,7 +14,7 @@
     "ServerEntityMixin",
     "ServerLevelMixin",
     "ServerPlayerMixin",
-    "client.EntityMixin"
+    "EntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

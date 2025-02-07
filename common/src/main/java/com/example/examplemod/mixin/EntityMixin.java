@@ -1,4 +1,4 @@
-package com.example.examplemod.mixin.client;
+package com.example.examplemod.mixin;
 
 import com.example.examplemod.data.TickableTrackedData;
 import com.example.examplemod.data.TrackedDataContainer;
