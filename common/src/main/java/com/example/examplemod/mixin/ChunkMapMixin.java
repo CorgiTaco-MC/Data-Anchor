@@ -26,6 +26,18 @@ public class ChunkMapMixin {
                     }
                 });
             }
+
+            chunk.getBlockEntities().values().forEach(entry -> {
+                if (entry instanceof TrackedDataContainer<?, ?> blockEntityContainer) {
+                    for (TrackedDataKey key : blockEntityContainer.getKeys()) {
+                        blockEntityContainer.get(key).ifPresent(blockEntityData -> {
+                            if (blockEntityData instanceof SyncedTrackedData syncedBlockEntityData) {
+                                syncedBlockEntityData.syncToPlayer(player);
+                            }
+                        });
+                    }
+                }
+            });
         }
     }
 }
