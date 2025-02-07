@@ -1,0 +1,45 @@
+package dev.corgitaco.dataanchor.data.type.chunk.network;
+
+import dev.corgitaco.dataanchor.data.TrackedDataContainer;
+import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
+import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
+import dev.corgitaco.dataanchor.data.type.chunk.SyncedLevelChunkTrackedData;
+import dev.corgitaco.dataanchor.network.Packet;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
+import org.jetbrains.annotations.Nullable;
+
+public record SyncLevelChunkTrackedDataS2C(TrackedDataKey<SyncedLevelChunkTrackedData> dataKey, ChunkPos pos,
+                                           CompoundTag tag) implements Packet {
+
+
+    public SyncLevelChunkTrackedDataS2C(FriendlyByteBuf buf) {
+        this((TrackedDataKey) TrackedDataKey.fromID(TrackedDataRegistries.CHUNK, buf.readResourceLocation()), new ChunkPos(buf.readInt(), buf.readInt()), buf.readNbt());
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
+        buf.writeResourceLocation(dataKey.getId());
+        buf.writeInt(pos.x);
+        buf.writeInt(pos.z);
+        buf.writeNbt(this.tag);
+    }
+
+    @Override
+    public void handle(@Nullable Level level, @Nullable Player player) {
+        LevelChunk chunk = level.getChunk(pos.x, pos.z);
+        if (!chunk.isEmpty()) {
+            if (chunk instanceof TrackedDataContainer access) {
+                access.get(this.dataKey).ifPresent(data -> {
+                    if (data instanceof SyncedLevelChunkTrackedData trackedData) {
+                        trackedData.readFromNetwork(tag);
+                    }
+                });
+            }
+        }
+    }
+}

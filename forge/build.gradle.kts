@@ -32,14 +32,14 @@ loom {
         convertAccessWideners.set(true)
         extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 
-        mixinConfig("examplemod-common.mixins.json")
-        mixinConfig("examplemod.mixins.json")
+        mixinConfig("dataanchor-common.mixins.json")
+        mixinConfig("dataanchor.mixins.json")
     }
 
     // Forge Datagen Gradle config.  Remove if not using Forge datagen
     runs.create("datagen") {
         data()
-        programArgs("--all", "--mod", "examplemod")
+        programArgs("--all", "--mod", "dataanchor")
         programArgs("--output", project(":common").file("src/main/generated/resources").absolutePath)
         programArgs("--existing", project(":common").file("src/main/resources").absolutePath)
     }
@@ -64,7 +64,7 @@ tasks {
     }
 
     shadowJar {
-        exclude("architectury.common.json", "com/example/examplemod/forge/datagen/**")
+        exclude("architectury.common.json", "dev/corgitaco/dataanchor/forge/datagen/**")
         configurations = listOf(project.configurations.getByName("shadowBundle"))
         archiveClassifier.set("dev-shadow")
         relocate("blue.endless.jankson", "${project.group}.shadow.blue.endless.jankson")

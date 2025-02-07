@@ -1,0 +1,25 @@
+package dev.corgitaco.dataanchor.data;
+
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+
+public interface SyncedTrackedData extends ServerTrackedData, ClientTrackedData {
+
+    void sync();
+
+    void syncToPlayer(ServerPlayer player);
+
+    default void readFromNetwork(CompoundTag tag) {
+        if (this instanceof TrackedData trackedData) {
+            trackedData.load(tag);
+        }
+    }
+
+    default CompoundTag writeToNetwork() {
+        if (this instanceof TrackedData trackedData) {
+           return trackedData.save();
+        }
+
+        return new CompoundTag();
+    }
+}

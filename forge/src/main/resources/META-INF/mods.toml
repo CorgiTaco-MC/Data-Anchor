@@ -4,22 +4,23 @@ issueTrackerURL = ""
 license = "All Rights Reserved"
 
 [[mods]]
-modId = "examplemod"
+modId = "dataanchor"
 version = "${version}"
-displayName = "ExampleMod"
-authors = "Example Author"
+displayName = "Data Anchor"
+authors = "Corgi Taco"
 description = '''
+Simple mod with helpful data attaching and networking utilities including attaching data to entities, chunks, players, and worlds with low boilerplate code. Its own system built from the ground up for multiloader support.
 '''
 #logoFile = ""
 
-[[dependencies.examplemod]]
+[[dependencies.dataanchor]]
 modId = "forge"
 mandatory = true
 versionRange = "[47.1,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.examplemod]]
+[[dependencies.dataanchor]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.20.1]"

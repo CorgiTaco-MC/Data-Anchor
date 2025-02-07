@@ -1,34 +1,36 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "dataanchor",
   "version": "${version}",
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Data Anchor",
+  "description": "Simple mod with helpful data attaching and networking utilities including attaching data to entities, chunks, players, and worlds with low boilerplate code. Its own system built from the ground up for multiloader support.",
   "authors": [
-    "Your Name Here"
+    "Corgi Taco"
   ],
   "contact": {
     "homepage": "https://fabricmc.net/",
     "sources": ""
   },
   "license": "All Rights Reserved",
-  "icon": "assets/examplemod/icon.png",
+  "icon": "assets/dataanchor/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.example.examplemod.fabric.ExampleModFabric"
+      "dev.corgitaco.dataanchor.fabric.DataAnchorFabric"
     ],
     "fabric-datagen": [
-        "com.example.examplemod.fabric.datagen.FabricDatagen"
+      "dev.corgitaco.dataanchor.fabric.datagen.FabricDatagen"
     ],
-    "client": ["com.example.examplemod.fabric.server.ExampleModFabricClientModInit"],
+    "client": [
+      "dev.corgitaco.dataanchor.fabric.server.DataAnchorFabricClientModInit"
+    ],
     "server": [
-      "com.example.examplemod.fabric.client.ExampleModFabricDedicatedServerModInit"
+      "dev.corgitaco.dataanchor.fabric.client.DataAnchorFabricDedicatedServerModInit"
     ]
   },
   "mixins": [
-    "examplemod.mixins.json",
-    "examplemod-common.mixins.json"
+    "dataanchor.mixins.json",
+    "dataanchor-common.mixins.json"
   ],
   "depends": {
     "fabric": "*",
