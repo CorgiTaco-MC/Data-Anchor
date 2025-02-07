@@ -17,5 +17,4 @@ public class TrackedDataRegistries {
     public static final TrackedDataRegistry<BlockEntity, BlockEntityTrackedData> BLOCK_ENTITY = TrackedDataRegistry.of(ExampleMod.id("block_entity"));
     public static final TrackedDataRegistry<ChunkAccess, ChunkTrackedData> CHUNK = TrackedDataRegistry.of(ExampleMod.id("chunk"));
     public static final TrackedDataRegistry<Level, LevelTrackedData> LEVEL = TrackedDataRegistry.of(ExampleMod.id("level"));
-    public static final TrackedDataRegistry<MinecraftServer, TrackedData<MinecraftServer>> SERVER = TrackedDataRegistry.of(ExampleMod.id("server"));
 }
