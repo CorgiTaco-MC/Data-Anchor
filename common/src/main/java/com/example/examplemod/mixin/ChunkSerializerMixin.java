@@ -32,7 +32,10 @@ public class ChunkSerializerMixin {
             for (TrackedDataKey<ChunkTrackedData> key : keys) {
                 trackedDataContainer.get(key).ifPresent(trackedData -> {
                     if (trackedData instanceof ChunkTrackedData chunkTrackedData) {
-                        trackedDataTag.put(key.getId().toString(), chunkTrackedData.save());
+                        CompoundTag save = chunkTrackedData.save();
+                        if (save != null) {
+                            trackedDataTag.put(key.getId().toString(), save);
+                        }
                     }
                 });
             }

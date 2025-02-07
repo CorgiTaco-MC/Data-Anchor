@@ -5,25 +5,27 @@ import com.example.examplemod.data.TickableTrackedData;
 import com.example.examplemod.data.TrackedDataContainer;
 import com.example.examplemod.data.registry.TrackedDataKey;
 import com.example.examplemod.data.registry.TrackedDataRegistries;
+import com.example.examplemod.data.type.blockentity.BlockEntityTrackedData;
 import com.example.examplemod.data.type.level.LevelTrackedData;
 import com.example.examplemod.data.type.level.TrackedLevelSavedData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Mixin(Level.class)
 public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTrackedData>, DirtyMarker {
-    @Shadow public abstract boolean isClientSide();
+    @Shadow
+    public abstract boolean isClientSide();
 
     @Unique
     private TrackedDataContainer<Level, LevelTrackedData> exampleMod$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.LEVEL, (Level) (Object) this, isClientSide());
@@ -71,6 +73,20 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
         }
     }
 
+    @Inject(method = "tickBlockEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/TickingBlockEntity;tick()V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void onTickBlockEntitiesEnd(CallbackInfo ci, ProfilerFiller profilerFiller, Iterator iterator, TickingBlockEntity tickingBlockEntity) {
+        if (((Level) (Object) this).getBlockEntity(tickingBlockEntity.getPos()) instanceof TrackedDataContainer container) {
+            Collection<TrackedDataKey<BlockEntityTrackedData>> keys = container.getKeys();
+            for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
+                container.get(key).ifPresent(data -> {
+                    if (data instanceof TickableTrackedData tickableData) {
+                        tickableData.tick();
+                    }
+                });
+            }
+        }
+    }
+
     @Override
     public void markDirty() {
         if (exampleMod$trackedDataContainer instanceof TrackedLevelSavedData dirtyMarker) {
@@ -81,11 +97,11 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
     @Override
     public void clearDirty() {
         exampleMod$trackedDataContainer.getKeys().forEach(key -> {
-             exampleMod$trackedDataContainer.get(key).ifPresent(levelTrackedData -> {
+            exampleMod$trackedDataContainer.get(key).ifPresent(levelTrackedData -> {
                 if (levelTrackedData instanceof DirtyMarker dirtyMarker) {
                     dirtyMarker.clearDirty();
                 }
-             });
+            });
         });
     }
 }

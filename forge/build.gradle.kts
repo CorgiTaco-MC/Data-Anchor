@@ -67,6 +67,7 @@ tasks {
         exclude("architectury.common.json", "com/example/examplemod/forge/datagen/**")
         configurations = listOf(project.configurations.getByName("shadowBundle"))
         archiveClassifier.set("dev-shadow")
+        relocate("blue.endless.jankson", "${project.group}.shadow.blue.endless.jankson")
     }
 
     remapJar {

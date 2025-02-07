@@ -25,6 +25,9 @@ public class TrackedDataKey<T extends TrackedData<?>> {
         if (Modifier.isAbstract(clazz.getModifiers())) {
             throw new IllegalArgumentException("TrackedData class must not be an abstract class!");
         }
+        if (clazz.isAnonymousClass()) {
+            throw new IllegalArgumentException("TrackedData class must not be an anonymous class!");
+        }
 
         TrackedDataKey<? extends TrackedData> trackedDataKey = TRACKED_DATA.computeIfAbsent(dataRegistry, k -> new HashMap<>()).get(id);
         if (trackedDataKey != null) {
