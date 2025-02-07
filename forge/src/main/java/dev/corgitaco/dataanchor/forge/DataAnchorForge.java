@@ -11,8 +11,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
  * Main class for the mod on the Forge platform.
  */
 @Mod(DataAnchor.MOD_ID)
-public class ExampleModForge {
-    public ExampleModForge() {
+public class DataAnchorForge {
+    public DataAnchorForge() {
         DataAnchor.init();
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
