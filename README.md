@@ -1,4 +1,2 @@
-# Arch Loom Multiloader Template
-This repo is used as a Template Repo.  This repo has both Forge and Fabric datagen setup,
-mixins and accesswideners so developers can start right away with there new project.  
-Our build script is entirely in Kotlin and using the latest Gradle 8.10
+# Data Anchor
+* Simple mod with helpful data attaching and networking utilities including attaching data to entities, chunks, players, and worlds with low boilerplate code. Its own system built from the ground up for multiloader support. Does NOT use mod loader internal data attachment systems.
