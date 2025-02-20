@@ -1,5 +1,10 @@
+import com.hypherionmc.modpublisher.properties.CurseEnvironment
+import com.hypherionmc.modpublisher.properties.ModLoader
+import com.hypherionmc.modpublisher.properties.ReleaseType
+
 plugins {
     id("com.gradleup.shadow")
+    id("com.hypherionmc.modutils.modpublisher") version "2.+"
 }
 
 architectury {
@@ -74,4 +79,33 @@ tasks {
         inputFile.set(shadowJar.get().archiveFile)
         dependsOn(shadowJar)
     }
+}
+
+
+
+publisher {
+    apiKeys {
+        curseforge(getPublishingCredentials().first)
+        modrinth(getPublishingCredentials().second)
+        github(project.properties["github_token"].toString())
+    }
+
+    curseID.set(project.properties["curseforge_id"].toString())
+    modrinthID.set(project.properties["modrinth_id"].toString())
+    githubRepo.set("https://github.com/CorgiTaco/Data-Anchor/")
+    setReleaseType(ReleaseType.RELEASE)
+    projectVersion.set("${project.version}-forge")
+    displayName.set(project.base.archivesName)
+    changelog.set(projectDir.toPath().parent.resolve("CHANGELOG.md").toFile().readText())
+    artifact.set(tasks.remapJar)
+    setGameVersions(minecraftVersion)
+    setLoaders(ModLoader.FORGE, ModLoader.NEOFORGE)
+    setCurseEnvironment(CurseEnvironment.SERVER)
+    setJavaVersions(JavaVersion.VERSION_17, JavaVersion.VERSION_18, JavaVersion.VERSION_19, JavaVersion.VERSION_20, JavaVersion.VERSION_21)
+}
+
+private fun getPublishingCredentials(): Pair<String?, String?> {
+    val curseForgeToken = (project.findProperty("curseforge_key") ?: System.getenv("CURSEFORGE_KEY") ?: "") as String?
+    val modrinthToken = (project.findProperty("modrinth_key") ?: System.getenv("MODRINTH_KEY") ?: "") as String?
+    return Pair(curseForgeToken, modrinthToken)
 }
