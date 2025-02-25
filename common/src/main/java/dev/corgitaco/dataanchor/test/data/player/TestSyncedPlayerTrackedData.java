@@ -17,20 +17,6 @@ public class TestSyncedPlayerTrackedData extends SyncedPlayerTrackedData impleme
     }
 
     @Override
-    public @Nullable CompoundTag save() {
-        CompoundTag compoundTag = new CompoundTag();
-        compoundTag.putInt("yum", yum);
-        return compoundTag;
-    }
-
-    @Override
-    public void load(CompoundTag tag) {
-        if (tag.contains("yum")) {
-            setYum(tag.getInt("yum"));
-        }
-    }
-
-    @Override
     public void tick() {
         if (!player.level().isClientSide) {
             setYum(this.yum + 1);

@@ -8,6 +8,7 @@ import dev.corgitaco.dataanchor.data.type.entity.network.SyncEntityTrackedDataS2
 import dev.corgitaco.dataanchor.data.type.level.network.SyncLevelTrackedDataS2C;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.S2CNetworkContainer;
+import dev.corgitaco.dataanchor.test.data.TestSyncedBlockEntityTrackedData;
 import dev.corgitaco.dataanchor.test.data.chunk.TestSyncedLevelChunkTrackedData;
 import dev.corgitaco.dataanchor.test.data.level.TestSyncedLevelTrackedData;
 import dev.corgitaco.dataanchor.test.data.player.TestSyncedPlayerTrackedData;
@@ -44,6 +45,9 @@ public class DataAnchor {
 //        }
 //        return null;
 //    });
+
+    public static final TrackedDataKey<TestSyncedBlockEntityTrackedData> TEST_BLOCK_ENTITY_DATA = TrackedDataRegistries.BLOCK_ENTITY.register(DataAnchor.id("test"), TestSyncedBlockEntityTrackedData.class, TestSyncedBlockEntityTrackedData::new);
+
 
     /**
      * Initializes the mod.

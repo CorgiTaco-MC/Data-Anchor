@@ -1,10 +1,11 @@
 package dev.corgitaco.dataanchor.data.type.blockentity;
 
+import dev.corgitaco.dataanchor.data.DirtyMarker;
 import dev.corgitaco.dataanchor.data.TrackedData;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public abstract sealed class BlockEntityTrackedData implements TrackedData<BlockEntity> permits ServerBlockEntityTrackedData, SyncedBlockEntityTrackedData {
+public abstract sealed class BlockEntityTrackedData implements TrackedData<BlockEntity>, DirtyMarker permits ServerBlockEntityTrackedData, SyncedBlockEntityTrackedData {
 
 
     protected final TrackedDataKey<? extends BlockEntityTrackedData> trackedDataKey;
@@ -18,5 +19,15 @@ public abstract sealed class BlockEntityTrackedData implements TrackedData<Block
     @Override
     public BlockEntity get() {
         return this.blockEntity;
+    }
+
+    @Override
+    public void markDirty() {
+        blockEntity.setChanged();
+    }
+
+    @Override
+    public void clearDirty() {
+
     }
 }

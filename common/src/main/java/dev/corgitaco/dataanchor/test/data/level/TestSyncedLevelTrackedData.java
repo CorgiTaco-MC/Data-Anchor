@@ -17,20 +17,6 @@ public class TestSyncedLevelTrackedData extends SyncedLevelTrackedData implement
     }
 
     @Override
-    public @Nullable CompoundTag save() {
-        CompoundTag compoundTag = new CompoundTag();
-        compoundTag.putInt("yum", yum);
-        return compoundTag;
-    }
-
-    @Override
-    public void load(CompoundTag tag) {
-        if (tag.contains("yum")) {
-            this.yum = tag.getInt("yum");
-        }
-    }
-
-    @Override
     public void tick() {
         if (level.dimension() == Level.OVERWORLD) {
             if (!level.isClientSide) {

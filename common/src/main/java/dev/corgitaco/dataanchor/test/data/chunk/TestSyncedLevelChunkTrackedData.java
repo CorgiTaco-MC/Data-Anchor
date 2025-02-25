@@ -1,5 +1,6 @@
 package dev.corgitaco.dataanchor.test.data.chunk;
 
+import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.data.TickableTrackedData;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.type.chunk.ChunkTrackedData;
@@ -17,22 +18,17 @@ public class TestSyncedLevelChunkTrackedData extends SyncedLevelChunkTrackedData
     }
 
     @Override
-    public @Nullable CompoundTag save() {
-        CompoundTag compoundTag = new CompoundTag();
-        compoundTag.putInt("timer", timer);
-        return compoundTag;
-    }
-
-    @Override
-    public void load(CompoundTag tag) {
-        this.timer = tag.getInt("timer");
-    }
-
-    @Override
     public void tick() {
-        if (!get().getLevel().isClientSide && get().getPos().x == 0 && get().getPos().z == 0) {
-            setTimer(this.timer + 1);
+        if (get().getPos().x == 0 && get().getPos().z == 0) {
+            if (!get().getLevel().isClientSide) {
+                setTimer(this.timer + 1);
+                DataAnchor.LOGGER.info("Server chunk timer: %s".formatted(this.timer));
+            } else {
+                DataAnchor.LOGGER.info("Client chunk timer: %s".formatted(this.timer));
+            }
         }
+
+
     }
 
     public void setTimer(int timer) {

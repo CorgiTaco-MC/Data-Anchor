@@ -53,15 +53,13 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
 
     @Override
     public CompoundTag save(CompoundTag compoundTag) {
-        CompoundTag compoundTag1 = new CompoundTag();
         for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
             CompoundTag save = entry.getValue().save();
             if (save != null) {
-                compoundTag1.put(entry.getKey().getId().toString(), save);
+                compoundTag.put(entry.getKey().getId().toString(), save);
             }
         }
-        compoundTag.put("TrackedData", compoundTag1);
-        return compoundTag1;
+        return compoundTag;
     }
 
     @Override

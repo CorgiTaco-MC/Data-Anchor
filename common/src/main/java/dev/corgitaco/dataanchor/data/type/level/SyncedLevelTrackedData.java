@@ -19,8 +19,6 @@ public abstract non-sealed class SyncedLevelTrackedData extends LevelTrackedData
     public void sync() {
         if (!level.isClientSide) {
             S2CPacketBroadcaster.S2C.sendToAllPlayersInDimension(new SyncLevelTrackedDataS2C((TrackedDataKey<SyncedLevelTrackedData>) trackedDataKey, writeToNetwork()), get().dimension());
-
-            markDirty();
         }
     }
 

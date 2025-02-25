@@ -32,8 +32,7 @@ public class BlockEntityMixin implements TrackedDataContainer<BlockEntity, Block
 
     @Inject(method = "setLevel", at = @At("RETURN"))
     private void setLevel(Level level, CallbackInfo ci) {
-        container = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.BLOCK_ENTITY, (BlockEntity) (Object) this, level.isClientSide());
-        this.container.create();
+        create();
     }
 
     @Override
@@ -43,7 +42,10 @@ public class BlockEntityMixin implements TrackedDataContainer<BlockEntity, Block
 
     @Override
     public void create() {
-        this.container.create();
+        if (container == null) {
+            container = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.BLOCK_ENTITY, (BlockEntity) (Object) this, level != null/*assume loading from disk*/ && level.isClientSide());
+            this.container.create();
+        }
     }
 
     @Override
@@ -54,6 +56,7 @@ public class BlockEntityMixin implements TrackedDataContainer<BlockEntity, Block
     @Inject(method = "loadStatic", at = @At("RETURN"))
     private static void loadStatic(BlockPos pos, BlockState state, CompoundTag tag, CallbackInfoReturnable<BlockEntity> cir) {
         if (cir.getReturnValue() instanceof TrackedDataContainer container) {
+            container.create();
             if (tag.contains("TrackedData")) {
                 CompoundTag trackedData = tag.getCompound("TrackedData");
                 Collection<TrackedDataKey<BlockEntityTrackedData>> keys = container.getKeys();

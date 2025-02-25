@@ -7,6 +7,7 @@ import dev.corgitaco.dataanchor.data.type.chunk.ChunkTrackedData;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.UpgradeData;
@@ -24,10 +25,15 @@ import java.util.Optional;
 public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, ChunkTrackedData> {
 
     @Unique
-    TrackedDataContainer<ChunkAccess, ChunkTrackedData> dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.CHUNK, (ChunkAccess) (Object) this, true);
+    TrackedDataContainer<ChunkAccess, ChunkTrackedData> dataAnchor$trackedDataContainer;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry biomeRegistry, long inhabitedTime, LevelChunkSection[] sections, BlendingData blendingData, CallbackInfo ci) {
+        if (levelHeightAccessor instanceof ServerLevelAccessor) {
+           this.dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.CHUNK, (ChunkAccess) (Object) this, false);
+        } else {
+            this.dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.CHUNK, (ChunkAccess) (Object) this, true);
+        }
         this.create();
     }
 

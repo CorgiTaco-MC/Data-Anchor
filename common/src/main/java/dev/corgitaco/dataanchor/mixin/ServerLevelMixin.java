@@ -3,6 +3,7 @@ package dev.corgitaco.dataanchor.mixin;
 import dev.corgitaco.dataanchor.data.TickableTrackedData;
 import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
+import dev.corgitaco.dataanchor.data.type.blockentity.BlockEntityTrackedData;
 import dev.corgitaco.dataanchor.data.type.chunk.ChunkTrackedData;
 import dev.corgitaco.dataanchor.data.type.entity.PlayerTrackedData;
 import dev.corgitaco.dataanchor.data.type.entity.SyncedPlayerTrackedData;
@@ -12,12 +13,14 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -58,6 +61,21 @@ public abstract class ServerLevelMixin extends Level {
                         tickableData.tick();
                     }
                 });
+            }
+        }
+
+        if (chunk.getFullStatus().isOrAfter(FullChunkStatus.BLOCK_TICKING)) {
+            for (BlockEntity value : chunk.getBlockEntities().values()) {
+                if (value instanceof TrackedDataContainer access) {
+                    Collection<TrackedDataKey<BlockEntityTrackedData>> keys = access.getKeys();
+                    for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
+                        access.get(key).ifPresent(data -> {
+                            if (data instanceof TickableTrackedData tickableData) {
+                                tickableData.tick();
+                            }
+                        });
+                    }
+                }
             }
         }
     }
