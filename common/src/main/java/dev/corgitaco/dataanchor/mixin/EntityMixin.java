@@ -24,8 +24,7 @@ import java.util.Optional;
 @Mixin(Entity.class)
 public abstract class EntityMixin implements TrackedDataContainer<Entity, EntityTrackedData> {
 
-    @Shadow public abstract Level level();
-
+    @Shadow private Level level;
     @Unique
     private TrackedDataContainer<Entity, EntityTrackedData> dataAnchor$container;
 
@@ -83,7 +82,7 @@ public abstract class EntityMixin implements TrackedDataContainer<Entity, Entity
 
     @Override
     public void create() {
-        this.dataAnchor$container = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.ENTITY, (Entity) (Object) this, level().isClientSide());
+        this.dataAnchor$container = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.ENTITY, (Entity) (Object) this, this.level.isClientSide());
         this.dataAnchor$container.create();
         for (TrackedDataKey<EntityTrackedData> key : this.dataAnchor$container.getKeys()) {
             this.dataAnchor$container.get(key).ifPresent(entityTrackedData -> {
