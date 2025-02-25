@@ -46,7 +46,7 @@ public class DataAnchor {
 //        return null;
 //    });
 
-    public static final TrackedDataKey<TestSyncedBlockEntityTrackedData> TEST_BLOCK_ENTITY_DATA = TrackedDataRegistries.BLOCK_ENTITY.register(DataAnchor.id("test"), TestSyncedBlockEntityTrackedData.class, TestSyncedBlockEntityTrackedData::new);
+//    public static final TrackedDataKey<TestSyncedBlockEntityTrackedData> TEST_BLOCK_ENTITY_DATA = TrackedDataRegistries.BLOCK_ENTITY.register(DataAnchor.id("test"), TestSyncedBlockEntityTrackedData.class, TestSyncedBlockEntityTrackedData::new);
 
 
     /**
