@@ -1,3 +1,6 @@
+# 1.0.0.3
+* Fix Access Widener.
+
 # 1.0.0.2
 * Use level field instead.
 

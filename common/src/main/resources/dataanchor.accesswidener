@@ -5,3 +5,5 @@ accessible field net/minecraft/server/level/ChunkMap$TrackedEntity seenBy Ljava/
 accessible field net/minecraft/server/level/ChunkMap$TrackedEntity entity Lnet/minecraft/world/entity/Entity;
 accessible field net/minecraft/client/multiplayer/ClientChunkCache storage Lnet/minecraft/client/multiplayer/ClientChunkCache$Storage;
 accessible field net/minecraft/client/multiplayer/ClientChunkCache$Storage chunks Ljava/util/concurrent/atomic/AtomicReferenceArray;
+accessible class net/minecraft/client/multiplayer/ClientChunkCache$Storage
+extendable class net/minecraft/client/multiplayer/ClientChunkCache$Storage
