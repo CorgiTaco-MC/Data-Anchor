@@ -36,6 +36,9 @@ public interface TrackedData<T> extends Supplier<T> {
         if (obj instanceof Integer) {
             return IntTag.valueOf((Integer) obj);
         }
+        if (obj instanceof Boolean) {
+            return ByteTag.valueOf((Boolean) obj ? (byte) 1 : (byte) 0);
+        }
         if (obj instanceof Long) {
             return LongTag.valueOf((Long) obj);
         }
