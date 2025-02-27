@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -113,8 +114,17 @@ public interface TrackedData<T> extends Supplier<T> {
 
         CompoundTag tag = new CompoundTag();
         for (Field declaredField : obj.getClass().getDeclaredFields()) {
+            int modifiers = declaredField.getModifiers();
+            if (Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers)) {
+                continue;
+            }
+
             declaredField.setAccessible(true);
-            tag.put(declaredField.getName(), toTag(declaredField.get(obj)));
+            Object obj1 = declaredField.get(obj);
+            if (obj1 == null) {
+                continue;
+            }
+            tag.put(declaredField.getName(), toTag(obj1));
         }
 
         return tag;
@@ -123,6 +133,11 @@ public interface TrackedData<T> extends Supplier<T> {
     static <T> T updateExistingFromTag(Tag tag, T obj) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException {
         if (tag instanceof CompoundTag compoundTag) {
             for (Field declaredField : obj.getClass().getDeclaredFields()) {
+                int modifiers = declaredField.getModifiers();
+                if (Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers)) {
+                    continue;
+                }
+
                 declaredField.setAccessible(true);
                 String name = declaredField.getName();
                 if (declaredField.isAnnotationPresent(SerializedName.class)) {
@@ -302,6 +317,10 @@ public interface TrackedData<T> extends Supplier<T> {
             T t = clazz.getConstructor().newInstance();
 
             for (Field declaredField : clazz.getDeclaredFields()) {
+                int modifiers = declaredField.getModifiers();
+                if (Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers)) {
+                    continue;
+                }
                 declaredField.setAccessible(true);
                 String name = getName(declaredField, entries);
 
