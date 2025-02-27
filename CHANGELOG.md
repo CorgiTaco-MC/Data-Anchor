@@ -1,3 +1,6 @@
+# 1.0.0.5
+* Fix boolean serialization.
+
 # 1.0.0.4
 * Fix Tracked Data (de)serialization.
 
