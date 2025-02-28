@@ -1,21 +1,13 @@
 package dev.corgitaco.dataanchor;
 
-import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
-import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
+import com.mojang.logging.LogUtils;
 import dev.corgitaco.dataanchor.data.type.blockentity.network.SyncBlockEntityTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.chunk.network.SyncLevelChunkTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.entity.network.SyncEntityTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.level.network.SyncLevelTrackedDataS2C;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.S2CNetworkContainer;
-import dev.corgitaco.dataanchor.test.data.TestSyncedBlockEntityTrackedData;
-import dev.corgitaco.dataanchor.test.data.chunk.TestSyncedLevelChunkTrackedData;
-import dev.corgitaco.dataanchor.test.data.level.TestSyncedLevelTrackedData;
-import dev.corgitaco.dataanchor.test.data.player.TestSyncedPlayerTrackedData;
-import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.chunk.LevelChunk;
 import org.slf4j.Logger;
 
 public class DataAnchor {
