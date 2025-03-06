@@ -1,3 +1,6 @@
+# 1.0.0.6
+* Fix server side loading.
+
 # 1.0.0.5
 * Fix boolean serialization.
 
