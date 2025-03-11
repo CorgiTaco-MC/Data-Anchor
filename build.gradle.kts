@@ -1,4 +1,5 @@
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("architectury-plugin") version "3.4-SNAPSHOT"
@@ -7,7 +8,7 @@ plugins {
     java
     idea
     `maven-publish`
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "2.0.0"
 }
 
 val minecraftVersion = project.properties["minecraft_version"] as String
@@ -56,6 +57,10 @@ subprojects {
 
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    tasks.compileKotlin {
+        compilerOptions.jvmTarget = JvmTarget.JVM_17
     }
 
     tasks.withType<JavaCompile>().configureEach {
