@@ -1,3 +1,7 @@
+# 1.0.0.7
+* Add Kotlin DSL support.
+* Fix data get method in tracked data registry.
+
 # 1.0.0.6
 * Fix server side loading.
 
