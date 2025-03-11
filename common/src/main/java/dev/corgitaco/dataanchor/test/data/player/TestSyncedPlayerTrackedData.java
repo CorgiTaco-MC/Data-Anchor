@@ -4,9 +4,7 @@ import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.data.TickableTrackedData;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.type.entity.SyncedPlayerTrackedData;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
-import org.jetbrains.annotations.Nullable;
 
 public class TestSyncedPlayerTrackedData extends SyncedPlayerTrackedData implements TickableTrackedData {
 

@@ -4,7 +4,10 @@ import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistry;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public interface TrackedDataContainer<O, T extends TrackedData<O>> {
 

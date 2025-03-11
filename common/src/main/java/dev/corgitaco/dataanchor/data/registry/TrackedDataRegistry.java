@@ -40,7 +40,7 @@ public class TrackedDataRegistry<O, T extends TrackedData<O>> {
 
     }
 
-    public Optional<T> get(TrackedDataKey<? extends T> key, O o) {
+    public <E extends T> Optional<E> get(TrackedDataKey<E> key, O o) {
         if (o instanceof TrackedDataContainer trackedDataContainer) {
             return trackedDataContainer.get(key);
         }

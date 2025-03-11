@@ -7,6 +7,7 @@ plugins {
     java
     idea
     `maven-publish`
+    kotlin("jvm") version "2.1.0"
 }
 
 val minecraftVersion = project.properties["minecraft_version"] as String
@@ -21,6 +22,7 @@ subprojects {
     apply(plugin = "dev.architectury.loom")
     apply(plugin = "architectury-plugin")
     apply(plugin = "maven-publish")
+    apply(plugin = "org.jetbrains.kotlin.jvm")
 
     base.archivesName.set(project.properties["archives_base_name"] as String + "-${project.name}" + "-${minecraftVersion}")
 

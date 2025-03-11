@@ -1,10 +1,10 @@
 package dev.corgitaco.dataanchor.fabric.network;
 
+import com.google.auto.service.AutoService;
 import dev.corgitaco.dataanchor.fabric.DataAnchorFabric;
 import dev.corgitaco.dataanchor.network.BiDirectionalNetworkContainer;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.BiDirectionalPacketBroadcaster;
-import com.google.auto.service.AutoService;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

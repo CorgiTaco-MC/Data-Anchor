@@ -1,9 +1,9 @@
 package dev.corgitaco.dataanchor.forge.network;
 
+import com.google.auto.service.AutoService;
 import dev.corgitaco.dataanchor.network.C2SNetworkContainer;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.C2SPacketBroadcaster;
-import com.google.auto.service.AutoService;
 
 @AutoService(C2SPacketBroadcaster.class)
 public class C2SForgeNetworkHandler extends ForgeNetworkHandler implements C2SPacketBroadcaster {

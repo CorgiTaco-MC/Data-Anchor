@@ -5,9 +5,7 @@ import dev.corgitaco.dataanchor.data.TickableTrackedData;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.type.chunk.ChunkTrackedData;
 import dev.corgitaco.dataanchor.data.type.chunk.SyncedLevelChunkTrackedData;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.chunk.LevelChunk;
-import org.jetbrains.annotations.Nullable;
 
 public class TestSyncedLevelChunkTrackedData extends SyncedLevelChunkTrackedData implements TickableTrackedData {
     int timer = 0;
