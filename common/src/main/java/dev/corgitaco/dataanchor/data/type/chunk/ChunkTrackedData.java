@@ -7,8 +7,8 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 
 public abstract sealed class ChunkTrackedData implements TrackedData<ChunkAccess>, DirtyMarker permits LevelChunkTrackedData, ProtoChunkTrackedData {
 
-    protected final TrackedDataKey<? extends ChunkTrackedData> trackedDataKey;
-    protected final ChunkAccess chunk;
+    protected transient final TrackedDataKey<? extends ChunkTrackedData> trackedDataKey;
+    protected transient final ChunkAccess chunk;
 
     public ChunkTrackedData(TrackedDataKey<? extends ChunkTrackedData> trackedDataKey, ChunkAccess chunk) {
         this.trackedDataKey = trackedDataKey;

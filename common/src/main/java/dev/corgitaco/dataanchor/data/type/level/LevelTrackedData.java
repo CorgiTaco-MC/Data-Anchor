@@ -6,8 +6,8 @@ import net.minecraft.world.level.Level;
 
 public abstract sealed class LevelTrackedData implements TrackedData<Level> permits ServerLevelTrackedData, SyncedLevelTrackedData {
 
-    protected final TrackedDataKey<? extends LevelTrackedData> trackedDataKey;
-    protected final Level level;
+    protected transient final TrackedDataKey<? extends LevelTrackedData> trackedDataKey;
+    protected transient final Level level;
 
     public LevelTrackedData(TrackedDataKey<? extends LevelTrackedData> trackedDataKey, Level level) {
         this.trackedDataKey = trackedDataKey;

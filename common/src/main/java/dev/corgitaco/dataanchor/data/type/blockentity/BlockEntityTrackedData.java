@@ -8,8 +8,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 public abstract sealed class BlockEntityTrackedData implements TrackedData<BlockEntity>, DirtyMarker permits ServerBlockEntityTrackedData, SyncedBlockEntityTrackedData {
 
 
-    protected final TrackedDataKey<? extends BlockEntityTrackedData> trackedDataKey;
-    protected final BlockEntity blockEntity;
+    protected transient final TrackedDataKey<? extends BlockEntityTrackedData> trackedDataKey;
+    protected transient final BlockEntity blockEntity;
 
     public BlockEntityTrackedData(TrackedDataKey<? extends BlockEntityTrackedData> trackedDataKey, BlockEntity blockEntity) {
         this.trackedDataKey = trackedDataKey;

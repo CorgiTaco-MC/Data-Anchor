@@ -56,7 +56,10 @@ public class ChunkSerializerMixin {
             for (TrackedDataKey key : trackedDataContainer.getKeys()) {
                 trackedDataContainer.get(key).ifPresent(trackedData -> {
                     if (trackedData instanceof ChunkTrackedData chunkTrackedData) {
-                        chunkTrackedData.load(trackedDataTag.getCompound(key.getId().toString()));
+                        String idString = key.getId().toString();
+                        if (trackedDataTag.contains(idString)) {
+                            chunkTrackedData.load(trackedDataTag.getCompound(idString));
+                        }
                     }
                 });
             }

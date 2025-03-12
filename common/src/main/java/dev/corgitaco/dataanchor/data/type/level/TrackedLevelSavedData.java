@@ -38,7 +38,10 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
         this.serverLevel = serverLevel;
         create();
         for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
-            entry.getValue().load(tag.getCompound(entry.getKey().getId().toString()));
+            String idString = entry.getKey().getId().toString();
+            if (tag.contains(idString, 10)) {
+                entry.getValue().load(tag.getCompound(idString));
+            }
         }
     }
 

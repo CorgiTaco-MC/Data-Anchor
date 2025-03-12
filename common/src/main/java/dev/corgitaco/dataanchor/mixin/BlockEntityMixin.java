@@ -63,8 +63,9 @@ public class BlockEntityMixin implements TrackedDataContainer<BlockEntity, Block
                 for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
                     container.get(key).ifPresent(data -> {
                         if (data instanceof BlockEntityTrackedData blockEntityTrackedData) {
-                            if (trackedData.contains(key.getId().toString())) {
-                                blockEntityTrackedData.load(trackedData.getCompound(key.getId().toString()));
+                            String idString = key.getId().toString();
+                            if (trackedData.contains(idString)) {
+                                blockEntityTrackedData.load(trackedData.getCompound(idString));
                             }
                         }
                     });
