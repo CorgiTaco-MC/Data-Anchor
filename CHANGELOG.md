@@ -1,3 +1,6 @@
+# 1.0.0.8
+* Check if a tag exists before attempting to load from it. Mark fields transient where needed.
+
 # 1.0.0.7
 * Add Kotlin DSL support.
 * Fix data get method in tracked data registry.
