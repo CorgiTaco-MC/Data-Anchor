@@ -18,9 +18,6 @@
     "main": [
       "dev.corgitaco.dataanchor.fabric.DataAnchorFabric"
     ],
-    "fabric-datagen": [
-      "dev.corgitaco.dataanchor.fabric.datagen.FabricDatagen"
-    ],
     "client": [
       "dev.corgitaco.dataanchor.fabric.server.DataAnchorFabricClientModInit"
     ],
