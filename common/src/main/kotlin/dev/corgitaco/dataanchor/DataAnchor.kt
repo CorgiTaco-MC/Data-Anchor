@@ -22,13 +22,13 @@ val <T : Level> T.container get() = TrackedDataRegistries.LEVEL.getContainer(thi
 
 val <T : ChunkAccess> T.container get() = TrackedDataRegistries.CHUNK.getContainer(this)
 
-operator fun <T : Entity, E : EntityTrackedData> T.get(key: TrackedDataKey<E>) = container?.get(key)
+operator fun <T : Entity, E : EntityTrackedData> T.get(key: TrackedDataKey<E>) = container?.`dataAnchor$getTrackedData`(key)
 
-operator fun <T : BlockEntity, E : BlockEntityTrackedData> T.get(key: TrackedDataKey<E>) = container?.get(key)
+operator fun <T : BlockEntity, E : BlockEntityTrackedData> T.get(key: TrackedDataKey<E>) = container?.`dataAnchor$getTrackedData`(key)
 
-operator fun <T : Level, E : LevelTrackedData> T.get(key: TrackedDataKey<E>) = container?.get(key)
+operator fun <T : Level, E : LevelTrackedData> T.get(key: TrackedDataKey<E>) = container?.`dataAnchor$getTrackedData`(key)
 
-operator fun <T : ChunkAccess, E : ChunkTrackedData> T.get(key: TrackedDataKey<E>) = container?.get(key)
+operator fun <T : ChunkAccess, E : ChunkTrackedData> T.get(key: TrackedDataKey<E>) = container?.`dataAnchor$getTrackedData`(key)
 
 fun <E : EntityTrackedData> KClass<E>.entityDataOf(name: ResourceLocation, factory: TrackedDataFactory<Entity, E>): TrackedDataKey<E> = TrackedDataRegistries.ENTITY.register(name, java, factory)
 

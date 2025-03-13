@@ -17,10 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ChunkMapMixin {
 
     @Inject(method = "playerLoadedChunk", at = @At("RETURN"))
-    private void onPlayerLoadedChunk(ServerPlayer player, MutableObject<ClientboundLevelChunkWithLightPacket> packetCache, LevelChunk chunk, CallbackInfo ci) {
+    private void dataAnchor$onPlayerLoadedChunk(ServerPlayer player, MutableObject<ClientboundLevelChunkWithLightPacket> packetCache, LevelChunk chunk, CallbackInfo ci) {
         if (chunk instanceof TrackedDataContainer<?, ?> trackedDataContainer) {
-            for (TrackedDataKey key : trackedDataContainer.getKeys()) {
-                trackedDataContainer.get(key).ifPresent(trackedData -> {
+            for (TrackedDataKey key : trackedDataContainer.dataAnchor$getTrackedDataKeys()) {
+                trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
                     if (trackedData instanceof SyncedTrackedData syncedData) {
                         syncedData.syncToPlayer(player);
                     }
@@ -29,8 +29,8 @@ public class ChunkMapMixin {
 
             chunk.getBlockEntities().values().forEach(entry -> {
                 if (entry instanceof TrackedDataContainer<?, ?> blockEntityContainer) {
-                    for (TrackedDataKey key : blockEntityContainer.getKeys()) {
-                        blockEntityContainer.get(key).ifPresent(blockEntityData -> {
+                    for (TrackedDataKey key : blockEntityContainer.dataAnchor$getTrackedDataKeys()) {
+                        blockEntityContainer.dataAnchor$getTrackedData(key).ifPresent(blockEntityData -> {
                             if (blockEntityData instanceof SyncedTrackedData syncedBlockEntityData) {
                                 syncedBlockEntityData.syncToPlayer(player);
                             }

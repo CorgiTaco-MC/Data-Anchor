@@ -11,19 +11,30 @@ import java.util.Optional;
 
 public interface TrackedDataContainer<O, T extends TrackedData<O>> {
 
-    <E extends T> Optional<E> get(TrackedDataKey<E> key);
+    <E extends T> Optional<E> dataAnchor$getTrackedData(TrackedDataKey<E> key);
 
-    void create();
+    void dataAnchor$createTrackedData();
 
-    Collection<TrackedDataKey<T>> getKeys();
+    Collection<TrackedDataKey<T>> dataAnchor$getTrackedDataKeys();
 
     static <O, T extends TrackedData<O>> TrackedDataContainer<O, T> makeBasicContainer(TrackedDataRegistry<O, T> registry, O o, boolean isClient) {
+        return makeBasicContainer(registry, o, isClient, false);
+    }
+
+    static <O, T extends TrackedData<O>> TrackedDataContainer<O, T> makeBasicContainer(TrackedDataRegistry<O, T> registry, O o, boolean isClient, boolean lazyLoad) {
         return new TrackedDataContainer<>() {
+
+            private boolean lazyLoaded = !lazyLoad;
             private final Map<TrackedDataKey<T>, T> trackedDataMap = new Reference2ReferenceOpenHashMap<>();
             private final List<TrackedDataKey<T>> keys = List.copyOf(registry.factories().keySet());
 
             @Override
-            public <E extends T> Optional<E> get(TrackedDataKey<E> key) {
+            public <E extends T> Optional<E> dataAnchor$getTrackedData(TrackedDataKey<E> key) {
+                if (!lazyLoaded) {
+                    dataAnchor$createTrackedData();
+                    lazyLoaded = true;
+                }
+
                 T t = trackedDataMap.get(key);
                 if (t == null) {
                     return Optional.empty();
@@ -32,7 +43,7 @@ public interface TrackedDataContainer<O, T extends TrackedData<O>> {
             }
 
             @Override
-            public void create() {
+            public void dataAnchor$createTrackedData() {
                 registry.factories().forEach((key, factory) -> {
                     T trackedData = factory.create(key, o);
                     if (trackedData != null) {
@@ -50,7 +61,11 @@ public interface TrackedDataContainer<O, T extends TrackedData<O>> {
             }
 
             @Override
-            public Collection<TrackedDataKey<T>> getKeys() {
+            public Collection<TrackedDataKey<T>> dataAnchor$getTrackedDataKeys() {
+                if (!lazyLoaded) {
+                    dataAnchor$createTrackedData();
+                    lazyLoaded = true;
+                }
                 return keys;
             }
         };

@@ -29,7 +29,7 @@ public record SyncEntityTrackedDataS2C(int id, TrackedDataKey<? extends EntityTr
     @Override
     public void handle(@Nullable Level level, @Nullable Player player) {
         if (level.getEntity(this.id) instanceof TrackedDataContainer access) {
-            access.get(this.dataKey).ifPresent(data -> {
+            access.dataAnchor$getTrackedData(this.dataKey).ifPresent(data -> {
                 if (data instanceof SyncedTrackedData syncedData) {
                     syncedData.readFromNetwork(tag);
                 }

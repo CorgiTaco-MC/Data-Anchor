@@ -34,7 +34,7 @@ public record SyncLevelChunkTrackedDataS2C(TrackedDataKey<SyncedLevelChunkTracke
         LevelChunk chunk = level.getChunk(pos.x, pos.z);
         if (!chunk.isEmpty()) {
             if (chunk instanceof TrackedDataContainer access) {
-                access.get(this.dataKey).ifPresent(data -> {
+                access.dataAnchor$getTrackedData(this.dataKey).ifPresent(data -> {
                     if (data instanceof SyncedLevelChunkTrackedData trackedData) {
                         trackedData.readFromNetwork(tag);
                     }

@@ -30,6 +30,6 @@ public class TestSyncedLevelTrackedData extends SyncedLevelTrackedData implement
     public void setYum(int yum) {
         this.yum = yum;
         sync();
-        markDirty();
+        dataAnchor$markDirty();
     }
 }

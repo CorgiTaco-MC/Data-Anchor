@@ -28,7 +28,7 @@ public record SyncLevelTrackedDataS2C(TrackedDataKey<SyncedLevelTrackedData> dat
     public void handle(@Nullable Level level, @Nullable Player player) {
         if (level != null) {
             if (level instanceof TrackedDataContainer access) {
-                access.get(this.dataKey).ifPresent(data -> {
+                access.dataAnchor$getTrackedData(this.dataKey).ifPresent(data -> {
                     if (data instanceof SyncedLevelTrackedData syncedData) {
                         syncedData.readFromNetwork(tag);
                     }

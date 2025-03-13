@@ -21,12 +21,12 @@ public abstract sealed class ChunkTrackedData implements TrackedData<ChunkAccess
     }
 
     @Override
-    public void markDirty() {
+    public void dataAnchor$markDirty() {
         chunk.setUnsaved(true);
     }
 
     @Override
-    public void clearDirty() {
+    public void dataAnchor$clearDirty() {
 
     }
 }

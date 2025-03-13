@@ -42,7 +42,7 @@ public class TrackedDataRegistry<O, T extends TrackedData<O>> {
 
     public <E extends T> Optional<E> get(TrackedDataKey<E> key, O o) {
         if (o instanceof TrackedDataContainer trackedDataContainer) {
-            return trackedDataContainer.get(key);
+            return trackedDataContainer.dataAnchor$getTrackedData(key);
         }
 
         return Optional.empty();

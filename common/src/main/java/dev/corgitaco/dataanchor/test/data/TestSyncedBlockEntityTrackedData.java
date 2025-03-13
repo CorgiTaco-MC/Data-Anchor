@@ -29,6 +29,6 @@ public class TestSyncedBlockEntityTrackedData extends SyncedBlockEntityTrackedDa
     public void setYum(int yum) {
         this.yum = yum;
         sync();
-        markDirty();
+        dataAnchor$markDirty();
     }
 }

@@ -18,12 +18,12 @@ public abstract non-sealed class ServerLevelTrackedData extends LevelTrackedData
     }
 
     @Override
-    public void markDirty() {
+    public void dataAnchor$markDirty() {
         dirty = true;
     }
 
     @Override
-    public void clearDirty() {
+    public void dataAnchor$clearDirty() {
         dirty = false;
     }
 }

@@ -2,7 +2,7 @@ package dev.corgitaco.dataanchor.data;
 
 public interface DirtyMarker {
 
-    void markDirty();
+    void dataAnchor$markDirty();
 
-    void clearDirty();
+    void dataAnchor$clearDirty();
 }

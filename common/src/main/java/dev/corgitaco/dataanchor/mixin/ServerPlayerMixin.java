@@ -17,11 +17,11 @@ public class ServerPlayerMixin {
 
 
     @Inject(method = "restoreFrom", at = @At("TAIL"))
-    private void restoreFrom(ServerPlayer oldPlayer, boolean keepEverything, CallbackInfo ci) {
+    private void dataAnchor$restoreFrom(ServerPlayer oldPlayer, boolean keepEverything, CallbackInfo ci) {
         if (this instanceof TrackedDataContainer access) {
-            Collection<TrackedDataKey<ServerPlayerTrackedData>> keys = access.getKeys();
+            Collection<TrackedDataKey<ServerPlayerTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
             keys.forEach(key -> {
-                access.get(key).ifPresent(data -> {
+                access.dataAnchor$getTrackedData(key).ifPresent(data -> {
                     if (data instanceof PlayerTrackedData playerTrackedData) {
                         playerTrackedData.copy(oldPlayer, keepEverything);
                     }

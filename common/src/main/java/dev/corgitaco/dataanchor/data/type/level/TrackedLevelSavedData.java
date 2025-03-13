@@ -29,14 +29,14 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
         super.setDirty(dirty);
         if (!dirty) {
             if (serverLevel instanceof DirtyMarker dirtyMarker) {
-                dirtyMarker.clearDirty();
+                dirtyMarker.dataAnchor$clearDirty();
             }
         }
     }
 
     private TrackedLevelSavedData(ServerLevel serverLevel, CompoundTag tag) {
         this.serverLevel = serverLevel;
-        create();
+        dataAnchor$createTrackedData();
         for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
             String idString = entry.getKey().getId().toString();
             if (tag.contains(idString, 10)) {
@@ -66,7 +66,7 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
     }
 
     @Override
-    public <E extends LevelTrackedData> Optional<E> get(TrackedDataKey<E> key) {
+    public <E extends LevelTrackedData> Optional<E> dataAnchor$getTrackedData(TrackedDataKey<E> key) {
         LevelTrackedData levelTrackedData = this.trackedDataMap.get(key);
         if (levelTrackedData == null) {
             return Optional.empty();
@@ -75,7 +75,7 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
     }
 
     @Override
-    public void create() {
+    public void dataAnchor$createTrackedData() {
         TrackedDataRegistries.LEVEL.factories().forEach((key, factory) -> {
             LevelTrackedData trackedData = factory.create(key, this.serverLevel);
             if (trackedData instanceof ServerTrackedData) {
@@ -88,7 +88,7 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
     }
 
     @Override
-    public Collection<TrackedDataKey<LevelTrackedData>> getKeys() {
+    public Collection<TrackedDataKey<LevelTrackedData>> dataAnchor$getTrackedDataKeys() {
         return this.trackedDataMap.keySet();
     }
 }

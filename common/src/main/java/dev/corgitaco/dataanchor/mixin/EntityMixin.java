@@ -32,17 +32,17 @@ public abstract class EntityMixin implements TrackedDataContainer<Entity, Entity
     private final Collection<TickableTrackedData> dataAnchor$tickableData = new ArrayList<>();
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(EntityType entityType, Level level, CallbackInfo ci) {
-        this.create();
+    private void dataAnchor$init(EntityType entityType, Level level, CallbackInfo ci) {
+        this.dataAnchor$createTrackedData();
     }
 
 
     @Inject(method = "saveWithoutId", at = @At("RETURN"))
-    private void saveWithoutId(CompoundTag compound, CallbackInfoReturnable<CompoundTag> cir) {
+    private void dataAnchor$saveWithoutId(CompoundTag compound, CallbackInfoReturnable<CompoundTag> cir) {
         CompoundTag trackedData = new CompoundTag();
-        Collection<TrackedDataKey<EntityTrackedData>> keys = this.dataAnchor$container.getKeys();
+        Collection<TrackedDataKey<EntityTrackedData>> keys = this.dataAnchor$container.dataAnchor$getTrackedDataKeys();
         for (TrackedDataKey<EntityTrackedData> key : keys) {
-            this.dataAnchor$container.get(key).ifPresent(data -> {
+            this.dataAnchor$container.dataAnchor$getTrackedData(key).ifPresent(data -> {
                 CompoundTag saveTag = data.save();
                 if (saveTag != null) {
                     trackedData.put(key.getId().toString(), saveTag);
@@ -53,15 +53,15 @@ public abstract class EntityMixin implements TrackedDataContainer<Entity, Entity
     }
 
     @Inject(method = "load", at = @At("RETURN"))
-    private void load(CompoundTag loadTag, CallbackInfo ci) {
+    private void dataAnchor$load(CompoundTag loadTag, CallbackInfo ci) {
         if (loadTag != null) {
             if (loadTag.contains("TrackedData")) {
                 CompoundTag trackedData = loadTag.getCompound("TrackedData");
-                Collection<TrackedDataKey<EntityTrackedData>> keys = this.dataAnchor$container.getKeys();
+                Collection<TrackedDataKey<EntityTrackedData>> keys = this.dataAnchor$container.dataAnchor$getTrackedDataKeys();
                 for (TrackedDataKey<EntityTrackedData> key : keys) {
                     String tagKey = key.getId().toString();
                     if (trackedData.contains(tagKey)) {
-                        this.dataAnchor$container.get(key).ifPresent(entityTrackedData -> entityTrackedData.load(trackedData.getCompound(tagKey)));
+                        this.dataAnchor$container.dataAnchor$getTrackedData(key).ifPresent(entityTrackedData -> entityTrackedData.load(trackedData.getCompound(tagKey)));
                     }
                 }
             }
@@ -69,23 +69,23 @@ public abstract class EntityMixin implements TrackedDataContainer<Entity, Entity
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
-    private void tick(CallbackInfo ci) {
+    private void dataAnchor$tick(CallbackInfo ci) {
         for (TickableTrackedData tickable : this.dataAnchor$tickableData) {
             tickable.tick();
         }
     }
 
     @Override
-    public <E extends EntityTrackedData> Optional<E> get(TrackedDataKey<E> key) {
-        return this.dataAnchor$container.get(key);
+    public <E extends EntityTrackedData> Optional<E> dataAnchor$getTrackedData(TrackedDataKey<E> key) {
+        return this.dataAnchor$container.dataAnchor$getTrackedData(key);
     }
 
     @Override
-    public void create() {
+    public void dataAnchor$createTrackedData() {
         this.dataAnchor$container = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.ENTITY, (Entity) (Object) this, this.level.isClientSide());
-        this.dataAnchor$container.create();
-        for (TrackedDataKey<EntityTrackedData> key : this.dataAnchor$container.getKeys()) {
-            this.dataAnchor$container.get(key).ifPresent(entityTrackedData -> {
+        this.dataAnchor$container.dataAnchor$createTrackedData();
+        for (TrackedDataKey<EntityTrackedData> key : this.dataAnchor$container.dataAnchor$getTrackedDataKeys()) {
+            this.dataAnchor$container.dataAnchor$getTrackedData(key).ifPresent(entityTrackedData -> {
                 if (entityTrackedData instanceof TickableTrackedData tickable) {
                     this.dataAnchor$tickableData.add(tickable);
                 }
@@ -95,7 +95,7 @@ public abstract class EntityMixin implements TrackedDataContainer<Entity, Entity
     }
 
     @Override
-    public Collection<TrackedDataKey<EntityTrackedData>> getKeys() {
-        return this.dataAnchor$container.getKeys();
+    public Collection<TrackedDataKey<EntityTrackedData>> dataAnchor$getTrackedDataKeys() {
+        return this.dataAnchor$container.dataAnchor$getTrackedDataKeys();
     }
 }

@@ -42,10 +42,10 @@ public abstract class LevelMixin implements LevelAccessor {
                         continue;
                     }
                     if (levelChunk instanceof TrackedDataContainer dataContainer) {
-                        Collection<TrackedDataKey<ChunkTrackedData>> keys = dataContainer.getKeys();
+                        Collection<TrackedDataKey<ChunkTrackedData>> keys = dataContainer.dataAnchor$getTrackedDataKeys();
 
                         for (TrackedDataKey<ChunkTrackedData> key : keys) {
-                            Optional optional = dataContainer.get(key);
+                            Optional optional = dataContainer.dataAnchor$getTrackedData(key);
                             if (optional.isPresent()) {
                                 if (optional.get() instanceof TickableTrackedData trackedData) {
                                     trackedData.tick();
@@ -56,9 +56,9 @@ public abstract class LevelMixin implements LevelAccessor {
 
                     for (BlockEntity value : levelChunk.getBlockEntities().values()) {
                         if (value instanceof TrackedDataContainer container) {
-                            Collection<TrackedDataKey<BlockEntityTrackedData>> keys = container.getKeys();
+                            Collection<TrackedDataKey<BlockEntityTrackedData>> keys = container.dataAnchor$getTrackedDataKeys();
                             for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
-                                container.get(key).ifPresent(data -> {
+                                container.dataAnchor$getTrackedData(key).ifPresent(data -> {
                                     if (data instanceof TickableTrackedData tickableData) {
                                         tickableData.tick();
                                     }

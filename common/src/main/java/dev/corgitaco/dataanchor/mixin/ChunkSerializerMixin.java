@@ -23,14 +23,14 @@ public class ChunkSerializerMixin {
 
 
     @Inject(method = "write", at = @At("RETURN"))
-    private static void save(ServerLevel level, ChunkAccess chunk, CallbackInfoReturnable<CompoundTag> cir) {
+    private static void dataAnchor$write(ServerLevel level, ChunkAccess chunk, CallbackInfoReturnable<CompoundTag> cir) {
         if (chunk instanceof TrackedDataContainer trackedDataContainer) {
             CompoundTag tag = cir.getReturnValue();
 
             CompoundTag trackedDataTag = new CompoundTag();
-            Collection<TrackedDataKey<ChunkTrackedData>> keys = trackedDataContainer.getKeys();
+            Collection<TrackedDataKey<ChunkTrackedData>> keys = trackedDataContainer.dataAnchor$getTrackedDataKeys();
             for (TrackedDataKey<ChunkTrackedData> key : keys) {
-                trackedDataContainer.get(key).ifPresent(trackedData -> {
+                trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
                     if (trackedData instanceof ChunkTrackedData chunkTrackedData) {
                         CompoundTag save = chunkTrackedData.save();
                         if (save != null) {
@@ -45,7 +45,7 @@ public class ChunkSerializerMixin {
     }
 
     @Inject(method = "read", at = @At("RETURN"))
-    private static void load(ServerLevel level, PoiManager poiManager, ChunkPos pos, CompoundTag tag, CallbackInfoReturnable<ProtoChunk> cir) {
+    private static void dataAnchor$read(ServerLevel level, PoiManager poiManager, ChunkPos pos, CompoundTag tag, CallbackInfoReturnable<ProtoChunk> cir) {
         ChunkAccess returnValue = cir.getReturnValue();
         if (returnValue instanceof ImposterProtoChunk imposterProtoChunk) {
             returnValue = imposterProtoChunk.getWrapped();
@@ -53,8 +53,8 @@ public class ChunkSerializerMixin {
 
         if (returnValue instanceof TrackedDataContainer<?, ?> trackedDataContainer) {
             CompoundTag trackedDataTag = tag.getCompound("TrackedData");
-            for (TrackedDataKey key : trackedDataContainer.getKeys()) {
-                trackedDataContainer.get(key).ifPresent(trackedData -> {
+            for (TrackedDataKey key : trackedDataContainer.dataAnchor$getTrackedDataKeys()) {
+                trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
                     if (trackedData instanceof ChunkTrackedData chunkTrackedData) {
                         String idString = key.getId().toString();
                         if (trackedDataTag.contains(idString)) {

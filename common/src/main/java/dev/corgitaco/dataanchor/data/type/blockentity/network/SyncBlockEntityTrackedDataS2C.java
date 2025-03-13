@@ -30,7 +30,7 @@ public record SyncBlockEntityTrackedDataS2C(BlockPos pos, TrackedDataKey<? exten
     @Override
     public void handle(@Nullable Level level, @Nullable Player player) {
         if (level.getBlockEntity(this.pos) instanceof TrackedDataContainer access) {
-            access.get(this.dataKey).ifPresent(data -> {
+            access.dataAnchor$getTrackedData(this.dataKey).ifPresent(data -> {
                 if (data instanceof SyncedTrackedData syncedData) {
                     syncedData.readFromNetwork(tag);
                 }

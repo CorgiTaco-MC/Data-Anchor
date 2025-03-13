@@ -24,11 +24,11 @@ public class ServerEntityMixin {
     private Entity entity;
 
     @Inject(method = "addPairing", at = @At("RETURN"))
-    private void addPairing(ServerPlayer player, CallbackInfo ci) {
+    private void dataAnchor$addPairing(ServerPlayer player, CallbackInfo ci) {
         if (this.entity instanceof TrackedDataContainer trackedDataContainer) {
-            Collection<TrackedDataKey<PlayerTrackedData>> keys = trackedDataContainer.getKeys();
+            Collection<TrackedDataKey<PlayerTrackedData>> keys = trackedDataContainer.dataAnchor$getTrackedDataKeys();
             keys.forEach(key -> {
-                trackedDataContainer.get(key).ifPresent(trackedData -> {
+                trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
                     if (trackedData instanceof SyncedTrackedData syncedTrackedData) {
                         syncedTrackedData.syncToPlayer(player);
                     }

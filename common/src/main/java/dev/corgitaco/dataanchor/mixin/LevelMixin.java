@@ -5,6 +5,7 @@ import dev.corgitaco.dataanchor.data.TickableTrackedData;
 import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
+import dev.corgitaco.dataanchor.data.type.blockentity.PendingBlockEntityTick;
 import dev.corgitaco.dataanchor.data.type.blockentity.BlockEntityTrackedData;
 import dev.corgitaco.dataanchor.data.type.level.LevelTrackedData;
 import dev.corgitaco.dataanchor.data.type.level.TrackedLevelSavedData;
@@ -33,34 +34,26 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
     @Final
     public boolean isClientSide;
     @Unique
-    private TrackedDataContainer<Level, LevelTrackedData> dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.LEVEL, (Level) (Object) this, isClientSide());
+    private TrackedDataContainer<Level, LevelTrackedData> dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.LEVEL, (Level) (Object) this, isClientSide(), true);
 
     @Unique
     private final List<TickableTrackedData> dataAnchor$tickableLevelData = new ArrayList<>();
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void onInit(CallbackInfo ci) {
-        if (((Level) (Object) this instanceof ServerLevel)) {
-            return;
-        }
-        this.create();
+    @Override
+    public <E extends LevelTrackedData> Optional<E> dataAnchor$getTrackedData(TrackedDataKey<E> key) {
+        return this.dataAnchor$trackedDataContainer.dataAnchor$getTrackedData(key);
     }
 
     @Override
-    public <E extends LevelTrackedData> Optional<E> get(TrackedDataKey<E> key) {
-        return this.dataAnchor$trackedDataContainer.get(key);
-    }
-
-    @Override
-    public void create() {
+    public void dataAnchor$createTrackedData() {
         if ((Object) this instanceof ServerLevel serverLevel) {
             this.dataAnchor$trackedDataContainer = TrackedLevelSavedData.get(serverLevel);
         } else {
-            this.dataAnchor$trackedDataContainer.create();
+            this.dataAnchor$trackedDataContainer.dataAnchor$createTrackedData();
         }
 
-        for (TrackedDataKey<LevelTrackedData> key : this.dataAnchor$trackedDataContainer.getKeys()) {
-            this.dataAnchor$trackedDataContainer.get(key).ifPresent(levelTrackedData -> {
+        for (TrackedDataKey<LevelTrackedData> key : this.dataAnchor$trackedDataContainer.dataAnchor$getTrackedDataKeys()) {
+            this.dataAnchor$trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(levelTrackedData -> {
                 if (levelTrackedData instanceof TickableTrackedData tickableData) {
                     this.dataAnchor$tickableLevelData.add(tickableData);
                 }
@@ -69,8 +62,8 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
     }
 
     @Override
-    public Collection<TrackedDataKey<LevelTrackedData>> getKeys() {
-        return this.dataAnchor$trackedDataContainer.getKeys();
+    public Collection<TrackedDataKey<LevelTrackedData>> dataAnchor$getTrackedDataKeys() {
+        return this.dataAnchor$trackedDataContainer.dataAnchor$getTrackedDataKeys();
     }
 
     @Inject(method = "tickBlockEntities", at = @At("RETURN"))
@@ -81,13 +74,13 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
     }
 
     @Inject(method = "tickBlockEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/TickingBlockEntity;tick()V"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void onTickBlockEntitiesEnd(CallbackInfo ci, ProfilerFiller profilerFiller, Iterator iterator, TickingBlockEntity tickingBlockEntity) {
-        if (((Level) (Object) this).getBlockEntity(tickingBlockEntity.getPos()) instanceof TrackedDataContainer container) {
-            Collection<TrackedDataKey<BlockEntityTrackedData>> keys = container.getKeys();
+    private void dataAnchor$onTickBlockEntitiesEnd(CallbackInfo ci, ProfilerFiller profilerFiller, Iterator iterator, TickingBlockEntity tickingBlockEntity) {
+        if (this.getBlockEntity(tickingBlockEntity.getPos()) instanceof TrackedDataContainer container) {
+            Collection<TrackedDataKey<BlockEntityTrackedData>> keys = container.dataAnchor$getTrackedDataKeys();
             for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
-                container.get(key).ifPresent(data -> {
-                    if (data instanceof TickableTrackedData tickableData) {
-                        tickableData.tick();
+                container.dataAnchor$getTrackedData(key).ifPresent(data -> {
+                    if (data instanceof PendingBlockEntityTick tickableData) {
+                        tickableData.blockEntityTick();
                     }
                 });
             }
@@ -95,18 +88,18 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
     }
 
     @Override
-    public void markDirty() {
+    public void dataAnchor$markDirty() {
         if (dataAnchor$trackedDataContainer instanceof TrackedLevelSavedData dirtyMarker) {
             dirtyMarker.setDirty();
         }
     }
 
     @Override
-    public void clearDirty() {
-        dataAnchor$trackedDataContainer.getKeys().forEach(key -> {
-            dataAnchor$trackedDataContainer.get(key).ifPresent(levelTrackedData -> {
+    public void dataAnchor$clearDirty() {
+        dataAnchor$trackedDataContainer.dataAnchor$getTrackedDataKeys().forEach(key -> {
+            dataAnchor$trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(levelTrackedData -> {
                 if (levelTrackedData instanceof DirtyMarker dirtyMarker) {
-                    dirtyMarker.clearDirty();
+                    dirtyMarker.dataAnchor$clearDirty();
                 }
             });
         });

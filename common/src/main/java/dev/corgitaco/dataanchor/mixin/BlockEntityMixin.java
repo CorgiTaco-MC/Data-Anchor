@@ -12,12 +12,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 @Mixin(BlockEntity.class)
@@ -26,42 +28,49 @@ public class BlockEntityMixin implements TrackedDataContainer<BlockEntity, Block
     @Shadow
     @Nullable
     protected Level level;
+    @Unique
     @Nullable
-    private TrackedDataContainer<BlockEntity, BlockEntityTrackedData> container;
+    private TrackedDataContainer<BlockEntity, BlockEntityTrackedData> dataAnchor$container;
 
 
     @Inject(method = "setLevel", at = @At("RETURN"))
-    private void setLevel(Level level, CallbackInfo ci) {
-        create();
+    private void dataAnchor$setLevel(Level level, CallbackInfo ci) {
+        dataAnchor$createTrackedData();
     }
 
     @Override
-    public <E extends BlockEntityTrackedData> Optional<E> get(TrackedDataKey<E> key) {
-        return this.container.get(key);
+    public <E extends BlockEntityTrackedData> Optional<E> dataAnchor$getTrackedData(TrackedDataKey<E> key) {
+        if (dataAnchor$container == null) {
+            return Optional.empty();
+        }
+        return this.dataAnchor$container.dataAnchor$getTrackedData(key);
     }
 
     @Override
-    public void create() {
-        if (container == null) {
-            container = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.BLOCK_ENTITY, (BlockEntity) (Object) this, level != null/*assume loading from disk*/ && level.isClientSide());
-            this.container.create();
+    public void dataAnchor$createTrackedData() {
+        if (dataAnchor$container == null) {
+            dataAnchor$container = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.BLOCK_ENTITY, (BlockEntity) (Object) this, level != null/*assume loading from disk*/ && level.isClientSide());
+            this.dataAnchor$container.dataAnchor$createTrackedData();
         }
     }
 
     @Override
-    public Collection<TrackedDataKey<BlockEntityTrackedData>> getKeys() {
-        return this.container.getKeys();
+    public Collection<TrackedDataKey<BlockEntityTrackedData>> dataAnchor$getTrackedDataKeys() {
+        if (dataAnchor$container == null) {
+            return Collections.emptyList();
+        }
+        return this.dataAnchor$container.dataAnchor$getTrackedDataKeys();
     }
 
     @Inject(method = "loadStatic", at = @At("RETURN"))
-    private static void loadStatic(BlockPos pos, BlockState state, CompoundTag tag, CallbackInfoReturnable<BlockEntity> cir) {
+    private static void dataAnchor$loadStatic(BlockPos pos, BlockState state, CompoundTag tag, CallbackInfoReturnable<BlockEntity> cir) {
         if (cir.getReturnValue() instanceof TrackedDataContainer container) {
-            container.create();
+            container.dataAnchor$createTrackedData();
             if (tag.contains("TrackedData")) {
                 CompoundTag trackedData = tag.getCompound("TrackedData");
-                Collection<TrackedDataKey<BlockEntityTrackedData>> keys = container.getKeys();
+                Collection<TrackedDataKey<BlockEntityTrackedData>> keys = container.dataAnchor$getTrackedDataKeys();
                 for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
-                    container.get(key).ifPresent(data -> {
+                    container.dataAnchor$getTrackedData(key).ifPresent(data -> {
                         if (data instanceof BlockEntityTrackedData blockEntityTrackedData) {
                             String idString = key.getId().toString();
                             if (trackedData.contains(idString)) {
@@ -75,11 +84,11 @@ public class BlockEntityMixin implements TrackedDataContainer<BlockEntity, Block
     }
 
     @Inject(method = "saveWithFullMetadata", at = @At("RETURN"))
-    private void saveWithFullMetadata(CallbackInfoReturnable<CompoundTag> cir) {
-        if (this.container != null) {
+    private void dataAnchor$saveWithFullMetadata(CallbackInfoReturnable<CompoundTag> cir) {
+        if (this.dataAnchor$container != null) {
             CompoundTag trackedData = new CompoundTag();
-            for (TrackedDataKey<BlockEntityTrackedData> key : this.container.getKeys()) {
-                this.container.get(key).ifPresent(data -> {
+            for (TrackedDataKey<BlockEntityTrackedData> key : this.dataAnchor$container.dataAnchor$getTrackedDataKeys()) {
+                this.dataAnchor$container.dataAnchor$getTrackedData(key).ifPresent(data -> {
                     CompoundTag save = data.save();
                     if (save != null) {
                         trackedData.put(key.getId().toString(), save);

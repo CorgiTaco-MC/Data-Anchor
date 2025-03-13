@@ -12,20 +12,14 @@ import dev.corgitaco.dataanchor.data.type.level.SyncedLevelTrackedData;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.RandomSequences;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.storage.LevelStorageSource;
-import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,8 +27,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
@@ -44,19 +36,12 @@ public abstract class ServerLevelMixin extends Level {
         super(levelData, dimension, registryAccess, dimensionTypeRegistration, profiler, isClientSide, isDebug, biomeZoomSeed, maxChainedNeighborUpdates);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void createTrackedData(MinecraftServer server, Executor dispatcher, LevelStorageSource.LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey dimension, LevelStem levelStem, ChunkProgressListener progressListener, boolean isDebug, long biomeZoomSeed, List customSpawners, boolean tickTime, RandomSequences randomSequences, CallbackInfo ci) {
-        if (this instanceof TrackedDataContainer access) {
-            access.create();
-        }
-    }
-
     @Inject(method = "tickChunk", at = @At("RETURN"))
-    private void onTickChunk(LevelChunk chunk, int randomTickSpeed, CallbackInfo ci) {
+    private void dataAnchor$onTickChunk(LevelChunk chunk, int randomTickSpeed, CallbackInfo ci) {
         if (chunk instanceof TrackedDataContainer access) {
-            Collection<TrackedDataKey<ChunkTrackedData>> keys = access.getKeys();
+            Collection<TrackedDataKey<ChunkTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
             for (TrackedDataKey<ChunkTrackedData> key : keys) {
-                access.get(key).ifPresent(data -> {
+                access.dataAnchor$getTrackedData(key).ifPresent(data -> {
                     if (data instanceof TickableTrackedData tickableData) {
                         tickableData.tick();
                     }
@@ -67,9 +52,9 @@ public abstract class ServerLevelMixin extends Level {
         if (chunk.getFullStatus().isOrAfter(FullChunkStatus.BLOCK_TICKING)) {
             for (BlockEntity value : chunk.getBlockEntities().values()) {
                 if (value instanceof TrackedDataContainer access) {
-                    Collection<TrackedDataKey<BlockEntityTrackedData>> keys = access.getKeys();
+                    Collection<TrackedDataKey<BlockEntityTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
                     for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
-                        access.get(key).ifPresent(data -> {
+                        access.dataAnchor$getTrackedData(key).ifPresent(data -> {
                             if (data instanceof TickableTrackedData tickableData) {
                                 tickableData.tick();
                             }
@@ -82,11 +67,11 @@ public abstract class ServerLevelMixin extends Level {
 
 
     @Inject(method = "addRespawnedPlayer", at = @At("RETURN"))
-    private void addRespawnTeleport(ServerPlayer player, CallbackInfo ci) {
+    private void dataAnchor$addRespawnTeleport(ServerPlayer player, CallbackInfo ci) {
         if (player instanceof TrackedDataContainer access) {
-            Collection<TrackedDataKey<PlayerTrackedData>> keys = access.getKeys();
+            Collection<TrackedDataKey<PlayerTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
             for (TrackedDataKey<PlayerTrackedData> key : keys) {
-                access.get(key).ifPresent(trackedData -> {
+                access.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
                     if (trackedData instanceof PlayerTrackedData data) {
                         data.addRespawnedPlayer();
                     }
@@ -97,11 +82,11 @@ public abstract class ServerLevelMixin extends Level {
 
 
     @Inject(method = "addDuringCommandTeleport", at = @At("RETURN"))
-    private void addDuringCommandTeleport(ServerPlayer player, CallbackInfo ci) {
+    private void dataAnchor$addDuringCommandTeleport(ServerPlayer player, CallbackInfo ci) {
         if (player instanceof TrackedDataContainer access) {
-            Collection<TrackedDataKey<PlayerTrackedData>> keys = access.getKeys();
+            Collection<TrackedDataKey<PlayerTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
             for (TrackedDataKey<PlayerTrackedData> key : keys) {
-                access.get(key).ifPresent(trackedData -> {
+                access.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
                     if (trackedData instanceof PlayerTrackedData data) {
                         data.addDuringCommandTeleport();
                     }
@@ -112,11 +97,11 @@ public abstract class ServerLevelMixin extends Level {
 
 
     @Inject(method = "addDuringPortalTeleport", at = @At("RETURN"))
-    private void addDuringPortalTeleport(ServerPlayer player, CallbackInfo ci) {
+    private void dataAnchor$addDuringPortalTeleport(ServerPlayer player, CallbackInfo ci) {
         if (player instanceof TrackedDataContainer access) {
-            Collection<TrackedDataKey<PlayerTrackedData>> keys = access.getKeys();
+            Collection<TrackedDataKey<PlayerTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
             for (TrackedDataKey<PlayerTrackedData> key : keys) {
-                access.get(key).ifPresent(trackedData -> {
+                access.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
                     if (trackedData instanceof PlayerTrackedData data) {
                         data.addDuringPortalTeleport();
                     }
@@ -126,11 +111,11 @@ public abstract class ServerLevelMixin extends Level {
     }
 
     @Inject(method = "addPlayer", at = @At("RETURN"))
-    private void onPlayerAddToWorld(ServerPlayer player, CallbackInfo ci) {
+    private void dataAnchor$onPlayerAddToWorld(ServerPlayer player, CallbackInfo ci) {
         if (player instanceof TrackedDataContainer access) {
-            Collection<TrackedDataKey<PlayerTrackedData>> keys = access.getKeys();
+            Collection<TrackedDataKey<PlayerTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
             for (TrackedDataKey<PlayerTrackedData> key : keys) {
-                access.get(key).ifPresent(data -> {
+                access.dataAnchor$getTrackedData(key).ifPresent(data -> {
                     if (data instanceof PlayerTrackedData playerTrackedData) {
                         playerTrackedData.playerAddedToWorld();
                         if (data instanceof SyncedPlayerTrackedData syncedData) {
@@ -141,9 +126,9 @@ public abstract class ServerLevelMixin extends Level {
             }
         }
         if (this instanceof TrackedDataContainer access) {
-            Collection<TrackedDataKey<LevelTrackedData>> keys = access.getKeys();
+            Collection<TrackedDataKey<LevelTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
             for (TrackedDataKey<LevelTrackedData> key : keys) {
-                access.get(key).ifPresent(data -> {
+                access.dataAnchor$getTrackedData(key).ifPresent(data -> {
 
                     if (data instanceof SyncedLevelTrackedData syncedData) {
                         syncedData.syncToPlayer(player);

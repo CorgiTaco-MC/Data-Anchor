@@ -28,28 +28,28 @@ public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, Chunk
     TrackedDataContainer<ChunkAccess, ChunkTrackedData> dataAnchor$trackedDataContainer;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void onInit(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry biomeRegistry, long inhabitedTime, LevelChunkSection[] sections, BlendingData blendingData, CallbackInfo ci) {
+    private void dataAnchor$onInit(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry biomeRegistry, long inhabitedTime, LevelChunkSection[] sections, BlendingData blendingData, CallbackInfo ci) {
         if (levelHeightAccessor instanceof ServerLevelAccessor) {
            this.dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.CHUNK, (ChunkAccess) (Object) this, false);
         } else {
             this.dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.CHUNK, (ChunkAccess) (Object) this, true);
         }
-        this.create();
+        this.dataAnchor$createTrackedData();
     }
 
     @Override
-    public <E extends ChunkTrackedData> Optional<E> get(TrackedDataKey<E> key) {
-        return dataAnchor$trackedDataContainer.get(key);
+    public <E extends ChunkTrackedData> Optional<E> dataAnchor$getTrackedData(TrackedDataKey<E> key) {
+        return dataAnchor$trackedDataContainer.dataAnchor$getTrackedData(key);
     }
 
     @Override
-    public void create() {
-        dataAnchor$trackedDataContainer.create();
+    public void dataAnchor$createTrackedData() {
+        dataAnchor$trackedDataContainer.dataAnchor$createTrackedData();
     }
 
     @Override
-    public Collection<TrackedDataKey<ChunkTrackedData>> getKeys() {
-        return dataAnchor$trackedDataContainer.getKeys();
+    public Collection<TrackedDataKey<ChunkTrackedData>> dataAnchor$getTrackedDataKeys() {
+        return dataAnchor$trackedDataContainer.dataAnchor$getTrackedDataKeys();
     }
 
 
