@@ -1,3 +1,6 @@
+# 1.0.0.9
+* Remove Fabric Data gen from fabric.mod.json.
+
 # 1.0.0.8
 * Check if a tag exists before attempting to load from it. Mark fields transient where needed.
 
