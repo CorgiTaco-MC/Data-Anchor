@@ -1,3 +1,6 @@
+# 1.0.0.10
+* Fix crashing with Create 6.0.2 by lazily creating tracked data.
+
 # 1.0.0.9
 * Remove Fabric Data gen from fabric.mod.json.
 
