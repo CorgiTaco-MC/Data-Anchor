@@ -1,10 +1,7 @@
 package dev.corgitaco.dataanchor.data.type.level;
 
 import dev.corgitaco.dataanchor.DataAnchor;
-import dev.corgitaco.dataanchor.data.DirtyMarker;
-import dev.corgitaco.dataanchor.data.ServerTrackedData;
-import dev.corgitaco.dataanchor.data.TickableTrackedData;
-import dev.corgitaco.dataanchor.data.TrackedDataContainer;
+import dev.corgitaco.dataanchor.data.*;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
@@ -28,7 +25,7 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
     public void setDirty(boolean dirty) {
         super.setDirty(dirty);
         if (!dirty) {
-            if (serverLevel instanceof DirtyMarker dirtyMarker) {
+            if (serverLevel instanceof InternalDirtyMarker dirtyMarker) {
                 dirtyMarker.dataAnchor$clearDirty();
             }
         }

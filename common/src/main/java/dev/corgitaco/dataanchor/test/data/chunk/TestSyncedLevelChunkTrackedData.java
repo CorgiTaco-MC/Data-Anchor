@@ -32,6 +32,6 @@ public class TestSyncedLevelChunkTrackedData extends SyncedLevelChunkTrackedData
     public void setTimer(int timer) {
         this.timer = timer;
         sync();
-        dataAnchor$markDirty();
+        markDirty();
     }
 }

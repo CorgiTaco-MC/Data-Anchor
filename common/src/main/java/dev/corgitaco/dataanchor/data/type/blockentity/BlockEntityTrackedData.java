@@ -22,12 +22,12 @@ public abstract sealed class BlockEntityTrackedData implements TrackedData<Block
     }
 
     @Override
-    public void dataAnchor$markDirty() {
+    public void markDirty() {
         blockEntity.setChanged();
     }
 
     @Override
-    public void dataAnchor$clearDirty() {
+    public void clearDirty() {
 
     }
 }

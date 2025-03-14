@@ -1,6 +1,7 @@
 package dev.corgitaco.dataanchor.mixin;
 
 import dev.corgitaco.dataanchor.data.DirtyMarker;
+import dev.corgitaco.dataanchor.data.InternalDirtyMarker;
 import dev.corgitaco.dataanchor.data.TickableTrackedData;
 import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
@@ -26,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.*;
 
 @Mixin(Level.class)
-public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTrackedData>, DirtyMarker, LevelAccessor {
+public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTrackedData>, InternalDirtyMarker, LevelAccessor {
     @Shadow
     public abstract boolean isClientSide();
 
@@ -111,7 +112,7 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
         dataAnchor$trackedDataContainer.dataAnchor$getTrackedDataKeys().forEach(key -> {
             dataAnchor$trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(levelTrackedData -> {
                 if (levelTrackedData instanceof DirtyMarker dirtyMarker) {
-                    dirtyMarker.dataAnchor$clearDirty();
+                    dirtyMarker.clearDirty();
                 }
             });
         });

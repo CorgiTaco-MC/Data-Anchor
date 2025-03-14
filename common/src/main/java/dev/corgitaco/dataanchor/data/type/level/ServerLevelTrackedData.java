@@ -1,12 +1,12 @@
 package dev.corgitaco.dataanchor.data.type.level;
 
 import dev.corgitaco.dataanchor.data.DirtyMarker;
+import dev.corgitaco.dataanchor.data.InternalDirtyMarker;
 import dev.corgitaco.dataanchor.data.ServerTrackedData;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import net.minecraft.server.level.ServerLevel;
 
 public abstract non-sealed class ServerLevelTrackedData extends LevelTrackedData implements DirtyMarker, ServerTrackedData {
-    private boolean dirty = false;
 
     public ServerLevelTrackedData(TrackedDataKey<ServerLevelTrackedData> trackedDataKey, ServerLevel chunk) {
         super(trackedDataKey, chunk);
@@ -18,12 +18,15 @@ public abstract non-sealed class ServerLevelTrackedData extends LevelTrackedData
     }
 
     @Override
-    public void dataAnchor$markDirty() {
-        dirty = true;
+    public void markDirty() {
+        if (!level.isClientSide) {
+            if (level instanceof InternalDirtyMarker dirtyMarker) {
+                dirtyMarker.dataAnchor$markDirty();
+            }
+        }
     }
 
     @Override
-    public void dataAnchor$clearDirty() {
-        dirty = false;
+    public void clearDirty() {
     }
 }

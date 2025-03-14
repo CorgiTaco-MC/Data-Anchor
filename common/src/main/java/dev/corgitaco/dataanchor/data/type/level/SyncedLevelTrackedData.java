@@ -28,15 +28,15 @@ public abstract non-sealed class SyncedLevelTrackedData extends LevelTrackedData
     }
 
     @Override
-    public void dataAnchor$markDirty() {
+    public void markDirty() {
         if (!level.isClientSide) {
             if (level instanceof DirtyMarker dirtyMarker) {
-                dirtyMarker.dataAnchor$markDirty();
+                dirtyMarker.markDirty();
             }
         }
     }
 
     @Override
-    public void dataAnchor$clearDirty() {
+    public void clearDirty() {
     }
 }
