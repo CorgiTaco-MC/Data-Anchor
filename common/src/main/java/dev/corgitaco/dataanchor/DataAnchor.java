@@ -24,30 +24,12 @@ public class DataAnchor {
 
     public static final S2CNetworkContainer NETWORK_CONTAINER = S2CNetworkContainer.of(MOD_ID);
 
-//    public static final TrackedDataKey<TestSyncedLevelTrackedData> TEST_LEVEL_DATA = TrackedDataRegistries.LEVEL.register(DataAnchor.id("test"), TestSyncedLevelTrackedData.class, TestSyncedLevelTrackedData::new);
-//    public static final TrackedDataKey<TestSyncedPlayerTrackedData> TEST_PLAYER_DATA = TrackedDataRegistries.ENTITY.register(DataAnchor.id("player"), TestSyncedPlayerTrackedData.class, (key, obj) -> {
-//        if (obj instanceof Player player) {
-//            return new TestSyncedPlayerTrackedData(key, player);
-//        }
-//        return null;
-//    });
-//    public static final TrackedDataKey<TestSyncedLevelChunkTrackedData> TEST_CHUNK_DATA = TrackedDataRegistries.CHUNK.register(DataAnchor.id("test"), TestSyncedLevelChunkTrackedData.class, (key, obj) -> {
-//        if (obj instanceof LevelChunk chunk) {
-//            return new TestSyncedLevelChunkTrackedData(key, chunk);
-//        }
-//        return null;
-//    });
-
-//    public static final TrackedDataKey<TestSyncedBlockEntityTrackedData> TEST_BLOCK_ENTITY_DATA = TrackedDataRegistries.BLOCK_ENTITY.register(DataAnchor.id("test"), TestSyncedBlockEntityTrackedData.class, TestSyncedBlockEntityTrackedData::new);
-
-
     /**
      * Initializes the mod.
      */
     public static void init() {
         registerPacketHandlers();
     }
-
 
     private static void registerPacketHandlers() {
         NETWORK_CONTAINER.registerPacketHandler("entity_tracked_data",

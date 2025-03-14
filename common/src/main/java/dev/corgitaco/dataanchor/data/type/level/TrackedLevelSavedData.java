@@ -1,7 +1,10 @@
 package dev.corgitaco.dataanchor.data.type.level;
 
 import dev.corgitaco.dataanchor.DataAnchor;
-import dev.corgitaco.dataanchor.data.*;
+import dev.corgitaco.dataanchor.data.InternalDirtyMarker;
+import dev.corgitaco.dataanchor.data.ServerTrackedData;
+import dev.corgitaco.dataanchor.data.TickableTrackedData;
+import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
