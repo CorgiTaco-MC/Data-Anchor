@@ -34,13 +34,21 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
     @Final
     public boolean isClientSide;
     @Unique
-    private TrackedDataContainer<Level, LevelTrackedData> dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.LEVEL, (Level) (Object) this, isClientSide(), true);
+    private TrackedDataContainer<Level, LevelTrackedData> dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.LEVEL, (Level) (Object) this, isClientSide(), false);
 
     @Unique
     private final List<TickableTrackedData> dataAnchor$tickableLevelData = new ArrayList<>();
 
+    @Unique
+    private boolean dataAnchor$lazyLoadedTrackedData = false;
+
     @Override
     public <E extends LevelTrackedData> Optional<E> dataAnchor$getTrackedData(TrackedDataKey<E> key) {
+        if (!dataAnchor$lazyLoadedTrackedData) {
+            dataAnchor$createTrackedData();
+            dataAnchor$lazyLoadedTrackedData = true;
+        }
+
         return this.dataAnchor$trackedDataContainer.dataAnchor$getTrackedData(key);
     }
 
@@ -63,6 +71,10 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
 
     @Override
     public Collection<TrackedDataKey<LevelTrackedData>> dataAnchor$getTrackedDataKeys() {
+        if (!dataAnchor$lazyLoadedTrackedData) {
+            dataAnchor$createTrackedData();
+            dataAnchor$lazyLoadedTrackedData = true;
+        }
         return this.dataAnchor$trackedDataContainer.dataAnchor$getTrackedDataKeys();
     }
 
