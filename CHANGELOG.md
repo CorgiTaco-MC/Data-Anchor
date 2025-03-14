@@ -1,3 +1,6 @@
+# 1.0.0.12
+* Fix method call for DirtyMarker.
+
 # 1.0.0.11
 * Fix lazily loading level data.
 
