@@ -107,7 +107,8 @@ public record ExampleBidirectionalStringPacket(String s) implements Packet {
 * You can register your packet like so(we will use our example packet from above):
   ```java
   public static void registerPackets() {
-          NETWORK_CONTAINER.registerPacketHandler("example_string", // Don't worry we are registering this to our namespace / mod id.
+          NETWORK_CONTAINER.registerPacketHandler(
+                  "example_string", // Don't worry we are registering this to our namespace / mod id.
                   new Packet.Handler<>(
                           ExampleBidirectionalStringPacket.class,
                           ExampleBidirectionalStringPacket::write,
