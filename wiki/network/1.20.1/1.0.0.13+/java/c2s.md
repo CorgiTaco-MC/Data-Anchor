@@ -58,7 +58,7 @@ public record ExampleC2SStringPacket(String s) implements Packet {
     // Used to handle our packet when it is received.
     @Override
     public void handle(@Nullable Level level, @Nullable Player player) {
-      if (level instanceof ServerLevel serverLevel) { // Checks if our server is null for us and gives us access to a ServerLevel which we may need for ServerLevel specific functions.
+      if (level instanceof ServerLevel serverLevel) { // Checks if our server level is null for us and gives us access to a ServerLevel which we may need for ServerLevel specific functions.
           level.getServer().execute(() -> {
               System.out.println("Received string from client: " + this.s);
           });
