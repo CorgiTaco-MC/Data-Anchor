@@ -441,4 +441,7 @@
 * Data anchor offers some handy utility interfaces that may be implemented on your tracked data class to make your life easier and code cleaner.
 
 ## `TickableTrackedData`
-* If you implement this interface, you will be able to use the `tick()` method to run code every tick.
+* If you implement this interface, you will be able to override the `tick()` method to run code every tick.
+
+## `PendingBlockEntityTick`
+* If you implement this interface, you will be able to override the `blockEntityTick()` to run code after a block entity runs its pending ticks.
