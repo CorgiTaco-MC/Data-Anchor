@@ -6,3 +6,7 @@
 
 ### <1.20
 * Not supported
+
+## Networking
+### 1.20.1
+* [1.0.0.13+](/wiki/network/1.20.1/1.0.0.13+)
