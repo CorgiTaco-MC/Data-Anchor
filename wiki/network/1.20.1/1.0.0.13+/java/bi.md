@@ -139,7 +139,7 @@ public record ExampleBidirectionalStringPacket(String s) implements Packet {
       ```
     * To send to all players tracking a specific entity:
       ```java
-      BiDirectionalPacketBroadcaster.BI.sendToPlayer(new ExampleBidirectionalStringPacket("Meow!"), entity);
+      BiDirectionalPacketBroadcaster.BI.trackingEntity(new ExampleBidirectionalStringPacket("Meow!"), entity);
       ```
     * To send to all players tracking a specific entity and themselves(if the entity is a player):
       ```java
