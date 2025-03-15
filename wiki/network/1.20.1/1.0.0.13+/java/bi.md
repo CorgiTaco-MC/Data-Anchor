@@ -31,24 +31,24 @@ public static final BiDirectionalNetworkContainer NETWORK_CONTAINER = BiDirectio
           // Server side code
       }
       ```
-    * This method is executed off the main thread.
-      * If you are on the server side and would like to execute code on the main server thread you can use the following:
+  * This method is executed off the main thread.
+    * If you are on the server side and would like to execute code on the main server thread you can use the following:
+      ```java
+        level.getServer().execute(() -> { /* your code here */ });
+      ```
+    * If you are on the client side you will need a bit more boilerplate to run your code on the main client thread. You can use the following:
+      * Make a utility class to run your code on the main client thread:
         ```java
-          level.getServer().execute(() -> { /* your code here */ });
+        public static class ClientUtil {
+            public static void execute(Runnable runnable) {
+                Minecraft.getInstance().execute(runnable);
+            }
+        }
         ```
-      * If you are on the client side you will need a bit more boilerplate to run your code on the main client thread. You can use the following:
-        * Make a utility class to run your code on the main client thread:
-          ```java
-          public static class ClientUtil {
-              public static void execute(Runnable runnable) {
-                  Minecraft.getInstance().execute(runnable);
-              }
-          }
-          ```
-        * Then you can call your utility class here to run your code on the main client thread:
-          ```java
-          ClientUtil.execute(() -> { /* your code here. Make sure NOT to call client classes here! */ });
-          ```
+      * Then you can call your utility class here to run your code on the main client thread:
+        ```java
+        ClientUtil.execute(() -> { /* your code here. Make sure NOT to call client classes here! */ });
+        ```
 ## Example Bidirectional Packet
 * Here is an example of a packet that sends a basic string between the client and server:
 
