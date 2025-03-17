@@ -5,6 +5,7 @@ import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
 import dev.corgitaco.dataanchor.data.type.blockentity.BlockEntityTrackedData;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -63,7 +64,7 @@ public class BlockEntityMixin implements TrackedDataContainer<BlockEntity, Block
     }
 
     @Inject(method = "loadStatic", at = @At("RETURN"))
-    private static void dataAnchor$loadStatic(BlockPos pos, BlockState state, CompoundTag tag, CallbackInfoReturnable<BlockEntity> cir) {
+    private static void dataAnchor$loadStatic(BlockPos pos, BlockState state, CompoundTag tag, HolderLookup.Provider registries, CallbackInfoReturnable<BlockEntity> cir) {
         if (cir.getReturnValue() instanceof TrackedDataContainer container) {
             container.dataAnchor$createTrackedData();
             if (tag.contains("TrackedData")) {

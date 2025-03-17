@@ -5,6 +5,7 @@ import dev.corgitaco.dataanchor.data.SyncedTrackedData;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.type.level.network.SyncLevelTrackedDataS2C;
 import dev.corgitaco.dataanchor.network.broadcast.S2CPacketBroadcaster;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
@@ -18,7 +19,7 @@ public abstract non-sealed class SyncedLevelTrackedData extends LevelTrackedData
     @Override
     public void sync() {
         if (!level.isClientSide) {
-            S2CPacketBroadcaster.S2C.sendToAllPlayersInDimension(new SyncLevelTrackedDataS2C((TrackedDataKey<SyncedLevelTrackedData>) trackedDataKey, writeToNetwork()), get().dimension());
+            S2CPacketBroadcaster.S2C.sendToAllPlayersInDimension(new SyncLevelTrackedDataS2C((TrackedDataKey<SyncedLevelTrackedData>) trackedDataKey, writeToNetwork()), (ServerLevel) get());
         }
     }
 

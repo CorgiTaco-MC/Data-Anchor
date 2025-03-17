@@ -32,38 +32,40 @@ public class DataAnchor {
     }
 
     private static void registerPacketHandlers() {
-        NETWORK_CONTAINER.registerPacketHandler("entity_tracked_data",
+        NETWORK_CONTAINER.registerPacketHandler(
                 new Packet.Handler<>(
                         SyncEntityTrackedDataS2C.class,
-                        SyncEntityTrackedDataS2C::write,
-                        SyncEntityTrackedDataS2C::new,
+                        SyncEntityTrackedDataS2C.TYPE,
+                        SyncEntityTrackedDataS2C.STREAM_CODEC,
                         SyncEntityTrackedDataS2C::handle)
         );
-        NETWORK_CONTAINER.registerPacketHandler("chunk_tracked_data",
+        NETWORK_CONTAINER.registerPacketHandler(
                 new Packet.Handler<>(
                         SyncLevelChunkTrackedDataS2C.class,
-                        SyncLevelChunkTrackedDataS2C::write,
-                        SyncLevelChunkTrackedDataS2C::new,
+                        SyncLevelChunkTrackedDataS2C.TYPE,
+                        SyncLevelChunkTrackedDataS2C.STREAM_CODEC,
                         SyncLevelChunkTrackedDataS2C::handle)
         );
-        NETWORK_CONTAINER.registerPacketHandler("level_tracked_data",
+        NETWORK_CONTAINER.registerPacketHandler(
                 new Packet.Handler<>(
                         SyncLevelTrackedDataS2C.class,
-                        SyncLevelTrackedDataS2C::write,
-                        SyncLevelTrackedDataS2C::new,
-                        SyncLevelTrackedDataS2C::handle)
+                        SyncLevelTrackedDataS2C.TYPE,
+                        SyncLevelTrackedDataS2C.STREAM_CODEC,
+                        SyncLevelTrackedDataS2C::handle
+                )
         );
-        NETWORK_CONTAINER.registerPacketHandler("block_entity_tracked_data",
+        NETWORK_CONTAINER.registerPacketHandler(
                 new Packet.Handler<>(
                         SyncBlockEntityTrackedDataS2C.class,
-                        SyncBlockEntityTrackedDataS2C::write,
-                        SyncBlockEntityTrackedDataS2C::new,
-                        SyncBlockEntityTrackedDataS2C::handle)
+                        SyncBlockEntityTrackedDataS2C.TYPE,
+                        SyncBlockEntityTrackedDataS2C.STREAM_CODEC,
+                        SyncBlockEntityTrackedDataS2C::handle
+                )
         );
 
     }
 
     public static ResourceLocation id(String path) {
-        return new ResourceLocation(MOD_ID, path);
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 }

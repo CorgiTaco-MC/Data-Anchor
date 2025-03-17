@@ -1,32 +1,32 @@
 package dev.corgitaco.dataanchor.fabric.network;
 
 import dev.corgitaco.dataanchor.network.Packet;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 public abstract class FabricPacketBroadcaster {
 
-    protected final Map<Class<? extends Packet>, BiConsumer<?, FriendlyByteBuf>> encoders = new ConcurrentHashMap<>();
-    protected final Map<Class<? extends Packet>, ResourceLocation> packetIds = new ConcurrentHashMap<>();
-
-    protected final <T extends Packet> void register(ResourceLocation path, Packet.Handler<T> handler) {
-        registerMessage(path, handler.clazz(), handler.write(), handler.read(), handler.handle());
+    protected final <T extends Packet> void register(Packet.Handler<T> handler) {
+        registerPayload(handler.type(), handler.serializer());
+        registerHandler(handler);
     }
 
-    private <T extends Packet> void registerMessage(ResourceLocation id,
-                                                    Class<T> clazz,
-                                                    BiConsumer<T, FriendlyByteBuf> encode,
-                                                    Function<FriendlyByteBuf, T> decode,
-                                                    Packet.Handle<T> handler) {
-        encoders.put(clazz, encode);
-        packetIds.put(clazz, id);
-        registerReceiver(id, decode, handler);
+    protected abstract <T extends Packet> void registerPayload(CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> serializer);
+
+    protected abstract <T extends Packet> void registerHandler(Packet.Handler<T> handler);
+
+    public record ClientProxy() {
+        public static <T extends Packet> void registerClientReceiver(Packet.Handler<T> handler) {
+            ClientPlayNetworking.registerGlobalReceiver(handler.type(), (t, context) -> handler.handle().handle(t, context.client().level, context.player()));
+        }
     }
 
-    public abstract <T extends Packet> void registerReceiver(ResourceLocation id, Function<FriendlyByteBuf, T> decode, Packet.Handle<T> handler);
+    public static class ServerProxy {
+        static <T extends Packet> void registerServerReceiver(Packet.Handler<T> handler) {
+            ServerPlayNetworking.registerGlobalReceiver(handler.type(), (t, context) -> handler.handle().handle(t, context.player().level(), context.player()));
+        }
+    }
 }

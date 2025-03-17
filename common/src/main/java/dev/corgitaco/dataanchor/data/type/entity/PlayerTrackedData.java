@@ -27,14 +27,6 @@ public sealed abstract class PlayerTrackedData extends EntityTrackedData permits
         // Do something when the player is added to a world regardless of action
     }
 
-    public void addDuringCommandTeleport() {
-        // Do something when the player is added to the world from a command teleport
-    }
-
-    public void addDuringPortalTeleport() {
-        // Do something when the player is added to the world from a teleport
-    }
-
     public void addRespawnedPlayer() {
         // Do something when the player is respawned
     }

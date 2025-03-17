@@ -14,6 +14,10 @@ public abstract sealed class EntityTrackedData implements TrackedData<Entity> pe
         this.entity = entity;
     }
 
+    public void addDuringPortalTeleport() {
+        // Do something when the entity is added to the world from a portal teleport
+    }
+
     @Override
     public Entity get() {
         return this.entity;

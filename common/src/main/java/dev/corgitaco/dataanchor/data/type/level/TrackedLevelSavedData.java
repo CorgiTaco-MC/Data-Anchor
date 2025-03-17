@@ -8,8 +8,10 @@ import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -51,11 +53,11 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
 
     public static TrackedLevelSavedData get(ServerLevel world) {
         DimensionDataStorage data = world.getDataStorage();
-        return data.computeIfAbsent(tag -> new TrackedLevelSavedData(world, tag), () -> new TrackedLevelSavedData(world), DATA_NAME);
+        return data.computeIfAbsent(new Factory<TrackedLevelSavedData>(() -> new TrackedLevelSavedData(world), (compoundTag, provider) -> new TrackedLevelSavedData(world, compoundTag), DataFixTypes.SAVED_DATA_MAP_DATA), DATA_NAME);
     }
 
     @Override
-    public CompoundTag save(CompoundTag compoundTag) {
+    public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider registries) {
         for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
             CompoundTag save = entry.getValue().save();
             if (save != null) {

@@ -34,7 +34,7 @@ public abstract class LevelMixin implements LevelAccessor {
     private void tickClient(CallbackInfo ci) {
         if (isClientSide) {
             if (getChunkSource() instanceof ClientChunkCache clientChunkCache) {
-                AtomicReferenceArray<LevelChunk> chunks = getChunks(clientChunkCache);
+                AtomicReferenceArray<LevelChunk> chunks = dataAnchor$getChunks(clientChunkCache);
                 int length = chunks.length();
                 for (int i = 0; i < length; i++) {
                     LevelChunk levelChunk = chunks.get(i);
@@ -72,7 +72,7 @@ public abstract class LevelMixin implements LevelAccessor {
     }
 
     @Unique
-    private synchronized AtomicReferenceArray<LevelChunk> getChunks(ClientChunkCache clientChunkCache) {
+    private synchronized AtomicReferenceArray<LevelChunk> dataAnchor$getChunks(ClientChunkCache clientChunkCache) {
         return clientChunkCache.storage.chunks;
     }
 }

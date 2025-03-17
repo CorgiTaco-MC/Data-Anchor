@@ -1,5 +1,6 @@
 package dev.corgitaco.dataanchor.data.type.blockentity.network;
 
+import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.data.SyncedTrackedData;
 import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
@@ -9,18 +10,24 @@ import dev.corgitaco.dataanchor.network.Packet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.protocol.common.custom.HiveDebugPayload;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 public record SyncBlockEntityTrackedDataS2C(BlockPos pos, TrackedDataKey<? extends BlockEntityTrackedData> dataKey,
                                             CompoundTag tag) implements Packet {
+    public static final StreamCodec<RegistryFriendlyByteBuf, SyncBlockEntityTrackedDataS2C> STREAM_CODEC = CustomPacketPayload.codec(SyncBlockEntityTrackedDataS2C::write, SyncBlockEntityTrackedDataS2C::new);
+    public static final CustomPacketPayload.Type<SyncBlockEntityTrackedDataS2C> TYPE = new CustomPacketPayload.Type<>(DataAnchor.id("block_entity_tracked_data"));
+
 
     public SyncBlockEntityTrackedDataS2C(FriendlyByteBuf buf) {
         this(buf.readBlockPos(), TrackedDataKey.fromID(TrackedDataRegistries.BLOCK_ENTITY, buf.readResourceLocation()), buf.readNbt());
     }
 
-    @Override
     public void write(FriendlyByteBuf buf) {
         buf.writeBlockPos(this.pos);
         buf.writeResourceLocation(dataKey.getId());
@@ -36,5 +43,10 @@ public record SyncBlockEntityTrackedDataS2C(BlockPos pos, TrackedDataKey<? exten
                 }
             });
         }
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

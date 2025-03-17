@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public abstract class NetworkContainer {
 
@@ -16,16 +17,20 @@ public abstract class NetworkContainer {
         this.nameSpace = namespace;
     }
 
-    public <T extends Packet> void registerPacketHandler(String name, Packet.Handler<T> packetHandle) {
+    public <T extends Packet> void registerPacketHandler(Packet.Handler<T> packetHandle) {
         if (!locked) {
-            this.packets.put(new ResourceLocation(this.nameSpace, name), packetHandle);
+            ResourceLocation id = packetHandle.type().id();
+            if (!id.getNamespace().equals(this.nameSpace)) {
+                throw new IllegalArgumentException("Network Container for namespace \"%s\" cannot register packet with namespace \"%s\", expected namespace \"%s\"".formatted(this.nameSpace, id, this.nameSpace));
+            }
+            this.packets.put(id, packetHandle);
         } else {
             throw new IllegalArgumentException("Network Container for namespace \"%s\" is already locked, try registering earlier!".formatted(this.nameSpace));
         }
     }
 
-    public void registerMessages(BiConsumer<ResourceLocation, Packet.Handler<? extends Packet>> handlerConsumer) {
-        this.packets.forEach(handlerConsumer);
+    public void registerMessages(Consumer<Packet.Handler<? extends Packet>> handlerConsumer) {
+        this.packets.values().forEach(handlerConsumer);
         this.locked = true;
     }
 }

@@ -16,6 +16,7 @@ import net.minecraft.server.level.FullChunkStatus;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -81,24 +82,9 @@ public abstract class ServerLevelMixin extends Level {
     }
 
 
-    @Inject(method = "addDuringCommandTeleport", at = @At("RETURN"))
-    private void dataAnchor$addDuringCommandTeleport(ServerPlayer player, CallbackInfo ci) {
-        if (player instanceof TrackedDataContainer access) {
-            Collection<TrackedDataKey<PlayerTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
-            for (TrackedDataKey<PlayerTrackedData> key : keys) {
-                access.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
-                    if (trackedData instanceof PlayerTrackedData data) {
-                        data.addDuringCommandTeleport();
-                    }
-                });
-            }
-        }
-    }
-
-
-    @Inject(method = "addDuringPortalTeleport", at = @At("RETURN"))
-    private void dataAnchor$addDuringPortalTeleport(ServerPlayer player, CallbackInfo ci) {
-        if (player instanceof TrackedDataContainer access) {
+    @Inject(method = "addDuringTeleport", at = @At("RETURN"))
+    private void dataAnchor$addDuringPortalTeleport(Entity entity, CallbackInfo ci) {
+        if (entity instanceof TrackedDataContainer access) {
             Collection<TrackedDataKey<PlayerTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
             for (TrackedDataKey<PlayerTrackedData> key : keys) {
                 access.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
