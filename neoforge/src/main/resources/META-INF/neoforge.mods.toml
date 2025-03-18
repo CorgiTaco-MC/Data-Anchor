@@ -30,4 +30,4 @@ side = "BOTH"
 [[mixins]]
 config = "dataanchor.mixins.json"
 [[mixins]]
-config = "dataanchor-common.neoforge.mixins.json"
+config = "dataanchor-common.mixins.json"
