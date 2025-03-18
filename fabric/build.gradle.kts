@@ -84,7 +84,7 @@ publisher {
     artifact.set(tasks.remapJar)
     setGameVersions(minecraftVersion)
     setLoaders(ModLoader.FABRIC, ModLoader.QUILT)
-    setCurseEnvironment(CurseEnvironment.SERVER)
+    setCurseEnvironment(CurseEnvironment.BOTH)
     setJavaVersions(JavaVersion.VERSION_17, JavaVersion.VERSION_18, JavaVersion.VERSION_19, JavaVersion.VERSION_20, JavaVersion.VERSION_21)
     val depends = mutableListOf("fabric-api")
     curseDepends.required.set(depends)

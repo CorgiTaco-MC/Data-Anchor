@@ -97,9 +97,9 @@ publisher {
     changelog.set(projectDir.toPath().parent.resolve("CHANGELOG.md").toFile().readText())
     artifact.set(tasks.remapJar)
     setGameVersions(minecraftVersion)
-    setLoaders(ModLoader.FORGE, ModLoader.NEOFORGE)
-    setCurseEnvironment(CurseEnvironment.SERVER)
-    setJavaVersions(JavaVersion.VERSION_17, JavaVersion.VERSION_18, JavaVersion.VERSION_19, JavaVersion.VERSION_20, JavaVersion.VERSION_21)
+    setLoaders(ModLoader.FORGE)
+    setCurseEnvironment(CurseEnvironment.BOTH)
+    setJavaVersions(JavaVersion.VERSION_21)
 }
 
 private fun getPublishingCredentials(): Pair<String?, String?> {
