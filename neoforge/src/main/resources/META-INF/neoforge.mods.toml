@@ -26,3 +26,8 @@ mandatory = true
 versionRange = "[1.21.1]"
 ordering = "NONE"
 side = "BOTH"
+
+[[mixins]]
+config = "dataanchor.mixins.json"
+[[mixins]]
+config = "dataanchor-common.neoforge.mixins.json"
