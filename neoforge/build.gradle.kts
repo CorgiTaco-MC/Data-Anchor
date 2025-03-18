@@ -31,7 +31,7 @@ loom {
     // NeoForge Datagen Gradle config.  Remove if not using NeoForge datagen
     runs.create("datagen") {
         data()
-        programArgs("--all", "--mod", "examplemod")
+        programArgs("--all", "--mod", "dataanchor")
         programArgs("--output", project(":common").file("src/main/generated/resources").absolutePath)
         programArgs("--existing", project(":common").file("src/main/resources").absolutePath)
     }
@@ -54,7 +54,7 @@ tasks {
     }
 
     shadowJar {
-        exclude("architectury.common.json", "com/example/examplemod/neoforge/datagen/**")
+        exclude("architectury.common.json", "dev/corgitaco/dataanchor/neoforge/datagen/**")
         configurations = listOf(project.configurations.getByName("shadowBundle"))
         archiveClassifier.set("dev-shadow")
     }
@@ -62,6 +62,6 @@ tasks {
     remapJar {
         inputFile.set(shadowJar.get().archiveFile)
         dependsOn(shadowJar)
-        atAccessWideners.add("examplemod.accesswidener")
+        atAccessWideners.add("dataanchor.accesswidener")
     }
 }
