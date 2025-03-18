@@ -1,3 +1,6 @@
+# 1.0.0.13
+* Change license to MPL 2.0.
+
 # 1.0.0.12
 * Fix method call for DirtyMarker.
 
