@@ -1,3 +1,6 @@
+# 2.0.0.2
+* Fix marking dirty on level data when changed.
+
 # 2.0.0.1
 * Add mixins to neo mods.toml.
 
