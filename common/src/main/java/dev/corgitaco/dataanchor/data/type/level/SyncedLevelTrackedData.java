@@ -9,6 +9,7 @@
 package dev.corgitaco.dataanchor.data.type.level;
 
 import dev.corgitaco.dataanchor.data.DirtyMarker;
+import dev.corgitaco.dataanchor.data.InternalDirtyMarker;
 import dev.corgitaco.dataanchor.data.SyncedTrackedData;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.type.level.network.SyncLevelTrackedDataS2C;
@@ -39,8 +40,8 @@ public abstract non-sealed class SyncedLevelTrackedData extends LevelTrackedData
     @Override
     public void markDirty() {
         if (!level.isClientSide) {
-            if (level instanceof DirtyMarker dirtyMarker) {
-                dirtyMarker.markDirty();
+            if (level instanceof InternalDirtyMarker dirtyMarker) {
+                dirtyMarker.dataAnchor$markDirty();
             }
         }
     }
