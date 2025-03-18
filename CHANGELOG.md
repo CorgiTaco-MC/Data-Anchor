@@ -1,3 +1,6 @@
+# 1.0.0.14
+* Fix SyncedLevelTrackedData not saving.
+
 # 1.0.0.13
 * Change license to MPL 2.0.
 
