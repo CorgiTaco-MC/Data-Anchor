@@ -1,3 +1,6 @@
+# 2.0.0.3
+* Fix invalid Neoforge mixin file.
+
 # 2.0.0.2
 * Fix marking dirty on level data when changed.
 
