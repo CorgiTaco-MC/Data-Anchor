@@ -1,3 +1,6 @@
+# 2.0.0.1
+* Add mixins to neo mods.toml.
+
 # 2.0.0.0
 * Port to 1.21.1
 
