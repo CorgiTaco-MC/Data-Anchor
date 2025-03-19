@@ -13,11 +13,15 @@
     "ChunkSerializerMixin",
     "EntityMixin",
     "LevelMixin",
+    "ChunkMixin",
     "ServerEntityMixin",
     "ServerLevelMixin",
     "ServerPlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
+  },
+  "mixinextras": {
+    "minVersion": "0.4.1"
   }
 }
