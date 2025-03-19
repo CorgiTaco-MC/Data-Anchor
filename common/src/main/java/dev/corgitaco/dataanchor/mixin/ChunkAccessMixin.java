@@ -11,15 +11,19 @@ package dev.corgitaco.dataanchor.mixin;
 import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
+import dev.corgitaco.dataanchor.data.type.chunk.ChunkBlockStateInterceptor;
 import dev.corgitaco.dataanchor.data.type.chunk.ChunkTrackedData;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,7 +34,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Mixin(ChunkAccess.class)
-public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, ChunkTrackedData> {
+public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, ChunkTrackedData>, ChunkBlockStateInterceptor.Internal {
 
     @Unique
     TrackedDataContainer<ChunkAccess, ChunkTrackedData> dataAnchor$trackedDataContainer;
@@ -38,7 +42,7 @@ public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, Chunk
     @Inject(method = "<init>", at = @At("RETURN"))
     private void dataAnchor$onInit(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry biomeRegistry, long inhabitedTime, LevelChunkSection[] sections, BlendingData blendingData, CallbackInfo ci) {
         if (levelHeightAccessor instanceof ServerLevelAccessor) {
-           this.dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.CHUNK, (ChunkAccess) (Object) this, false);
+            this.dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.CHUNK, (ChunkAccess) (Object) this, false);
         } else {
             this.dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.CHUNK, (ChunkAccess) (Object) this, true);
         }
@@ -60,5 +64,21 @@ public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, Chunk
         return dataAnchor$trackedDataContainer.dataAnchor$getTrackedDataKeys();
     }
 
+    @Override
+    public @Nullable BlockState dataAnchor$getInterceptorState(BlockPos pos, BlockState original, @Nullable BlockState lastState, boolean isMoving) {
+        BlockState replacement = lastState;
+        Collection<TrackedDataKey<ChunkTrackedData>> collection = dataAnchor$getTrackedDataKeys();
+        for (TrackedDataKey<ChunkTrackedData> dataAnchor$getTrackedDataKey : collection) {
+            Optional<ChunkTrackedData> trackedData = dataAnchor$getTrackedData(dataAnchor$getTrackedDataKey);
+            if (trackedData.isPresent()) {
+                ChunkTrackedData chunkTrackedData = trackedData.get();
+                if (chunkTrackedData instanceof ChunkBlockStateInterceptor chunkBlockStateInterceptor) {
+                    replacement = chunkBlockStateInterceptor.getNewState(pos, original, replacement, isMoving);
+                }
+            }
+        }
 
+
+        return replacement;
+    }
 }
