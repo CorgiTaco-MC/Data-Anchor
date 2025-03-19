@@ -1,3 +1,6 @@
+# 2.0.0.4
+* Add ChunkBlockStateInterceptor interface for ChunkData.
+
 # 2.0.0.3
 * Fix invalid Neoforge mixin file.
 
