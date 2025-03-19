@@ -3,10 +3,7 @@ package dev.corgitaco.dataanchor.storage;
 
 import net.minecraft.core.Vec3i;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class QuadTreeNearestPoint2D implements NearestPoint {
 
@@ -57,7 +54,7 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
     }
 
     @Override
-    public Vec3i getNearestPoint(Vec3i point) {
+    public Vec3i getNearestPoint(Vec3i point, DistanceFunction distanceFunction) {
         int x = point.getX();
         int z = point.getZ();
 
@@ -80,11 +77,11 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
 
                 NearestPoint offsetNearestPoint = leafs[offsetXIndex][offsetZIndex];
                 if (offsetNearestPoint != null) {
-                    Vec3i offsetNearest = offsetNearestPoint.getNearestPoint(point);
+                    Vec3i offsetNearest = offsetNearestPoint.getNearestPoint(point, distanceFunction);
                     if (nearest == null) {
                         nearest = offsetNearest;
                     } else {
-                        if (nearest.distManhattan(point) > offsetNearest.distManhattan(point)) {
+                        if (distanceFunction.apply(nearest, point) > distanceFunction.apply(offsetNearest, point)) {
                             nearest = offsetNearest;
                         }
                     }
@@ -96,6 +93,42 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
             }
         }
         return nearest;
+    }
+
+    @Override
+    public Collection<Vec3i> getPointsWithinRange(Vec3i point, int range, DistanceFunction distanceFunction) {
+        int x = point.getX();
+        int z = point.getZ();
+
+        Set<Vec3i> points = new TreeSet<>(Comparator.comparing(point::distSqr));
+
+        int xIndex = (x >> (this.highestShiftScale - this.bitShiftScale)) & (this.leafs.length - 1);
+        int zIndex = (z >> (this.highestShiftScale - this.bitShiftScale)) & (this.leafs.length - 1);
+
+
+        for (int i = 0; i < this.leafs.length; i++) {
+            int[][] distance = SPIRAL_FAST[i];
+            for (int[] position : distance) {
+                int offsetX = position[0];
+                int offsetZ = position[1];
+
+                int offsetXIndex = offsetX + xIndex;
+                int offsetZIndex = offsetZ + zIndex;
+                if (offsetXIndex < 0 || offsetXIndex >= this.leafs.length || offsetZIndex < 0 || offsetZIndex >= this.leafs.length) {
+                    continue;
+                }
+
+                NearestPoint offsetNearestPoint = leafs[offsetXIndex][offsetZIndex];
+                if (offsetNearestPoint != null) {
+                    Vec3i offsetNearest = offsetNearestPoint.getNearestPoint(point, distanceFunction);
+
+                    if (distanceFunction.apply(offsetNearest, point) <= range) {
+                        points.add(offsetNearest);
+                    }
+                }
+            }
+        }
+        return points;
     }
 
     @Override
@@ -134,8 +167,13 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
         }
 
         @Override
-        public Vec3i getNearestPoint(Vec3i point) {
+        public Vec3i getNearestPoint(Vec3i point, DistanceFunction distanceFunction) {
             return this.point;
+        }
+
+        @Override
+        public Collection<Vec3i> getPointsWithinRange(Vec3i point, int range, DistanceFunction distanceFunction) {
+            return Collections.singleton(this.point);
         }
 
         @Override
@@ -144,14 +182,11 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
         }
     }
 
-    // Method to generate spiral pattern and return an array of Vec3iitions
     public static int[][][] spiral(int xSize, int ySize) {
         Map<Integer, List<int[]>> distanceMap = new TreeMap<>();
-        // Fill the distance map with all Vec3iitions (x, z) from 0 to maxValue
         for (int x = -xSize; x <= xSize; x++) {
             for (int z = -ySize; z <= ySize; z++) {
-                int distSquared = chebyshevDistance(0, 0, x, z); // Distance squared to avoid floating-point math
-                // Add the Vec3iition (x, z) to the list of Vec3iitions for the given distance
+                int distSquared = chebyshevDistance(0, 0, x, z);
                 distanceMap.computeIfAbsent(distSquared, k -> new ArrayList<>()).add(new int[]{x, z});
             }
         }
@@ -165,11 +200,8 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
     }
 
     public static int chebyshevDistance(int x1, int y1, int x2, int y2) {
-        // Calculate the absolute differences along each axis
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
-
-        // Return the maximum of the two differences
         return Math.max(dx, dy);
     }
 }
