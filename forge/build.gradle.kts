@@ -54,7 +54,15 @@ dependencies {
     forge("net.minecraftforge:forge:$minecraftVersion-${project.properties["forge_version"]}")
 
     "common"(project(":common", "namedElements")) { isTransitive = false }
+
+    implementation("io.github.llamalad7:mixinextras-forge:${project.properties["mixinextras_version"]}")?.let {
+        annotationProcessor(it)
+        include(it)
+    }
+
     "shadowBundle"(project(":common", "transformProductionForge"))
+
+
 }
 
 tasks {
