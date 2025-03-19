@@ -32,8 +32,8 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
         int z = point.getZ();
 
 
-        int xIndex = (x >> (this.highestShiftScale - this.bitShiftScale)) & (this.leafs.length - 1);
-        int zIndex = (z >> (this.highestShiftScale - this.bitShiftScale)) & (this.leafs.length - 1);
+        int xIndex = getXZIndex(x);
+        int zIndex = getXZIndex(z);
 
         setPointRecursively(point, xIndex, zIndex);
     }
@@ -58,8 +58,8 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
         int x = point.getX();
         int z = point.getZ();
 
-        int xIndex = (x >> (this.highestShiftScale - this.bitShiftScale)) & (this.leafs.length - 1);
-        int zIndex = (z >> (this.highestShiftScale - this.bitShiftScale)) & (this.leafs.length - 1);
+        int xIndex = getXZIndex(x);
+        int zIndex = getXZIndex(z);
 
         Vec3i nearest = null;
 
@@ -102,8 +102,8 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
 
         Set<Vec3i> points = new TreeSet<>(Comparator.comparing(point::distSqr));
 
-        int xIndex = (x >> (this.highestShiftScale - this.bitShiftScale)) & (this.leafs.length - 1);
-        int zIndex = (z >> (this.highestShiftScale - this.bitShiftScale)) & (this.leafs.length - 1);
+        int xIndex = getXZIndex(x);
+        int zIndex = getXZIndex(z);
 
 
         for (int i = 0; i < this.leafs.length; i++) {
@@ -131,31 +131,48 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
         return points;
     }
 
+    private int getXZIndex(int coord) {
+        return (coord >> (this.highestShiftScale - this.bitShiftScale)) & (this.leafs.length - 1);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        for (NearestPoint[] leaf : leafs) {
+            for (NearestPoint nearestPoint : leaf) {
+                if (nearestPoint != null && !nearestPoint.isEmpty()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     @Override
     public void removePoint(Vec3i point) {
         int x = point.getX();
         int z = point.getZ();
 
-
-        int xIndex = (x >> (this.highestShiftScale - this.bitShiftScale)) & (this.leafs.length - 1);
-        int zIndex = (z >> (this.highestShiftScale - this.bitShiftScale)) & (this.leafs.length - 1);
+        int xIndex = getXZIndex(x);
+        int zIndex = getXZIndex(z);
 
         removePointRecursively(point, xIndex, zIndex);
     }
 
     private void removePointRecursively(Vec3i point, int xIndex, int zIndex) {
+        NearestPoint nearestPoint = leafs[xIndex][zIndex];
         if (bitShiftScale == this.highestShiftScale) {
-            if (leafs[xIndex][zIndex] != null) {
+            if (nearestPoint != null) {
                 leafs[xIndex][zIndex] = null;
             }
             return;
         }
 
-        if (leafs[xIndex][zIndex] != null) {
-            leafs[xIndex][zIndex] = null;
+        if (nearestPoint != null) {
+            nearestPoint.removePoint(point);
+            if (nearestPoint.isEmpty()) {
+                leafs[xIndex][zIndex] = null;
+            }
         }
-
-        leafs[xIndex][zIndex].removePoint(point);
     }
 
 
@@ -173,7 +190,12 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
 
         @Override
         public Collection<Vec3i> getPointsWithinRange(Vec3i point, int range, DistanceFunction distanceFunction) {
-            return Collections.singleton(this.point);
+            return distanceFunction.apply(point, this.point) <= range ? Collections.singleton(this.point) : Collections.emptyList();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
         }
 
         @Override
@@ -186,17 +208,17 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
         Map<Integer, List<int[]>> distanceMap = new TreeMap<>();
         for (int x = -xSize; x <= xSize; x++) {
             for (int z = -ySize; z <= ySize; z++) {
-                int distSquared = chebyshevDistance(0, 0, x, z);
-                distanceMap.computeIfAbsent(distSquared, k -> new ArrayList<>()).add(new int[]{x, z});
+                int distance = chebyshevDistance(0, 0, x, z);
+                distanceMap.computeIfAbsent(distance, dist -> new ArrayList<>()).add(new int[]{x, z});
             }
         }
 
-        List<int[][]> Vec3iitionOffsets = new ArrayList<>();
+        List<int[][]> offsets = new ArrayList<>();
 
         for (List<int[]> value : distanceMap.values()) {
-            Vec3iitionOffsets.add(value.toArray(int[][]::new));
+            offsets.add(value.toArray(int[][]::new));
         }
-        return Vec3iitionOffsets.toArray(new int[Vec3iitionOffsets.size()][][]);
+        return offsets.toArray(new int[offsets.size()][][]);
     }
 
     public static int chebyshevDistance(int x1, int y1, int x2, int y2) {

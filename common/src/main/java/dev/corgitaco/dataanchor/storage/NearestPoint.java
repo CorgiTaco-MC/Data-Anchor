@@ -22,6 +22,8 @@ public interface NearestPoint {
         }
     }
 
+    boolean isEmpty();
+
 //    Collection<Vec3i> getPointsInBox(int minX, int minY, int minZ, int maxX, int maxY, int maxZ);
 //
 //
