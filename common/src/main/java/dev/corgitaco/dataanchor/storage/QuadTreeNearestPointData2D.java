@@ -13,27 +13,27 @@ import net.minecraft.core.Vec3i;
 
 import java.util.*;
 
-public class QuadTreeNearestPoint2D implements NearestPoint {
+public class QuadTreeNearestPointData2D<T> implements NearestPoint<T> {
 
     public static final int[][][] SPIRAL_FAST = spiral(32, 32);
 
-    private final NearestPoint[] leafs = new NearestPoint[2 * 2];
+    private final NearestPoint<T>[] leafs = new NearestPoint[2 * 2];
     private final byte bitShiftScale;
     private final byte highestShiftScale;
 
-    public QuadTreeNearestPoint2D(int highestShiftScale) {
+    public QuadTreeNearestPointData2D(int highestShiftScale) {
         this((byte) 0, (byte) highestShiftScale); // Highest level
     }
 
-    public static QuadTreeNearestPoint2D fromSize(int xzSize) {
-        return new QuadTreeNearestPoint2D((byte) (Integer.SIZE - Integer.numberOfLeadingZeros(xzSize)));
+    public static <T> QuadTreeNearestPointData2D<T> fromSize(int xzSize) {
+        return new QuadTreeNearestPointData2D<>((byte) (Integer.SIZE - Integer.numberOfLeadingZeros(xzSize)));
     }
 
-    public QuadTreeNearestPoint2D() {
+    public QuadTreeNearestPointData2D() {
         this((byte) 0, (byte) 31); // Highest level
     }
 
-    public QuadTreeNearestPoint2D(byte bitShiftScale, byte highestShiftScale) {
+    public QuadTreeNearestPointData2D(byte bitShiftScale, byte highestShiftScale) {
         this.bitShiftScale = bitShiftScale;
         this.highestShiftScale = highestShiftScale;
         if (bitShiftScale < 0 || bitShiftScale > Integer.SIZE - 1) {
@@ -42,7 +42,7 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
     }
 
     @Override
-    public void setPoint(Vec3i point) {
+    public void setPoint(Vec3i point, T o) {
         int x = point.getX();
         int z = point.getZ();
 
@@ -50,33 +50,33 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
         int xIndex = getXZIndex(x);
         int zIndex = getXZIndex(z);
 
-        setPointRecursively(point, getIndex(xIndex, zIndex));
+        setPointRecursively(point, o, getIndex(xIndex, zIndex));
     }
 
-    private void setPointRecursively(Vec3i point, int index) {
+    private void setPointRecursively(Vec3i point, T o, int index) {
         if (bitShiftScale == this.highestShiftScale) {
             if (leafs[index] == null) {
-                leafs[index] = new Target(point);
+                leafs[index] = new Target<>(new PointData<>(o, point));
             }
             return;
         }
 
         if (leafs[index] == null) {
-            leafs[index] = new QuadTreeNearestPoint2D((byte) (bitShiftScale + 1), this.highestShiftScale);
+            leafs[index] = new QuadTreeNearestPointData2D((byte) (bitShiftScale + 1), this.highestShiftScale);
         }
 
-        leafs[index].setPoint(point);
+        leafs[index].setPoint(point, o);
     }
 
     @Override
-    public Vec3i getNearestPoint(Vec3i point, DistanceFunction distanceFunction) {
+    public PointData<T> getNearestPointData(Vec3i point, DistanceFunction distanceFunction) {
         int x = point.getX();
         int z = point.getZ();
 
         int xIndex = getXZIndex(x);
         int zIndex = getXZIndex(z);
 
-        Vec3i nearest = null;
+        PointData<T> nearest = null;
 
         for (int i = 0; i < rowSize(); i++) {
             int[][] distance = SPIRAL_FAST[i];
@@ -92,14 +92,16 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
                     continue;
                 }
 
-                NearestPoint offsetNearestPoint = leafs[index];
+                NearestPoint<T> offsetNearestPoint = leafs[index];
                 if (offsetNearestPoint != null) {
-                    Vec3i offsetNearest = offsetNearestPoint.getNearestPoint(point, distanceFunction);
-                    if (nearest == null) {
-                        nearest = offsetNearest;
-                    } else {
-                        if (distanceFunction.apply(nearest, point) > distanceFunction.apply(offsetNearest, point)) {
+                    PointData<T> offsetNearest = offsetNearestPoint.getNearestPointData(point, distanceFunction);
+                    if (offsetNearest != null) {
+                        if (nearest == null) {
                             nearest = offsetNearest;
+                        } else {
+                            if (distanceFunction.apply(nearest.point(), point) > distanceFunction.apply(offsetNearest.point(), point)) {
+                                nearest = offsetNearest;
+                            }
                         }
                     }
                 }
@@ -113,11 +115,11 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
     }
 
     @Override
-    public Collection<Vec3i> getPointsWithinRange(Vec3i point, double radius, DistanceFunction distanceFunction) {
+    public Collection<PointData<T>> getPointDataWithinRange(Vec3i point, double radius, DistanceFunction distanceFunction) {
         int x = point.getX();
         int z = point.getZ();
 
-        Set<Vec3i> points = new TreeSet<>(Comparator.comparing(point::distSqr));
+        Set<PointData<T>> points = new TreeSet<>(Comparator.comparing(pointData -> distanceFunction.apply(point, pointData.point())));
 
         int xIndex = getXZIndex(x);
         int zIndex = getXZIndex(z);
@@ -135,11 +137,11 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
                     continue;
                 }
 
-                NearestPoint offsetNearestPoint = leafs[getIndex(offsetXIndex, offsetZIndex)];
+                NearestPoint<T> offsetNearestPoint = leafs[getIndex(offsetXIndex, offsetZIndex)];
                 if (offsetNearestPoint != null) {
-                    Vec3i offsetNearest = offsetNearestPoint.getNearestPoint(point, distanceFunction);
+                    PointData<T> offsetNearest = offsetNearestPoint.getNearestPointData(point, distanceFunction);
 
-                    if (distanceFunction.apply(offsetNearest, point) <= radius) {
+                    if (distanceFunction.apply(offsetNearest.point(), point) <= radius) {
                         points.add(offsetNearest);
                     }
                 }
@@ -173,11 +175,11 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
     }
 
     @Override
-    public Collection<Vec3i> getAllPoints() {
-        List<Vec3i> points = new ArrayList<>();
-        for (NearestPoint leaf : leafs) {
+    public Collection<PointData<T>> getAllPointData() {
+        List<PointData<T>> points = new ArrayList<>();
+        for (NearestPoint<T> leaf : leafs) {
             if (leaf != null && !leaf.isEmpty()) {
-                points.addAll(leaf.getAllPoints());
+                points.addAll(leaf.getAllPointData());
             }
         }
 
@@ -218,21 +220,21 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
     }
 
 
-    public record Target(Vec3i point) implements NearestPoint {
+    public record Target<T>(PointData<T> pointData) implements NearestPoint<T> {
 
         @Override
-        public void setPoint(Vec3i point) {
+        public void setPoint(Vec3i point, T o) {
             throw new IllegalArgumentException("Cannot set lowest level point, use constructor.");
         }
 
         @Override
-        public Vec3i getNearestPoint(Vec3i point, DistanceFunction distanceFunction) {
-            return this.point;
+        public PointData<T> getNearestPointData(Vec3i point, DistanceFunction distanceFunction) {
+            return this.pointData;
         }
 
         @Override
-        public Collection<Vec3i> getPointsWithinRange(Vec3i point, double radius, DistanceFunction distanceFunction) {
-            return distanceFunction.apply(point, this.point) <= radius ? Collections.singleton(this.point) : Collections.emptyList();
+        public Collection<PointData<T>> getPointDataWithinRange(Vec3i point, double radius, DistanceFunction distanceFunction) {
+            return distanceFunction.apply(point, this.pointData.point()) <= radius ? Collections.singleton(this.pointData) : Collections.emptyList();
         }
 
         @Override
@@ -241,8 +243,8 @@ public class QuadTreeNearestPoint2D implements NearestPoint {
         }
 
         @Override
-        public Collection<Vec3i> getAllPoints() {
-            return Collections.singleton(point);
+        public Collection<PointData<T>> getAllPointData() {
+            return Collections.singleton(this.pointData);
         }
 
         @Override
