@@ -41,13 +41,13 @@ public class DataAnchor {
      */
     public static void init() {
         registerPacketHandlers();
-        QuadTreeNearestPoint quadTreeNearestPoint2D2D = new QuadTreeNearestPoint();
+        QuadTreeNearestPoint quadTreeNearestPoint = new QuadTreeNearestPoint();
 
-        quadTreeNearestPoint2D2D.setPoint(new Vec3i(0, 0, 0));
-        quadTreeNearestPoint2D2D.setPoint(new Vec3i(-10000, 0, -10000));
-        quadTreeNearestPoint2D2D.setPoint(new Vec3i(10000, 0, 10000));
-        quadTreeNearestPoint2D2D.setPoint(new Vec3i(-10000, 0, 10000));
-        quadTreeNearestPoint2D2D.setPoint(new Vec3i(10000, 0, -10000));
+        quadTreeNearestPoint.setPoint(new Vec3i(0, 0, 0));
+        quadTreeNearestPoint.setPoint(new Vec3i(-10000, 0, -10000));
+        quadTreeNearestPoint.setPoint(new Vec3i(10000, 0, 10000));
+        quadTreeNearestPoint.setPoint(new Vec3i(-10000, 0, 10000));
+        quadTreeNearestPoint.setPoint(new Vec3i(10000, 0, -10000));
 
 
         for (int i = 0; i < 120000; i++) {
@@ -57,13 +57,13 @@ public class DataAnchor {
             if (Math.sqrt(x * x + z * z) < 5) {
                 continue;
             }
-            quadTreeNearestPoint2D2D.setPoint(new Vec3i(x, 0, z));
+            quadTreeNearestPoint.setPoint(new Vec3i(x, 0, z));
         }
 
 
 
         long currentTimeMillis = System.currentTimeMillis();
-        Vec3i nearestPoint = quadTreeNearestPoint2D2D.getNearestPoint(new Vec3i(5000, 0, 6780), Vec3i::distSqr);
+        Vec3i nearestPoint = quadTreeNearestPoint.getNearestPoint(new Vec3i(1, 0, 1), Vec3i::distSqr);
         System.out.println("Time taken: " + (System.currentTimeMillis() - currentTimeMillis) + "ms");
 
         if (nearestPoint != null) {
