@@ -10,6 +10,7 @@ package dev.corgitaco.dataanchor.storage._3D;
 
 import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.storage.NearestPoint;
+import dev.corgitaco.dataanchor.storage.Target;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
 
@@ -82,7 +83,7 @@ public class OctreeNearestPointData<T> implements NearestPoint<T> {
     }
 
     @Override
-    public PointData<T> getNearestPointData(Vec3i point, DistanceFunction distanceFunction) {
+    public PointData<T> getNearestPointData(Vec3i point, int skip, DistanceFunction distanceFunction, int[] skipDepth) {
         int x = point.getX();
         int y = point.getY();
         int z = point.getZ();
@@ -111,7 +112,7 @@ public class OctreeNearestPointData<T> implements NearestPoint<T> {
 
                 NearestPoint<T> offsetNearestPoint = leafs[index];
                 if (offsetNearestPoint != null) {
-                    PointData<T> offsetNearest = offsetNearestPoint.getNearestPointData(point, distanceFunction);
+                    PointData<T> offsetNearest = offsetNearestPoint.getNearestPointData(point, skip, distanceFunction, skipDepth);
                     if (offsetNearest != null) {
                         if (nearest == null) {
                             nearest = offsetNearest;
@@ -159,7 +160,7 @@ public class OctreeNearestPointData<T> implements NearestPoint<T> {
 
                 NearestPoint<T> offsetNearestPoint = leafs[getIndex(offsetXIndex, offsetYIndex, offsetZIndex)];
                 if (offsetNearestPoint != null) {
-                    PointData<T> offsetNearest = offsetNearestPoint.getNearestPointData(point, distanceFunction);
+                    PointData<T> offsetNearest = offsetNearestPoint.getNearestPointData(point, 0, distanceFunction, new int[1]);
 
                     if (distanceFunction.apply(offsetNearest.point(), point) <= radius) {
                         points.add(offsetNearest);
@@ -168,6 +169,43 @@ public class OctreeNearestPointData<T> implements NearestPoint<T> {
             }
         }
         return points;
+    }
+
+    @Override
+    public void getNearbyPointDatas(Vec3i point, int maxEntries, Collection<PointData<T>> collector, DistanceFunction distanceFunction) {
+        int x = point.getX();
+        int y = point.getY();
+        int z = point.getZ();
+
+        int xIndex = getXYZIndex(x);
+        int yIndex = getXYZIndex(y);
+        int zIndex = getXYZIndex(z);
+
+        for (int i = 0; i < rowSize(); i++) {
+            int[][] distance = SPIRAL_FAST_3D[i];
+            for (int[] position : distance) {
+                int offsetX = position[0];
+                int offsetY = position[1];
+                int offsetZ = position[2];
+
+                int offsetXIndex = offsetX + xIndex;
+                int offsetYIndex = offsetY + yIndex;
+                int offsetZIndex = offsetZ + zIndex;
+                int index = getIndex(offsetXIndex, offsetYIndex, offsetZIndex);
+
+                if (offsetXIndex < 0 || offsetXIndex >= rowSize() || offsetYIndex < 0 || offsetYIndex >= rowSize() || offsetZIndex < 0 || offsetZIndex >= rowSize()) {
+                    continue;
+                }
+
+                NearestPoint<T> offsetNearestPoint = leafs[index];
+                if (offsetNearestPoint != null) {
+                    offsetNearestPoint.getNearbyPointDatas(point, maxEntries, collector, distanceFunction);
+                    if (collector.size() >= maxEntries) {
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     private int getXYZIndex(int coord) {
@@ -237,44 +275,6 @@ public class OctreeNearestPointData<T> implements NearestPoint<T> {
             if (nearestPoint.isEmpty()) {
                 leafs[index] = null;
             }
-        }
-    }
-
-    public record Target<T>(PointData<T> pointData) implements NearestPoint<T> {
-
-        @Override
-        public void setPoint(Vec3i point, T o) {
-            throw new IllegalArgumentException("Cannot set lowest level point, use constructor.");
-        }
-
-        @Override
-        public PointData<T> getNearestPointData(Vec3i point, DistanceFunction distanceFunction) {
-            return this.pointData;
-        }
-
-        @Override
-        public Collection<PointData<T>> getPointDataWithinRange(Vec3i point, double radius, DistanceFunction distanceFunction) {
-            return distanceFunction.apply(point, this.pointData.point()) <= radius ? Collections.singleton(this.pointData) : Collections.emptyList();
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return false;
-        }
-
-        @Override
-        public Collection<PointData<T>> getAllPointData() {
-            return Collections.singleton(this.pointData);
-        }
-
-        @Override
-        public void clear() {
-            throw new IllegalArgumentException("Cannot clear lowest level point");
-        }
-
-        @Override
-        public void removePoint(Vec3i point) {
-            throw new IllegalArgumentException("Cannot remove lowest level point");
         }
     }
 }

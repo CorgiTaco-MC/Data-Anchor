@@ -26,7 +26,22 @@ public interface NearestPoint<T> {
     void removePoint(Vec3i point);
 
     @Nullable
-    PointData<T> getNearestPointData(Vec3i point, DistanceFunction distanceFunction);
+    PointData<T> getNearestPointData(Vec3i point, int skip, DistanceFunction distanceFunction, int[] skipDepth);
+
+    default void getNearbyPointDatas(Vec3i point, int maxEntries, Collection<PointData<T>> collector, DistanceFunction distanceFunction) {
+         for (int i = 0; i < maxEntries;) {
+            PointData<T> foundPoint = getNearestPointData(point, i, distanceFunction, new int[0]);
+            if (collector.add(foundPoint)) {
+                i++;
+            }
+        }
+    }
+
+    default Collection<PointData<T>> getNearbyPointDatas(Vec3i point, int maxEntries, DistanceFunction distanceFunction) {
+        Collection<PointData<T>> pointsWithinRange = new TreeSet<>(Comparator.comparingDouble(value -> distanceFunction.apply(point, value.point)));
+        getNearbyPointDatas(point, maxEntries, pointsWithinRange, distanceFunction);
+        return pointsWithinRange;
+    }
 
     Collection<PointData<T>> getPointDataWithinRange(Vec3i point, double radius, DistanceFunction distanceFunction);
 
@@ -44,7 +59,7 @@ public interface NearestPoint<T> {
     void clear();
 
     default Collection<PointData<T>> getPointDataInBox(Vec3i min, Vec3i max) {
-        return getPointDataWithinRange(getCenter(min, max), chebyshevDistance(min.getX(), min.getY(), max.getX(), max.getY()) / 2D, NearestPoint::chebyshevDistance);
+        return getPointDataWithinRange(getCenter(min, max), chebyshevDistance(min.getX(), min.getZ(), max.getX(), max.getZ()) / 2D, NearestPoint::chebyshevDistance);
     }
 
     default Collection<PointData<T>> getPointDataInBox(BlockBox box) {
@@ -81,7 +96,7 @@ public interface NearestPoint<T> {
 
     @Nullable
     default Vec3i getNearestPoint(Vec3i point, DistanceFunction distanceFunction) {
-        PointData<T> nearestPointData = getNearestPointData(point, distanceFunction);
+        PointData<T> nearestPointData = getNearestPointData(point, 0, distanceFunction, new int[1]);
         if (nearestPointData == null) {
             return null;
         }

@@ -10,10 +10,11 @@
     "BlockEntityMixin",
     "ChunkAccessMixin",
     "ChunkMapMixin",
+    "ChunkMixin",
     "ChunkSerializerMixin",
+    "ChunkStatusTasksMixin",
     "EntityMixin",
     "LevelMixin",
-    "ChunkMixin",
     "ServerEntityMixin",
     "ServerLevelMixin",
     "ServerPlayerMixin"

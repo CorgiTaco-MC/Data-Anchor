@@ -9,10 +9,13 @@
 package dev.corgitaco.dataanchor;
 
 import com.mojang.logging.LogUtils;
+import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.type.blockentity.network.SyncBlockEntityTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.chunk.network.SyncLevelChunkTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.entity.network.SyncEntityTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.level.network.SyncLevelTrackedDataS2C;
+import dev.corgitaco.dataanchor.levelgen.CanyonChunkTrackedData;
+import dev.corgitaco.dataanchor.levelgen.CanyonLevelTrackedData;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.S2CNetworkContainer;
 import dev.corgitaco.dataanchor.storage._2D.QuadTreeNearestPoint;
@@ -40,6 +43,8 @@ public class DataAnchor {
      * Initializes the mod.
      */
     public static void init() {
+        TrackedDataKey<CanyonLevelTrackedData> key = CanyonLevelTrackedData.KEY;
+        TrackedDataKey<CanyonChunkTrackedData> key1 = CanyonChunkTrackedData.KEY;
         registerPacketHandlers();
         QuadTreeNearestPoint quadTreeNearestPoint = new QuadTreeNearestPoint();
 

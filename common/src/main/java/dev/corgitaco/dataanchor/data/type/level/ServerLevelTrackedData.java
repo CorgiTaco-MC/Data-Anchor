@@ -16,7 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 
 public abstract non-sealed class ServerLevelTrackedData extends LevelTrackedData implements DirtyMarker, ServerTrackedData {
 
-    public ServerLevelTrackedData(TrackedDataKey<ServerLevelTrackedData> trackedDataKey, ServerLevel chunk) {
+    public ServerLevelTrackedData(TrackedDataKey<? extends ServerLevelTrackedData> trackedDataKey, ServerLevel chunk) {
         super(trackedDataKey, chunk);
     }
 

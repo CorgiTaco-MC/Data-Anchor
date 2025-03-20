@@ -11,6 +11,7 @@ package dev.corgitaco.dataanchor.storage._2D;
 
 import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.storage.NearestPoint;
+import dev.corgitaco.dataanchor.storage.Target;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
 
@@ -76,14 +77,14 @@ public class QuadTreeNearestPointData<T> implements NearestPoint<T> {
         }
 
         if (leafs[index] == null) {
-            leafs[index] = new QuadTreeNearestPointData((byte) (bitShiftScale + 1), this.highestShiftScale, rowSize());
+            leafs[index] = new QuadTreeNearestPointData<>((byte) (bitShiftScale + 1), this.highestShiftScale, rowSize());
         }
 
         leafs[index].setPoint(point, o);
     }
 
     @Override
-    public PointData<T> getNearestPointData(Vec3i point, DistanceFunction distanceFunction) {
+    public PointData<T> getNearestPointData(Vec3i point, int skip, DistanceFunction distanceFunction, int[] skipDepth) {
         int x = point.getX();
         int z = point.getZ();
 
@@ -108,12 +109,14 @@ public class QuadTreeNearestPointData<T> implements NearestPoint<T> {
 
                 NearestPoint<T> offsetNearestPoint = leafs[index];
                 if (offsetNearestPoint != null) {
-                    PointData<T> offsetNearest = offsetNearestPoint.getNearestPointData(point, distanceFunction);
+                    PointData<T> offsetNearest = offsetNearestPoint.getNearestPointData(point, skip, distanceFunction, skipDepth);
                     if (offsetNearest != null) {
                         if (nearest == null) {
                             nearest = offsetNearest;
                         } else {
-                            if (distanceFunction.apply(nearest.point(), point) > distanceFunction.apply(offsetNearest.point(), point)) {
+                            double distanceFromNewPoint = distanceFunction.apply(offsetNearest.point(), point);
+                            double distanceFromLastPoint = distanceFunction.apply(nearest.point(), point);
+                            if (distanceFromLastPoint >= distanceFromNewPoint) {
                                 nearest = offsetNearest;
                             }
                         }
@@ -127,6 +130,40 @@ public class QuadTreeNearestPointData<T> implements NearestPoint<T> {
         }
         return nearest;
     }
+
+//    @Override
+//    public void getNearbyPointDatas(Vec3i point, int maxEntries, Collection<PointData<T>> dataCollector, DistanceFunction distanceFunction) {
+//        int x = point.getX();
+//        int z = point.getZ();
+//
+//        int xIndex = getXZIndex(x);
+//        int zIndex = getXZIndex(z);
+//
+//
+//        for (int i = 0; i < rowSize(); i++) {
+//            int[][] distance = SPIRAL_FAST_2D[i];
+//            for (int[] position : distance) {
+//                int offsetX = position[0];
+//                int offsetZ = position[1];
+//
+//                int offsetXIndex = offsetX + xIndex;
+//                int offsetZIndex = offsetZ + zIndex;
+//                int index = getIndex(offsetXIndex, offsetZIndex);
+//
+//                if (offsetXIndex < 0 || offsetXIndex >= rowSize() || offsetZIndex < 0 || offsetZIndex >= rowSize()) {
+//                    continue;
+//                }
+//
+//                NearestPoint<T> offsetNearestPoint = leafs[index];
+//                if (offsetNearestPoint != null) {
+//                    offsetNearestPoint.getNearbyPointDatas(point, maxEntries, dataCollector, distanceFunction);
+//                    if (dataCollector.size() >= maxEntries) {
+//                        return;
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     @Override
     public Collection<PointData<T>> getPointDataWithinRange(Vec3i point, double radius, DistanceFunction distanceFunction) {
@@ -153,7 +190,7 @@ public class QuadTreeNearestPointData<T> implements NearestPoint<T> {
 
                 NearestPoint<T> offsetNearestPoint = leafs[getIndex(offsetXIndex, offsetZIndex)];
                 if (offsetNearestPoint != null) {
-                    PointData<T> offsetNearest = offsetNearestPoint.getNearestPointData(point, distanceFunction);
+                    PointData<T> offsetNearest = offsetNearestPoint.getNearestPointData(point, 0, distanceFunction, new int[1]);
 
                     if (distanceFunction.apply(offsetNearest.point(), point) <= radius) {
                         points.add(offsetNearest);
@@ -217,7 +254,7 @@ public class QuadTreeNearestPointData<T> implements NearestPoint<T> {
     }
 
     private void removePointRecursively(Vec3i point, int index) {
-        NearestPoint nearestPoint = leafs[index];
+        NearestPoint<T> nearestPoint = leafs[index];
         if (bitShiftScale == this.highestShiftScale) {
             if (nearestPoint != null) {
                 leafs[index] = null;
@@ -232,48 +269,4 @@ public class QuadTreeNearestPointData<T> implements NearestPoint<T> {
             }
         }
     }
-
-
-    public record Target<T>(PointData<T> pointData) implements NearestPoint<T> {
-
-        @Override
-        public void setPoint(Vec3i point, T o) {
-            throw new IllegalArgumentException("Cannot set lowest level point, use constructor.");
-        }
-
-        @Override
-        public PointData<T> getNearestPointData(Vec3i point, DistanceFunction distanceFunction) {
-            return this.pointData;
-        }
-
-        @Override
-        public Collection<PointData<T>> getPointDataWithinRange(Vec3i point, double radius, DistanceFunction distanceFunction) {
-            return distanceFunction.apply(point, this.pointData.point()) <= radius ? Collections.singleton(this.pointData) : Collections.emptyList();
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return false;
-        }
-
-        @Override
-        public Collection<PointData<T>> getAllPointData() {
-            return Collections.singleton(this.pointData);
-        }
-
-        @Override
-        public void clear() {
-            throw new IllegalArgumentException("Cannot clear lowest level point");
-
-        }
-
-        @Override
-        public void removePoint(Vec3i point) {
-            throw new IllegalArgumentException("Cannot remove lowest level point");
-        }
-    }
-
-
-
-
 }
