@@ -14,12 +14,12 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public interface NearestPoint<T> {
+    int[][][] SPIRAL_FAST_2D = spiral2D(32);
+    int[][][] SPIRAL_FAST_3D = spiral3D(32);
+
 
     void setPoint(Vec3i point, T o);
 
@@ -109,6 +109,13 @@ public interface NearestPoint<T> {
         return chebyshevDistance(min.getX(), min.getZ(), max.getX(), max.getZ());
     }
 
+    static int chebyshevDistance(int x1, int y1, int z1, int x2, int y2, int z2) {
+        int dx = Math.abs(x2 - x1);
+        int dy = Math.abs(y2 - y1);
+        int dz = Math.abs(z2 - z1);
+        return Math.max(dx, Math.max(dy, dz));
+    }
+
     static int chebyshevDistance(int x1, int y1, int x2, int y2) {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
@@ -128,6 +135,42 @@ public interface NearestPoint<T> {
             points.add(inBox.point());
         }
         return Collections.unmodifiableList(points);
+    }
+
+    static int[][][] spiral2D(int size) {
+        Map<Integer, List<int[]>> distanceMap = new TreeMap<>();
+        for (int x = -size; x <= size; x++) {
+            for (int z = -size; z <= size; z++) {
+                int distance = NearestPoint.chebyshevDistance(0, 0, x, z);
+                distanceMap.computeIfAbsent(distance, dist -> new ArrayList<>()).add(new int[]{x, z});
+            }
+        }
+
+        List<int[][]> offsets = new ArrayList<>();
+
+        for (List<int[]> value : distanceMap.values()) {
+            offsets.add(value.toArray(int[][]::new));
+        }
+        return offsets.toArray(new int[offsets.size()][][]);
+    }
+
+    static int[][][] spiral3D(int size) {
+        Map<Integer, List<int[]>> distanceMap = new TreeMap<>();
+        for (int x = -size; x <= size; x++) {
+            for (int y = -size; y <= size; y++) {
+                for (int z = -size; z <= size; z++) {
+                    int distance = NearestPoint.chebyshevDistance(0, 0, 0, x, y, z);
+                    distanceMap.computeIfAbsent(distance, dist -> new ArrayList<>()).add(new int[]{x, y, z});
+                }
+            }
+        }
+
+        List<int[][]> offsets = new ArrayList<>();
+
+        for (List<int[]> value : distanceMap.values()) {
+            offsets.add(value.toArray(int[][]::new));
+        }
+        return offsets.toArray(new int[offsets.size()][][]);
     }
 
     @FunctionalInterface

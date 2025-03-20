@@ -15,8 +15,7 @@ import dev.corgitaco.dataanchor.data.type.entity.network.SyncEntityTrackedDataS2
 import dev.corgitaco.dataanchor.data.type.level.network.SyncLevelTrackedDataS2C;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.S2CNetworkContainer;
-import dev.corgitaco.dataanchor.storage.QuadTreeNearestPointData;
-import dev.corgitaco.dataanchor.storage.QuadTreeNearestPointData2D;
+import dev.corgitaco.dataanchor.storage._2D.QuadTreeNearestPoint;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -42,13 +41,13 @@ public class DataAnchor {
      */
     public static void init() {
         registerPacketHandlers();
-        QuadTreeNearestPointData quadTreeNearestPointData2D = new QuadTreeNearestPointData();
+        QuadTreeNearestPoint quadTreeNearestPoint2D2D = new QuadTreeNearestPoint();
 
-        quadTreeNearestPointData2D.setPoint(new Vec3i(0, 0, 0));
-        quadTreeNearestPointData2D.setPoint(new Vec3i(-10000, 0, -10000));
-        quadTreeNearestPointData2D.setPoint(new Vec3i(10000, 0, 10000));
-        quadTreeNearestPointData2D.setPoint(new Vec3i(-10000, 0, 10000));
-        quadTreeNearestPointData2D.setPoint(new Vec3i(10000, 0, -10000));
+        quadTreeNearestPoint2D2D.setPoint(new Vec3i(0, 0, 0));
+        quadTreeNearestPoint2D2D.setPoint(new Vec3i(-10000, 0, -10000));
+        quadTreeNearestPoint2D2D.setPoint(new Vec3i(10000, 0, 10000));
+        quadTreeNearestPoint2D2D.setPoint(new Vec3i(-10000, 0, 10000));
+        quadTreeNearestPoint2D2D.setPoint(new Vec3i(10000, 0, -10000));
 
 
         for (int i = 0; i < 120000; i++) {
@@ -58,13 +57,13 @@ public class DataAnchor {
             if (Math.sqrt(x * x + z * z) < 5) {
                 continue;
             }
-            quadTreeNearestPointData2D.setPoint(new Vec3i(x, 0, z));
+            quadTreeNearestPoint2D2D.setPoint(new Vec3i(x, 0, z));
         }
 
 
 
         long currentTimeMillis = System.currentTimeMillis();
-        Vec3i nearestPoint = quadTreeNearestPointData2D.getNearestPoint(new Vec3i(5000, 0, 6780), Vec3i::distSqr);
+        Vec3i nearestPoint = quadTreeNearestPoint2D2D.getNearestPoint(new Vec3i(5000, 0, 6780), Vec3i::distSqr);
         System.out.println("Time taken: " + (System.currentTimeMillis() - currentTimeMillis) + "ms");
 
         if (nearestPoint != null) {
