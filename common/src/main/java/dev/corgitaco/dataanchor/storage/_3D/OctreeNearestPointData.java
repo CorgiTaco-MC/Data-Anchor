@@ -179,7 +179,7 @@ public class OctreeNearestPointData<T> implements NearestPoint<T> {
     }
 
     private int getIndex(int x, int y, int z) {
-        return x * 4 + y * 2 + z;
+        return x * (rowSize() * rowSize()) + y * rowSize() + z;
     }
 
     @Override

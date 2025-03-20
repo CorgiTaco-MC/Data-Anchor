@@ -174,7 +174,7 @@ public class QuadTreeNearestPointData<T> implements NearestPoint<T> {
 
 
     private int getIndex(int x, int z) {
-        return x * 2 + z;
+        return x * rowSize() + z;
     }
 
     @Override
