@@ -75,7 +75,7 @@ public class OctreeNearestPointData<T> implements NearestPoint<T> {
         }
 
         if (leafs[index] == null) {
-            leafs[index] = new OctreeNearestPointData<>((byte) (bitShiftScale + 1), this.highestShiftScale, this.leafs.length);
+            leafs[index] = new OctreeNearestPointData<>((byte) (bitShiftScale + 1), this.highestShiftScale, rowSize());
         }
 
         leafs[index].setPoint(point, o);
