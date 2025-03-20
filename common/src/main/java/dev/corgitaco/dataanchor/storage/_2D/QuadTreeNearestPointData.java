@@ -9,20 +9,22 @@
 package dev.corgitaco.dataanchor.storage._2D;
 
 
+import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.storage.NearestPoint;
 import net.minecraft.core.Vec3i;
+import net.minecraft.util.Mth;
 
 import java.util.*;
 
 public class QuadTreeNearestPointData<T> implements NearestPoint<T> {
 
 
-    private final NearestPoint<T>[] leafs = new NearestPoint[2 * 2];
+    private final NearestPoint<T>[] leafs;
     private final byte bitShiftScale;
     private final byte highestShiftScale;
 
     public QuadTreeNearestPointData(int highestShiftScale) {
-        this((byte) 0, (byte) highestShiftScale); // Highest level
+        this((byte) 0, (byte) highestShiftScale, 2); // Highest level
     }
 
     public static <T> QuadTreeNearestPointData<T> fromSize(int xzSize) {
@@ -30,15 +32,27 @@ public class QuadTreeNearestPointData<T> implements NearestPoint<T> {
     }
 
     public QuadTreeNearestPointData() {
-        this((byte) 0, (byte) 31); // Highest level
+        this((byte) 0, (byte) 31, 2); // Highest level
     }
 
-    public QuadTreeNearestPointData(byte bitShiftScale, byte highestShiftScale) {
+    public QuadTreeNearestPointData(byte bitShiftScale, byte highestShiftScale, int rowSize) {
         this.bitShiftScale = bitShiftScale;
         this.highestShiftScale = highestShiftScale;
         if (bitShiftScale < 0 || bitShiftScale > Integer.SIZE - 1) {
             throw new IllegalArgumentException("bitShiftScale must be between 0 and 31");
         }
+
+        if (rowSize < 2) {
+            throw new IllegalArgumentException("rowSize must be greater than 1");
+        }
+
+        int smallestEncompassingPowerOfTwo = Mth.smallestEncompassingPowerOfTwo(rowSize);
+        if (smallestEncompassingPowerOfTwo != rowSize) {
+            DataAnchor.LOGGER.warn("rowSize is not a power of two, rounding up to the nearest power of two...");
+            rowSize = smallestEncompassingPowerOfTwo;
+        }
+
+        this.leafs = new NearestPoint[rowSize * rowSize];
     }
 
     @Override
@@ -62,7 +76,7 @@ public class QuadTreeNearestPointData<T> implements NearestPoint<T> {
         }
 
         if (leafs[index] == null) {
-            leafs[index] = new QuadTreeNearestPointData((byte) (bitShiftScale + 1), this.highestShiftScale);
+            leafs[index] = new QuadTreeNearestPointData((byte) (bitShiftScale + 1), this.highestShiftScale, this.leafs.length);
         }
 
         leafs[index].setPoint(point, o);
@@ -155,7 +169,7 @@ public class QuadTreeNearestPointData<T> implements NearestPoint<T> {
     }
 
     public int rowSize() {
-        return (int) Math.sqrt(this.leafs.length);
+        return this.leafs.length >> 1;
     }
 
 

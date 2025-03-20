@@ -8,19 +8,21 @@
 
 package dev.corgitaco.dataanchor.storage._3D;
 
+import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.storage.NearestPoint;
 import net.minecraft.core.Vec3i;
+import net.minecraft.util.Mth;
 
 import java.util.*;
 
 public class OctreeNearestPointData<T> implements NearestPoint<T> {
 
-    private final NearestPoint<T>[] leafs = new NearestPoint[2 * 2 * 2];
+    private final NearestPoint<T>[] leafs;
     private final byte bitShiftScale;
     private final byte highestShiftScale;
 
     public OctreeNearestPointData(int highestShiftScale) {
-        this((byte) 0, (byte) highestShiftScale); // Highest level
+        this((byte) 0, (byte) highestShiftScale, 2); // Highest level
     }
 
     public static <T> OctreeNearestPointData<T> fromSize(int xyzSize) {
@@ -28,15 +30,27 @@ public class OctreeNearestPointData<T> implements NearestPoint<T> {
     }
 
     public OctreeNearestPointData() {
-        this((byte) 0, (byte) 31); // Highest level
+        this((byte) 0, (byte) 31, 2); // Highest level
     }
 
-    public OctreeNearestPointData(byte bitShiftScale, byte highestShiftScale) {
+    public OctreeNearestPointData(byte bitShiftScale, byte highestShiftScale, int rowSize) {
         this.bitShiftScale = bitShiftScale;
         this.highestShiftScale = highestShiftScale;
         if (bitShiftScale < 0 || bitShiftScale > Integer.SIZE - 1) {
             throw new IllegalArgumentException("bitShiftScale must be between 0 and 31");
         }
+
+        if (rowSize < 2) {
+            throw new IllegalArgumentException("rowSize must be greater than 1");
+        }
+
+        int smallestEncompassingPowerOfTwo = Mth.smallestEncompassingPowerOfTwo(rowSize);
+        if (smallestEncompassingPowerOfTwo != rowSize) {
+            DataAnchor.LOGGER.warn("rowSize is not a power of two, rounding up to the nearest power of two...");
+            rowSize = smallestEncompassingPowerOfTwo;
+        }
+
+        this.leafs = new NearestPoint[rowSize * rowSize * rowSize];
     }
 
     @Override
@@ -61,7 +75,7 @@ public class OctreeNearestPointData<T> implements NearestPoint<T> {
         }
 
         if (leafs[index] == null) {
-            leafs[index] = new OctreeNearestPointData<>((byte) (bitShiftScale + 1), this.highestShiftScale);
+            leafs[index] = new OctreeNearestPointData<>((byte) (bitShiftScale + 1), this.highestShiftScale, this.leafs.length);
         }
 
         leafs[index].setPoint(point, o);
@@ -161,7 +175,7 @@ public class OctreeNearestPointData<T> implements NearestPoint<T> {
     }
 
     public int rowSize() {
-        return (int) Math.cbrt(this.leafs.length);
+        return this.leafs.length >> 2;
     }
 
     private int getIndex(int x, int y, int z) {
