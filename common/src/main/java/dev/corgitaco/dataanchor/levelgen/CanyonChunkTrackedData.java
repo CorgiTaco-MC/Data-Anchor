@@ -23,7 +23,6 @@ public class CanyonChunkTrackedData extends ProtoChunkTrackedData {
 
     public CanyonChunkTrackedData(TrackedDataKey<? extends ChunkTrackedData> trackedDataKey, ProtoChunk chunk) {
         super(trackedDataKey, chunk);
-        worldGenChunkLoad(chunk);
     }
 
     @Override
@@ -50,9 +49,11 @@ public class CanyonChunkTrackedData extends ProtoChunkTrackedData {
     }
 
     public void afterSurface(ProtoChunk chunk, WorldGenRegion context) {
+        worldGenChunkLoad(chunk);
         if (chunk.levelHeightAccessor instanceof ServerLevelAccessor serverLevelAccessor) {
             TrackedDataRegistries.LEVEL.get(CanyonLevelTrackedData.KEY, serverLevelAccessor.getLevel()).ifPresent(canyonLevelTrackedData -> {
                 canyonLevelTrackedData.getCanyonStorage().afterSurface(chunk, context);
+                canyonLevelTrackedData.getChunkRipper().onChunkLoad(chunk);
             });
         }
     }

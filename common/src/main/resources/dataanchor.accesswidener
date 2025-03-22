@@ -8,3 +8,16 @@ accessible field net/minecraft/client/multiplayer/ClientChunkCache$Storage chunk
 accessible class net/minecraft/client/multiplayer/ClientChunkCache$Storage
 extendable class net/minecraft/client/multiplayer/ClientChunkCache$Storage
 accessible field net/minecraft/world/level/chunk/ChunkAccess levelHeightAccessor Lnet/minecraft/world/level/LevelHeightAccessor;
+accessible method net/minecraft/world/level/chunk/status/ChunkStatusTasks generateBiomes (Lnet/minecraft/world/level/chunk/status/WorldGenContext;Lnet/minecraft/world/level/chunk/status/ChunkStep;Lnet/minecraft/util/StaticCache2D;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;
+accessible method net/minecraft/world/level/chunk/status/ChunkStatusTasks generateNoise (Lnet/minecraft/world/level/chunk/status/WorldGenContext;Lnet/minecraft/world/level/chunk/status/ChunkStep;Lnet/minecraft/util/StaticCache2D;Lnet/minecraft/world/level/chunk/ChunkAccess;)Ljava/util/concurrent/CompletableFuture;
+accessible field net/minecraft/world/level/levelgen/Heightmap data Lnet/minecraft/util/BitStorage;
+accessible method net/minecraft/server/level/GenerationChunkHolder getOrCreateFuture (Lnet/minecraft/world/level/chunk/status/ChunkStatus;)Ljava/util/concurrent/CompletableFuture;
+accessible method net/minecraft/server/level/ServerChunkCache getChunkFutureMainThread (IILnet/minecraft/world/level/chunk/status/ChunkStatus;Z)Ljava/util/concurrent/CompletableFuture;
+accessible method net/minecraft/server/level/ChunkMap save (Lnet/minecraft/world/level/chunk/ChunkAccess;)Z
+extendable method net/minecraft/server/level/ChunkMap save (Lnet/minecraft/world/level/chunk/ChunkAccess;)Z
+accessible method net/minecraft/server/level/ChunkMap readChunk (Lnet/minecraft/world/level/ChunkPos;)Ljava/util/concurrent/CompletableFuture;
+extendable method net/minecraft/server/level/ChunkMap readChunk (Lnet/minecraft/world/level/ChunkPos;)Ljava/util/concurrent/CompletableFuture;
+accessible field net/minecraft/server/MinecraftServer progressListenerFactory Lnet/minecraft/server/level/progress/ChunkProgressListenerFactory;
+accessible method net/minecraft/server/level/ChunkMap scheduleChunkLoad (Lnet/minecraft/world/level/ChunkPos;)Ljava/util/concurrent/CompletableFuture;
+extendable method net/minecraft/server/level/ChunkMap scheduleChunkLoad (Lnet/minecraft/world/level/ChunkPos;)Ljava/util/concurrent/CompletableFuture;
+accessible field net/minecraft/server/MinecraftServer storageSource Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;

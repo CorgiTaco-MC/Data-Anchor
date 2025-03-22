@@ -17,7 +17,8 @@
     "LevelMixin",
     "ServerEntityMixin",
     "ServerLevelMixin",
-    "ServerPlayerMixin"
+    "ServerPlayerMixin",
+    "Vec3iMixin"
   ],
   "injectors": {
     "defaultRequire": 1

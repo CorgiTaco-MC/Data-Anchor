@@ -1,3 +1,8 @@
 {
-  "accessWidener": "dataanchor.accesswidener"
+  "accessWidener": "dataanchor.accesswidener",
+  "injected_interfaces": {
+    "net/minecraft/class_2382": [
+      "dev/corgitaco/dataanchor/coord/Point"
+    ]
+  }
 }

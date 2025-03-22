@@ -33,5 +33,6 @@ public class ChunkStatusTasksMixin {
                 canyonChunkTrackedData.afterSurface(protoChunk, region);
             }
         });
+        original.call(instance, region, structureManager, randomState, chunkAccess);
     }
 }

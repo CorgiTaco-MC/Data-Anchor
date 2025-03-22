@@ -1,7 +1,8 @@
 package dev.corgitaco.dataanchor.levelgen;
 
-import dev.corgitaco.dataanchor.storage.NearestPoint;
-import dev.corgitaco.dataanchor.storage._2D.QuadTreeNearestPoint;
+import dev.corgitaco.dataanchor.coord.Point;
+import dev.corgitaco.dataanchor.datastructure.Target;
+import dev.corgitaco.dataanchor.datastructure.impl.QuadTreeNearestPoint;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -12,23 +13,21 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ProtoChunk;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.synth.ImprovedNoise;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2d;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class CanyonStorage {
 
-    private final QuadTreeNearestPoint loadedChunksStorage = new QuadTreeNearestPoint();
-    private final QuadTreeNearestPoint canyonAnchorStorage = new QuadTreeNearestPoint();
-    private final QuadTreeNearestPoint canyonPointStorage = new QuadTreeNearestPoint();
+    private final QuadTreeNearestPoint<Vec3i> loadedChunksStorage = new QuadTreeNearestPoint<>();
+    private final QuadTreeNearestPoint<Vec3i> canyonAnchorStorage = new QuadTreeNearestPoint<>();
+    private final QuadTreeNearestPoint<Vec3i> canyonPointStorage = new QuadTreeNearestPoint<>();
 
     public CanyonStorage() {
 
@@ -41,7 +40,7 @@ public class CanyonStorage {
         int canyonPosZ = toCanyonPos(worldPosition.getZ());
         this.loadedChunksStorage.setPoint(protoChunk.getPos().getWorldPosition());
 
-        int radius = 1;
+        int radius = 2;
 
         loadAnchors(radius, canyonPosX, canyonPosZ);
         fillPoints(canyonPosX, canyonPosZ);
@@ -53,27 +52,28 @@ public class CanyonStorage {
 
         int maxX = fromCanyonPos(canyonPosX + 1) - 1;
         int maxZ = fromCanyonPos(canyonPosZ + 1) - 1;
+
+        RandomSource randomSource = RandomSource.create(ChunkPos.asLong(canyonPosX, canyonPosZ));
         Collection<Vec3i> anchorsInBox = canyonAnchorStorage.getPointsInBox(new Vec3i(minX, 0, minZ), new Vec3i(maxX, 0, maxZ));
 
         Collection<Vec3i> pointsInBox = canyonPointStorage.getPointsInBox(new Vec3i(minX, 0, minZ), new Vec3i(maxX, 0, maxZ));
         if (pointsInBox.isEmpty() && !anchorsInBox.isEmpty()) {
-            RandomSource randomSource = RandomSource.create(ChunkPos.asLong(canyonPosX, canyonPosZ));
             for (Vec3i firstPoint : anchorsInBox) {
-                for (NearestPoint.PointData<Vec3i> nearbyPointData : canyonAnchorStorage.getNearbyPointDatas(firstPoint, 10, Vec3i::distSqr)) {
+                for (Target<Vec3i, Vec3i> nearbyPointData : canyonAnchorStorage.getNearbyTargets(firstPoint, 10, Point::distSqr)) {
                     Vec3i moving = firstPoint;
 
                     Vec3i endPoint = nearbyPointData.point();
 
-                    while (!moving.closerThan(endPoint, 3)) {
+                    while (!moving.closerThan(endPoint, 10)) {
                         double angleRadians = Math.atan2(endPoint.getZ() - moving.getZ(), endPoint.getX() - moving.getX());
                         double angleDegrees = Math.toDegrees(angleRadians);
-                        double randomDistance = Mth.randomBetweenInclusive(randomSource, 100, 250);
+                        double randomDistance = Mth.randomBetweenInclusive(randomSource, 10, 25);
 
-                        double angleRangeDegrees = Mth.randomBetween(randomSource, (float) (angleDegrees - 45), (float) (angleDegrees + 45));
+                        double angleRangeDegrees = Mth.randomBetween(randomSource, (float) (angleDegrees - 90), (float) (angleDegrees + 90));
                         double angleRangeRadians = Math.toRadians(angleRangeDegrees);
 
-                        int randomX = moving.getX() + (int) (randomDistance * Math.cos(angleRadians));
-                        int randomZ = moving.getZ() + (int) (randomDistance * Math.sin(angleRadians));
+                        int randomX = moving.getX() + (int) (randomDistance * Math.cos(angleRangeRadians));
+                        int randomZ = moving.getZ() + (int) (randomDistance * Math.sin(angleRangeRadians));
                         moving = new Vec3i(randomX, 0, randomZ);
                         canyonPointStorage.setPoint(moving);
                     }
@@ -112,7 +112,7 @@ public class CanyonStorage {
         RandomSource randomSource = RandomSource.create(key);
 
         // Generate Canyon Anchors to create worms between
-        for (int i = 0; i < randomSource.nextInt(5, 10); i++) {
+        for (int i = 0; i < 2; i++) {
             int x = randomSource.nextInt(minX, maxX);
             int z = randomSource.nextInt(minZ, maxZ);
             this.canyonAnchorStorage.setPoint(new BlockPos(x, 0, z));
@@ -136,10 +136,10 @@ public class CanyonStorage {
 
         loadedChunksStorage.removePoint(protoChunk.getPos().getWorldPosition());
 
-        if (loadedChunksStorage.getPointDataInBox(new Vec3i(minX, 0, minZ), new Vec3i(maxX, 0, maxZ)).isEmpty()) {
-            canyonAnchorStorage.removePointsInBox(new Vec3i(minX, 0, minZ), new Vec3i(maxX, 0, maxZ));
-            canyonPointStorage.removePointsInBox(new Vec3i(minX, 0, minZ), new Vec3i(maxX, 0, maxZ));
-        }
+//        if (loadedChunksStorage.getTargetsInBox(new Vec3i(minX, 0, minZ), new Vec3i(maxX, 0, maxZ)).isEmpty()) {
+//            canyonAnchorStorage.removePointsInBox(new Vec3i(minX, 0, minZ), new Vec3i(maxX, 0, maxZ));
+//            canyonPointStorage.removePointsInBox(new Vec3i(minX, 0, minZ), new Vec3i(maxX, 0, maxZ));
+//        }
     }
 
     public void afterSurface(ProtoChunk protoChunk, WorldGenRegion region) {
@@ -157,12 +157,65 @@ public class CanyonStorage {
 
 
     public void postProcess(ProtoChunk chunk, WorldGenRegion region) {
+        ChunkPos chunkPos = chunk.getPos();
+
+
+
+
+
+
+        if (true) {
+            BlockPos worldPosition = chunkPos.getWorldPosition();
+
+            BoundingBox box = BoundingBox.fromCorners(new Vec3i(chunkPos.getMinBlockX(), 0, chunkPos.getMinBlockZ()), new Vec3i(chunkPos.getMaxBlockX(), 0, chunkPos.getMaxBlockZ())).inflatedBy(100, 0, 100);
+
+            List<Vec3i> pointsInBox = new ArrayList<>(canyonPointStorage.getPointsInBox(new Vec3i(box.minX(), box.minY(), box.minZ()), new Vec3i(box.maxX(), box.maxY(), box.maxZ())).stream().toList());
+            BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos(0, 0, 0);
+
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    int blockX = chunkPos.getBlockX(x);
+                    int blockZ = chunkPos.getBlockZ(z);
+                    mutable.set(blockX, 0, blockZ);
+                    chunk.setBlockState(mutable, Blocks.STONE.defaultBlockState(), false);
+                    if (pointsInBox.isEmpty()) {
+                        continue;
+                    }
+
+                    Collections.sort(pointsInBox, Comparator.comparingDouble(mutable::distSqr));
+                    Vec3i first = pointsInBox.getFirst();
+                    if (first.getX() == blockX && first.getZ() == blockZ) {
+                        chunk.setBlockState(mutable.above(), Blocks.EMERALD_BLOCK.defaultBlockState(), false);
+                    }
+
+
+                    if (pointsInBox.size() == 1) {
+                        if (first.closerThan(mutable, 5)) {
+                            chunk.setBlockState(mutable, Blocks.EMERALD_BLOCK.defaultBlockState(), false);
+                        }
+
+                    } else {
+                        double distanceToClosestPoint = Math.sqrt(getDistanceToClosestPoint(first, pointsInBox.get(1), blockX, blockZ));
+                        if (distanceToClosestPoint <= 25) {
+                            chunk.setBlockState(mutable, Blocks.DIAMOND_BLOCK.defaultBlockState(), false);
+
+                        } else {
+                            chunk.setBlockState(mutable, Blocks.STONE.defaultBlockState(), false);
+
+                        }
+                    }
+
+                }
+            }
+
+            return;
+        }
+
         long seed = region.getSeed();
         WorldgenRandom worldgenRandom = new WorldgenRandom(new XoroshiroRandomSource(seed));
 
         int distance = 100;
 
-        ChunkPos chunkPos = chunk.getPos();
 
         BlockState[] bands = makeBands(worldgenRandom);
 
@@ -173,9 +226,6 @@ public class CanyonStorage {
                 BlendingFunction.EaseOutCubic.INSTANCE,
                 BlendingFunction.EaseOutQuint.INSTANCE
         };
-
-
-
 
 
         int layerMinY = 63;
@@ -191,7 +241,7 @@ public class CanyonStorage {
                     int blockX = chunkPos.getBlockX(x);
                     int blockZ = chunkPos.getBlockZ(z);
 
-                    List<NearestPoint.PointData<Vec3i>> list = canyonPointStorage.getNearbyPointDatas(new Vec3i(blockX, 0, blockZ), 4, Vec3i::distSqr).stream().toList();
+                    List<Target<Vec3i, Vec3i>> list = canyonPointStorage.getNearbyTargets(new Vec3i(blockX, 0, blockZ), 4, Point::distSqr).stream().toList();
 
                     double distSqr = Math.sqrt(getDistanceToClosestPoint(list.get(0).point(), list.get(1).point(), blockX, blockZ));
 
@@ -244,13 +294,20 @@ public class CanyonStorage {
         Vector2d nearest = new Vector2d(first.getX(), first.getZ());
         Vector2d secondNearest = new Vector2d(second.getX(), second.getZ());
 
-        Vector2d line = new Vector2d(secondNearest).sub(nearest).normalize();
+        Vector2d line = new Vector2d(secondNearest).sub(nearest);
+
+        if (line.length() == 0) {
+            return point.distanceSquared(nearest);
+        }
+
+        line = line.normalize();
 
         double dotProduct = new Vector2d(point).sub(nearest).dot(line);
         dotProduct = Mth.clamp(dotProduct, 0, line.length());
         Vector2d result = new Vector2d(nearest).add(new Vector2d(line).mul(dotProduct));
         return result.distanceSquared(point);
     }
+
 
     private static void buildLayer(BlendingFunction function, double distSqr, int distance, int blockX, int blockZ, int minY, int min, int max, Predicate<BlockPos> blockPosPredicate) {
         double apply = function.apply(Mth.clampedLerp(0, 1, (distSqr) / (distance)), min, max);

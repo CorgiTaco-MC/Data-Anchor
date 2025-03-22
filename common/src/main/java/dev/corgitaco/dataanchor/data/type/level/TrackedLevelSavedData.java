@@ -46,13 +46,16 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
 
     private TrackedLevelSavedData(ServerLevel serverLevel, CompoundTag tag) {
         this.serverLevel = serverLevel;
-        dataAnchor$createTrackedData();
-        for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
-            String idString = entry.getKey().getId().toString();
-            if (tag.contains(idString, 10)) {
-                entry.getValue().load(tag.getCompound(idString));
+        serverLevel.getServer().submit(() -> {
+            dataAnchor$createTrackedData();
+            for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
+                String idString = entry.getKey().getId().toString();
+                if (tag.contains(idString, 10)) {
+                    entry.getValue().load(tag.getCompound(idString));
+                }
             }
-        }
+        });
+
     }
 
     private TrackedLevelSavedData(ServerLevel serverLevel) {
@@ -61,7 +64,7 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
 
     public static TrackedLevelSavedData get(ServerLevel world) {
         DimensionDataStorage data = world.getDataStorage();
-        return data.computeIfAbsent(new Factory<TrackedLevelSavedData>(() -> new TrackedLevelSavedData(world), (compoundTag, provider) -> new TrackedLevelSavedData(world, compoundTag), DataFixTypes.SAVED_DATA_MAP_DATA), DATA_NAME);
+        return data.computeIfAbsent(new Factory<>(() -> new TrackedLevelSavedData(world), (compoundTag, provider) -> new TrackedLevelSavedData(world, compoundTag), DataFixTypes.SAVED_DATA_MAP_DATA), DATA_NAME);
     }
 
     @Override
