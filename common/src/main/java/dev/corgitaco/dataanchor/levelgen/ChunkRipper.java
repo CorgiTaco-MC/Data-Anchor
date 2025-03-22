@@ -4,6 +4,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.coord.Point;
 import dev.corgitaco.dataanchor.coord.impl.Point2D;
+import dev.corgitaco.dataanchor.datastructure.AStar;
+import dev.corgitaco.dataanchor.datastructure.Node;
 import dev.corgitaco.dataanchor.datastructure.Target;
 import dev.corgitaco.dataanchor.datastructure.impl.QuadTreeNearestPoint;
 import dev.corgitaco.dataanchor.datastructure.impl.QuadTreeNearestPointData;
@@ -23,6 +25,7 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.entity.ChunkStatusUpdateListener;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -30,10 +33,7 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -93,18 +93,42 @@ public class ChunkRipper {
             int maxZ = fromCanyonPos(canyonPosZ + 1) - 1;
 
 
-            int radius = 1;
-            ChunkStatus chunkStatus = ChunkStatus.STRUCTURE_STARTS;
+            int radius = 2;
 
-            for (int x = -radius; x < radius; x++) {
-                for (int z = -radius; z < radius; z++) {
-                    loadVillages(chunkStatus, canyonPosX + x, canyonPosZ + z);
-                }
-            }
+            for (int canyonOffsetX = -radius; canyonOffsetX <= radius; canyonOffsetX++) {
+                for (int canyonOffsetZ = -radius; canyonOffsetZ <= radius; canyonOffsetZ++) {
+                    loadStatus(ChunkStatus.NOISE, canyonPosX + canyonOffsetX, canyonPosZ + canyonOffsetZ, chunkAccess -> {
+                        Point2D point = new Point2D(chunkAccess.getPos().getMinBlockX(), chunkAccess.getPos().getMinBlockZ());
+                        statusesLoaded.setPoint(point, ChunkStatus.NOISE);
 
-            for (int x = -radius; x < radius; x++) {
-                for (int z = -radius; z < radius; z++) {
-                    loadStatus(ChunkStatus.NOISE, canyonPosX + x, canyonPosZ + z);
+                        Registry<Structure> structures = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
+                        structures.getTag(StructureTags.VILLAGE).ifPresent(holders ->
+                                holders.forEach(structureHolder -> {
+                                    StructureStart startForStructure = chunkAccess.getStartForStructure(structureHolder.value());
+
+                                    if (startForStructure != null) {
+                                        if (startForStructure.isValid()) {
+                                            villages.setPoint(new Point2D(chunkAccess.getPos().getWorldPosition().getX(), chunkAccess.getPos().getWorldPosition().getZ()), new VillageInfoContext(new HashSet<>(), new HashSet<>()));
+                                        }
+                                    }
+                                })
+                        );
+
+                        int[] seaLevelBiomes = new int[4 * 4];
+                        int[] heights = new int[16 * 16];
+
+                        chunkAccess.getOrCreateHeightmapUnprimed(Heightmap.Types.OCEAN_FLOOR_WG).data.unpack(heights);
+
+                        for (int x = 0; x < 4; x++) {
+                            for (int z = 0; z < 4; z++) {
+                                Holder<Biome> noiseBiome = chunkAccess.getNoiseBiome(x, QuartPos.fromBlock(heights[QuartPos.toBlock(x) * 16 + QuartPos.toBlock(z)]), z);
+
+                                seaLevelBiomes[x * 4 + z] = biomeLookup.getId(noiseBiome);
+                            }
+                        }
+
+                        pathingChunkData.setPoint(point, new PathingChunkData(heights, seaLevelBiomes));
+                    });
                 }
             }
 
@@ -126,81 +150,54 @@ public class ChunkRipper {
                     if (village.get().failures().contains(neighboringVillagePosition) || neighboringVillage.get().failures().contains(village.point())) {
                         continue;
                     }
-                    int stepDistance = 32;
 
-                    Point2D start = villageOnePosition;
-
-                    Point2D end = neighboringVillagePosition;
+                    BoundingBox box = BoundingBox.fromCorners(new Vec3i(villageOnePosition.getX(), 0, villageOnePosition.getZ()), new Vec3i(neighboringVillagePosition.getX(), 0, neighboringVillagePosition.getZ())).inflatedBy(100);
 
 
                     futures.add(CompletableFuture.supplyAsync(() -> {
                         List<Point2D> setPositions = new ArrayList<>();
+                        int rows = box.getXSpan();
+                        int cols = box.getZSpan();
 
-                        Point2D moving = start;
+                        AStar aStar = new AStar(rows, cols, new Node(villageOnePosition.getX() - box.minX(), villageOnePosition.getZ() - box.minZ()), new Node(neighboringVillagePosition.getX() - box.minX(), neighboringVillagePosition.getZ() - box.minZ()));
 
-                        int lastY = getY(moving.getX(), moving.getZ());
-                        double angleoffset = 0;
+                        int[] lastY = new int[] {
+                                getY(villageOnePosition.getX(), villageOnePosition.getZ())
+                        };
 
-                        while (true) {
-                            if (!setPositions.isEmpty()) {
-                                lastY = getY(moving.getX(), moving.getZ());
-                            }
-                            setPositions.add(moving);
-                            if (setPositions.size() >= 10000) {
-                                village.value().failures().add(neighboringVillagePosition);
-                                neighboringVillage.value().failures().add(villageOnePosition);
-                                setPositions.clear();
-                                break;
-                            }
+                        for (int x = 0; x < aStar.getSearchArea().length; x++) {
+                            for (int z = 0; z < aStar.getSearchArea()[0].length; z++) {
+                                int worldX = x + box.minX();
+                                int worldZ = z + box.minZ();
 
-                            if (moving.distSqr(neighboringVillagePosition) < Mth.square(stepDistance - 1)) {
-                                village.get().connections().add(neighboringVillagePosition);
-                                neighboringVillage.get().connections().add(villageOnePosition);
-                                System.out.println("Found path between " + villageOnePosition + " and " + neighboringVillagePosition);
-                                break;
-                            }
+                                aStar.setBlock(x, z, o -> {
+                                    Holder<Biome> biomeHolder1 = getBiomeHolder(worldX, worldZ);
+                                    boolean biomeFailure = biomeHolder1.is(BiomeTags.IS_OCEAN) || biomeHolder1.is(BiomeTags.IS_MOUNTAIN) || biomeHolder1.is(BiomeTags.IS_HILL);
 
-
-                            double angleRadians = Math.atan2(neighboringVillagePosition.getZ() - moving.getZ(), neighboringVillagePosition.getX() - moving.getX());
-                            double angleDegrees = Math.toDegrees(angleRadians);
-
-                            int offsetX = moving.getX() + (int) (stepDistance * Math.cos(angleRadians + Math.toRadians(angleoffset)));
-                            int offsetZ = moving.getZ() + (int) (stepDistance * Math.sin(angleRadians + Math.toRadians(angleoffset)));
-
-                            Holder<Biome> attemptedNextBiome = getBiomeHolder(offsetX, offsetZ);
-
-                            boolean badBiomes = attemptedNextBiome.is(BiomeTags.IS_OCEAN) || attemptedNextBiome.is(BiomeTags.IS_MOUNTAIN) || attemptedNextBiome.is(BiomeTags.IS_HILL);
-                            boolean greaterThan10 = getAbsoluteDifference(getY(offsetX, offsetZ), lastY) > yDifference;
-                            boolean recalculate = badBiomes || greaterThan10;
-                            if (recalculate) {
-                                int[] angleOffsets = new int[]{-45, 45, -60, 60, -75, 75, -95, 95, -120, 120};
-                                boolean failed = true;
-                                for (int angleOffset : angleOffsets) {
-                                    double angleRadians2 = Math.toRadians(angleDegrees + angleOffset);
-                                    int offsetX2 = moving.getX() + (int) (stepDistance * Math.cos(angleRadians2));
-                                    int offsetZ2 = moving.getZ() + (int) (stepDistance * Math.sin(angleRadians2));
-
-                                    Holder<Biome> attemptedNextBiome2 = getBiomeHolder(offsetX2, offsetZ2);
-                                    boolean isNotBadBiome = !attemptedNextBiome2.is(BiomeTags.IS_OCEAN) && !attemptedNextBiome2.is(BiomeTags.IS_MOUNTAIN) && !attemptedNextBiome2.is(BiomeTags.IS_HILL);
-                                    boolean lessThan10 = getAbsoluteDifference(getY(offsetX2, offsetZ2), lastY) < yDifference;
-                                    boolean passes = isNotBadBiome && lessThan10;
-                                    if (passes) {
-                                        moving = new Point2D(offsetX2, offsetZ2);
-                                        failed = false;
-                                        angleoffset = 0;
-                                        break;
+                                    if (biomeFailure) {
+                                        return true;
                                     }
-                                }
 
-                                if (failed) {
-                                    angleoffset += 45;
-                                    setPositions.remove(moving);
-                                    moving = setPositions.getLast();
-                                }
-                            } else {
-                                moving = new Point2D(offsetX, offsetZ);
+                                    boolean exceeds3 = getAbsoluteDifference(getY(worldX, worldZ), lastY[0]) > 3;
+                                    if (exceeds3) {
+                                        lastY[0] = getY(worldX, worldZ);
+                                    }
+
+
+                                    return exceeds3;
+                                });
                             }
                         }
+
+                        List<Node> path = aStar.findPath();
+
+                        for (Node node : path) {
+                            int worldX = node.getRow() + box.minX();
+                            int worldZ = node.getCol() + box.minZ();
+                            setPositions.add(new Point2D(worldX, worldZ));
+                        }
+
+
                         return setPositions;
                     }, CHUNK_RIPPER_EXECUTORS));
 
@@ -208,17 +205,6 @@ public class ChunkRipper {
             }
 
             CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
-
-            for (CompletableFuture<List<Point2D>> future : futures) {
-                try {
-                    List<Point2D> setPositions = future.get();
-                    for (Point2D position : setPositions) {
-                        villagePaths.setPoint(position, position);
-                    }
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
-            }
 
 
             return Unit.INSTANCE;
@@ -279,24 +265,12 @@ public class ChunkRipper {
         Collection<Target<Point2D, ChunkStatus>> targetsInBox = statusesLoaded.getTargetsInBox(min, max);
         if (targetsInBox.isEmpty() || targetsInBox.stream().anyMatch(point2DChunkStatusTarget -> point2DChunkStatusTarget.get().isBefore(chunkStatus))) {
             queueChunksForWorldBigChunk(canyonPosX, canyonPosZ, chunkStatus, chunkAccess -> {
-                statusesLoaded.setPoint(new Point2D(chunkAccess.getPos().getMinBlockX(), chunkAccess.getPos().getMinBlockZ()), chunkStatus);
-                Registry<Structure> structures = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
-                structures.getTag(StructureTags.VILLAGE).ifPresent(holders ->
-                        holders.forEach(structureHolder -> {
-                            StructureStart startForStructure = chunkAccess.getStartForStructure(structureHolder.value());
 
-                            if (startForStructure != null) {
-                                if (startForStructure.isValid()) {
-                                    villages.setPoint(new Point2D(chunkAccess.getPos().getWorldPosition().getX(), chunkAccess.getPos().getWorldPosition().getZ()), new VillageInfoContext(new HashSet<>(), new HashSet<>()));
-                                }
-                            }
-                        })
-                );
             });
         }
     }
 
-    private void loadStatus(ChunkStatus chunkStatus, int canyonPosX, int canyonPosZ) {
+    private void loadStatus(ChunkStatus chunkStatus, int canyonPosX, int canyonPosZ, Consumer<ChunkAccess> chunk) {
         int minX = fromCanyonPos(canyonPosX);
         int minZ = fromCanyonPos(canyonPosZ);
 
@@ -305,28 +279,9 @@ public class ChunkRipper {
 
         Point2D min = new Point2D(minX, minZ);
         Point2D max = new Point2D(maxX, maxZ);
-        if (statusesLoaded.getTargetsInBox(min, max).stream().anyMatch(point2DChunkStatusTarget -> point2DChunkStatusTarget.get().isBefore(chunkStatus))) {
-            queueChunksForWorldBigChunk(canyonPosX, canyonPosZ, chunkStatus, chunkAccess -> {
-                Point2D point = new Point2D(chunkAccess.getPos().getMinBlockX(), chunkAccess.getPos().getMinBlockZ());
-                statusesLoaded.setPoint(point, chunkStatus);
-
-
-                Heightmap orCreateHeightmapUnprimed = chunkAccess.getOrCreateHeightmapUnprimed(Heightmap.Types.OCEAN_FLOOR_WG);
-
-                int[] heights = new int[16 * 16];
-                orCreateHeightmapUnprimed.data.unpack(heights);
-
-                int[] seaLevelBiomes = new int[4 * 4];
-
-                for (int x = 0; x < 4; x++) {
-                    for (int z = 0; z < 4; z++) {
-                        Holder<Biome> noiseBiome = chunkAccess.getNoiseBiome(x, QuartPos.fromBlock(63), z);
-
-                        seaLevelBiomes[x * 4 + z] = biomeLookup.getId(noiseBiome);
-                    }
-                }
-                pathingChunkData.setPoint(point, new PathingChunkData(heights, seaLevelBiomes));
-            });
+        Collection<Target<Point2D, ChunkStatus>> targetsInBox = statusesLoaded.getTargetsInBox(min, max);
+        if (targetsInBox.isEmpty() || targetsInBox.stream().anyMatch(point2DChunkStatusTarget -> point2DChunkStatusTarget.get().isBefore(chunkStatus))) {
+            queueChunksForWorldBigChunk(canyonPosX, canyonPosZ, chunkStatus, chunk);
         }
     }
 
@@ -340,6 +295,7 @@ public class ChunkRipper {
         List<CompletableFuture<ChunkAccess>> futures = new ArrayList<>();
         for (int chunkX = SectionPos.blockToSectionCoord(minX); chunkX <= SectionPos.blockToSectionCoord(maxX); chunkX++) {
             for (int chunkZ = SectionPos.blockToSectionCoord(minZ); chunkZ <= SectionPos.blockToSectionCoord(maxZ); chunkZ++) {
+                statusesLoaded.setPoint(new Point2D(SectionPos.sectionToBlockCoord(chunkX), SectionPos.sectionToBlockCoord(chunkZ)), status);
                 CompletableFuture<ChunkAccess> chunkAccessCompletableFuture = queueChunk(chunkX, chunkZ, status)
                         .whenComplete((chunkAccess, throwable) -> chunk.accept(chunkAccess));
                 futures.add(chunkAccessCompletableFuture);

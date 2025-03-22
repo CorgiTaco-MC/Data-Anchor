@@ -23,6 +23,10 @@ public final class PathingChunkData {
         return surfaceHeight;
     }
 
+    public void setSurfaceHeight(int[] surfaceHeight) {
+        this.surfaceHeight = surfaceHeight;
+    }
+
     public int[] surfaceBiomes() {
         return surfaceBiomes;
     }
