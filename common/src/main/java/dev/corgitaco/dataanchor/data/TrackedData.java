@@ -170,28 +170,28 @@ public interface TrackedData<T> extends Supplier<T> {
                 Class<?> declaringClass = declaredField.getType();
                 if (declaringClass.isPrimitive()) {
                     if (declaringClass == boolean.class || declaringClass == Boolean.class) {
-                        declaredField.set(obj, compoundTag.getBoolean(name));
+                        declaredField.set(obj, compoundTag.getBoolean(name).get().booleanValue());
                     }
                     if (declaringClass == int.class || declaringClass == Integer.class) {
-                        declaredField.set(obj, compoundTag.getInt(name));
+                        declaredField.set(obj, compoundTag.getInt(name).get().intValue());
                     }
                     if (declaringClass == long.class || declaringClass == Long.class) {
-                        declaredField.set(obj, compoundTag.getLong(name));
+                        declaredField.set(obj, compoundTag.getLong(name).get().longValue());
                     }
                     if (declaringClass == float.class || declaringClass == Float.class) {
-                        declaredField.set(obj, compoundTag.getFloat(name));
+                        declaredField.set(obj, compoundTag.getFloat(name).get().floatValue());
                     }
                     if (declaringClass == double.class || declaringClass == Double.class) {
-                        declaredField.set(obj, compoundTag.getDouble(name));
+                        declaredField.set(obj, compoundTag.getDouble(name).get().doubleValue());
                     }
                     if (declaringClass == byte.class || declaringClass == Byte.class) {
-                        declaredField.set(obj, compoundTag.getByte(name));
+                        declaredField.set(obj, compoundTag.getByte(name).get().byteValue());
                     }
                     if (declaringClass == short.class || declaringClass == Short.class) {
-                        declaredField.set(obj, compoundTag.getShort(name));
+                        declaredField.set(obj, compoundTag.getShort(name).get().shortValue());
                     }
                     if (declaringClass == char.class || declaringClass == Character.class) {
-                        declaredField.set(obj, (char) compoundTag.getInt(name));
+                        declaredField.set(obj, (char) compoundTag.getInt(name).get().intValue());
                     }
                 }
 
@@ -203,16 +203,16 @@ public interface TrackedData<T> extends Supplier<T> {
 
                     if (o instanceof Collection<?> collection) {
                         collection.clear();
-                        ListTag list = compoundTag.getList(name, compoundTag.getId());
+                        ListTag list = compoundTag.getListOrEmpty(name);
                         for (Tag tag1 : list) {
                             collection.add(fromTag(tag1, null));
                         }
                     }
-                    declaredField.set(obj, compoundTag.getList(name, compoundTag.getId()));
+                    declaredField.set(obj, compoundTag.getListOrEmpty(name));
                 }
 
                 if (declaredField.getType().isEnum()) {
-                    declaredField.set(obj, Enum.valueOf((Class<Enum>) declaredField.getType(), compoundTag.getString(name)));
+                    declaredField.set(obj, Enum.valueOf((Class<Enum>) declaredField.getType(), compoundTag.getString(name).get()));
                 }
 
                 if (declaredField.getType().isArray()) {
@@ -226,47 +226,47 @@ public interface TrackedData<T> extends Supplier<T> {
                         declaredField.set(obj, compoundTag.getByteArray(name));
                     }
                     if (declaringClass == float[].class) {
-                        ListTag list = compoundTag.getList(name, Tag.TAG_FLOAT);
+                        ListTag list = compoundTag.getListOrEmpty(name);
                         float[] result = new float[list.size()];
                         for (int i = 0; i < list.size(); i++) {
                             FloatTag tag1 = (FloatTag) list.get(i);
-                            result[i] = tag1.getAsFloat();
+                            result[i] = tag1.floatValue();
                         }
                         declaredField.set(obj, result);
                     }
                     if (declaringClass == double[].class) {
-                        ListTag list = compoundTag.getList(name, Tag.TAG_DOUBLE);
+                        ListTag list = compoundTag.getListOrEmpty(name);
                         double[] result = new double[list.size()];
                         for (int i = 0; i < list.size(); i++) {
                             DoubleTag tag1 = (DoubleTag) list.get(i);
-                            result[i] = tag1.getAsDouble();
+                            result[i] = tag1.doubleValue();
                         }
                         declaredField.set(obj, result);
                     }
                     if (declaringClass == boolean[].class) {
-                        ListTag list = compoundTag.getList(name, Tag.TAG_BYTE);
+                        ListTag list = compoundTag.getListOrEmpty(name);
                         boolean[] result = new boolean[list.size()];
                         for (int i = 0; i < list.size(); i++) {
                             ByteTag tag1 = (ByteTag) list.get(i);
-                            result[i] = tag1.getAsByte() == 1;
+                            result[i] = tag1.byteValue() == 1;
                         }
                         declaredField.set(obj, result);
                     }
                     if (declaringClass == short[].class) {
-                        ListTag list = compoundTag.getList(name, Tag.TAG_SHORT);
+                        ListTag list = compoundTag.getListOrEmpty(name);
                         short[] result = new short[list.size()];
                         for (int i = 0; i < list.size(); i++) {
                             ShortTag tag1 = (ShortTag) list.get(i);
-                            result[i] = tag1.getAsShort();
+                            result[i] = tag1.shortValue();
                         }
                         declaredField.set(obj, result);
                     }
                     if (declaringClass == char[].class) {
-                        ListTag list = compoundTag.getList(name, Tag.TAG_INT);
+                        ListTag list = compoundTag.getListOrEmpty(name);
                         char[] result = new char[list.size()];
                         for (int i = 0; i < list.size(); i++) {
                             IntTag tag1 = (IntTag) list.get(i);
-                            result[i] = (char) tag1.getAsInt();
+                            result[i] = (char) tag1.intValue();
                         }
                         declaredField.set(obj, result);
                     }
@@ -282,29 +282,29 @@ public interface TrackedData<T> extends Supplier<T> {
 
     static <T> T fromTag(Tag tag, Class<T> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (tag instanceof IntTag intTag) {
-            return (T) (Integer) intTag.getAsInt();
+            return (T) (Integer) intTag.intValue();
         }
 
         if (tag instanceof LongTag longTag) {
-            return (T) (Long) longTag.getAsLong();
+            return (T) (Long) longTag.longValue();
         }
         if (tag instanceof FloatTag floatTag) {
-            return (T) (Float) floatTag.getAsFloat();
+            return (T) (Float) floatTag.floatValue();
         }
         if (tag instanceof DoubleTag doubleTag) {
-            return (T) (Double) doubleTag.getAsDouble();
+            return (T) (Double) doubleTag.doubleValue();
         }
         if (tag instanceof ByteTag byteTag) {
-            return (T) (Byte) byteTag.getAsByte();
+            return (T) (Byte) byteTag.byteValue();
         }
         if (tag instanceof ShortTag shortTag) {
-            return (T) (Short) shortTag.getAsShort();
+            return (T) (Short) shortTag.shortValue();
         }
         if (tag instanceof StringTag stringTag) {
             if (clazz.isEnum()) {
-                return (T) Enum.valueOf((Class<Enum>) clazz, stringTag.getAsString());
+                return (T) Enum.valueOf((Class<Enum>) clazz, stringTag.value());
             }
-            return (T) stringTag.getAsString();
+            return (T) stringTag.value();
         }
 
         if (tag instanceof IntArrayTag intArrayTag) {
@@ -321,7 +321,7 @@ public interface TrackedData<T> extends Supplier<T> {
         if (tag instanceof CompoundTag compoundTag) {
             Map<String, Tag> entries = new HashMap<>();
 
-            for (String key : compoundTag.getAllKeys()) {
+            for (String key : compoundTag.keySet()) {
                 entries.put(key, compoundTag.get(key));
             }
 

@@ -65,7 +65,7 @@ public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, Chunk
     }
 
     @Override
-    public @Nullable BlockState dataAnchor$getInterceptorState(BlockPos pos, BlockState original, @Nullable BlockState lastState, boolean isMoving) {
+    public @Nullable BlockState dataAnchor$getInterceptorState(BlockPos pos, BlockState original, @Nullable BlockState lastState, int flags) {
         BlockState replacement = lastState;
         Collection<TrackedDataKey<ChunkTrackedData>> collection = dataAnchor$getTrackedDataKeys();
         for (TrackedDataKey<ChunkTrackedData> dataAnchor$getTrackedDataKey : collection) {
@@ -73,7 +73,7 @@ public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, Chunk
             if (trackedData.isPresent()) {
                 ChunkTrackedData chunkTrackedData = trackedData.get();
                 if (chunkTrackedData instanceof ChunkBlockStateInterceptor chunkBlockStateInterceptor) {
-                    replacement = chunkBlockStateInterceptor.getNewState(pos, original, replacement, isMoving);
+                    replacement = chunkBlockStateInterceptor.getNewState(pos, original, replacement, flags);
                 }
             }
         }

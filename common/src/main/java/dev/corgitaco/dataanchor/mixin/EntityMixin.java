@@ -64,12 +64,12 @@ public abstract class EntityMixin implements TrackedDataContainer<Entity, Entity
     private void dataAnchor$load(CompoundTag loadTag, CallbackInfo ci) {
         if (loadTag != null) {
             if (loadTag.contains("TrackedData")) {
-                CompoundTag trackedData = loadTag.getCompound("TrackedData");
+                CompoundTag trackedData = loadTag.getCompoundOrEmpty("TrackedData");
                 Collection<TrackedDataKey<EntityTrackedData>> keys = this.dataAnchor$container.dataAnchor$getTrackedDataKeys();
                 for (TrackedDataKey<EntityTrackedData> key : keys) {
                     String tagKey = key.getId().toString();
                     if (trackedData.contains(tagKey)) {
-                        this.dataAnchor$container.dataAnchor$getTrackedData(key).ifPresent(entityTrackedData -> entityTrackedData.load(trackedData.getCompound(tagKey)));
+                        this.dataAnchor$container.dataAnchor$getTrackedData(key).ifPresent(entityTrackedData -> entityTrackedData.load(trackedData.getCompoundOrEmpty(tagKey)));
                     }
                 }
             }

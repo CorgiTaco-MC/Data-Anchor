@@ -10,7 +10,7 @@
     "BlockEntityMixin",
     "ChunkAccessMixin",
     "ChunkMapMixin",
-    "ChunkSerializerMixin",
+    "SerializableChunkDataMixin",
     "EntityMixin",
     "LevelMixin",
     "ChunkMixin",

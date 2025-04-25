@@ -8,6 +8,8 @@
 
 package dev.corgitaco.dataanchor.data.type.level;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.data.InternalDirtyMarker;
 import dev.corgitaco.dataanchor.data.ServerTrackedData;
@@ -16,12 +18,12 @@ import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.level.storage.DimensionDataStorage;
 
 import java.util.*;
@@ -44,35 +46,37 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
         }
     }
 
-    private TrackedLevelSavedData(ServerLevel serverLevel, CompoundTag tag) {
+    private TrackedLevelSavedData(ServerLevel serverLevel) {
         this.serverLevel = serverLevel;
         dataAnchor$createTrackedData();
-        for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
-            String idString = entry.getKey().getId().toString();
-            if (tag.contains(idString, 10)) {
-                entry.getValue().load(tag.getCompound(idString));
-            }
-        }
-    }
-
-    private TrackedLevelSavedData(ServerLevel serverLevel) {
-        this(serverLevel, new CompoundTag());
     }
 
     public static TrackedLevelSavedData get(ServerLevel world) {
         DimensionDataStorage data = world.getDataStorage();
-        return data.computeIfAbsent(new Factory<TrackedLevelSavedData>(() -> new TrackedLevelSavedData(world), (compoundTag, provider) -> new TrackedLevelSavedData(world, compoundTag), DataFixTypes.SAVED_DATA_MAP_DATA), DATA_NAME);
-    }
 
-    @Override
-    public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider registries) {
-        for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
-            CompoundTag save = entry.getValue().save();
-            if (save != null) {
-                compoundTag.put(entry.getKey().getId().toString(), save);
-            }
-        }
-        return compoundTag;
+        Codec<TrackedLevelSavedData> codec = RecordCodecBuilder.create(trackedLevelSavedDataInstance ->
+                trackedLevelSavedDataInstance.group(
+                        Codec.unboundedMap(Codec.STRING, CompoundTag.CODEC).fieldOf("map").forGetter(trackedLevelData -> {
+                            Map<String, CompoundTag> map = new HashMap<>();
+                            for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedLevelData.trackedDataMap.entrySet()) {
+                                map.put(entry.getKey().getId().toString(), entry.getValue().save());
+                            }
+                            return map;
+                        })
+                ).apply(trackedLevelSavedDataInstance, map -> {
+                    TrackedLevelSavedData trackedLevelSavedData = new TrackedLevelSavedData(world);
+                    for (Map.Entry<String, CompoundTag> entry : map.entrySet()) {
+                        trackedLevelSavedData.trackedDataMap.forEach((key, value) -> {
+                            if (key.getId().toString().equals(entry.getKey())) {
+                                value.load(entry.getValue());
+                            }
+                        });
+                    }
+                    return trackedLevelSavedData;
+                })
+        );
+
+        return data.computeIfAbsent(new SavedDataType<>(DATA_NAME, () -> new TrackedLevelSavedData(world), codec, DataFixTypes.LEVEL));
     }
 
     @Override

@@ -1,3 +1,6 @@
+# 3,0.0.0
+* Add support for 1.21.5.
+
 # 2.0.0.4
 * Add ChunkBlockStateInterceptor interface for ChunkData.
 

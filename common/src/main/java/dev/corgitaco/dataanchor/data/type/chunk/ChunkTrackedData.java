@@ -30,7 +30,7 @@ public abstract sealed class ChunkTrackedData implements TrackedData<ChunkAccess
 
     @Override
     public void markDirty() {
-        chunk.setUnsaved(true);
+        chunk.markUnsaved();
     }
 
     @Override
