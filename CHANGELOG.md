@@ -1,4 +1,7 @@
-# 3,0.0.0
+# 3.0.0.1
+* Fix a bad packet ID pertaining to syncing entity data.
+
+# 3.0.0.0
 * Add support for 1.21.5.
 
 # 2.0.0.4
