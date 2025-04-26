@@ -29,7 +29,7 @@ public record SyncEntityTrackedDataS2C(int id, TrackedDataKey<? extends EntityTr
                                        CompoundTag tag) implements Packet {
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SyncEntityTrackedDataS2C> STREAM_CODEC = CustomPacketPayload.codec(SyncEntityTrackedDataS2C::write, SyncEntityTrackedDataS2C::new);
-    public static final CustomPacketPayload.Type<SyncEntityTrackedDataS2C> TYPE = new CustomPacketPayload.Type<>(DataAnchor.id("chunk_tracked_data"));
+    public static final CustomPacketPayload.Type<SyncEntityTrackedDataS2C> TYPE = new CustomPacketPayload.Type<>(DataAnchor.id("entity_tracked_data"));
 
     public SyncEntityTrackedDataS2C(FriendlyByteBuf buf) {
         this(buf.readInt(), TrackedDataKey.fromID(TrackedDataRegistries.ENTITY, buf.readResourceLocation()), buf.readNbt());
