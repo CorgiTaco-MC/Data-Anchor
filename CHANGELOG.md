@@ -1,3 +1,6 @@
+# 1.0.0.15
+* Mark ServerBlockEntityTrackedData as ServerTrackedData.
+
 # 1.0.0.14
 * Fix SyncedLevelTrackedData not saving.
 
