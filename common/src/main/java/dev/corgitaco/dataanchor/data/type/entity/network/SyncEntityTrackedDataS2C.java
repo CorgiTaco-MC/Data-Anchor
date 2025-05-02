@@ -42,6 +42,8 @@ public record SyncEntityTrackedDataS2C(int id, TrackedDataKey<? extends EntityTr
                     syncedData.readFromNetwork(tag);
                 }
             });
+        } else {
+            DataAnchor.LOGGER.warn("Failed to sync entity tracked data {}: Entity {} not found", this.dataKey.getId().toString(), this.id);
         }
     }
 }
