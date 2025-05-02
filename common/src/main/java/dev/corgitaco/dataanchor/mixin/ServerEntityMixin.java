@@ -11,6 +11,7 @@ package dev.corgitaco.dataanchor.mixin;
 import dev.corgitaco.dataanchor.data.SyncedTrackedData;
 import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
+import dev.corgitaco.dataanchor.data.type.entity.EntityTrackedData;
 import dev.corgitaco.dataanchor.data.type.entity.PlayerTrackedData;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,7 +35,7 @@ public class ServerEntityMixin {
     @Inject(method = "addPairing", at = @At("RETURN"))
     private void dataAnchor$addPairing(ServerPlayer player, CallbackInfo ci) {
         if (this.entity instanceof TrackedDataContainer trackedDataContainer) {
-            Collection<TrackedDataKey<PlayerTrackedData>> keys = trackedDataContainer.dataAnchor$getTrackedDataKeys();
+            Collection<TrackedDataKey<EntityTrackedData>> keys = trackedDataContainer.dataAnchor$getTrackedDataKeys();
             keys.forEach(key -> {
                 trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
                     if (trackedData instanceof SyncedTrackedData syncedTrackedData) {
