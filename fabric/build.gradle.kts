@@ -66,6 +66,20 @@ tasks {
     }
 }
 
+loom {
+    project.file("runs/client2").mkdirs()
+
+    runs {
+        create("Fabric Client 2") {
+            client()
+            setConfigName("Fabric Client 2")
+            ideConfigGenerated(true)
+            runDir("runs/client2")
+        }
+    }
+
+}
+
 
 publisher {
     apiKeys {

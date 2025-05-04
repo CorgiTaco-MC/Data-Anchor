@@ -24,13 +24,13 @@ public class TestSyncedPlayerTrackedData extends SyncedPlayerTrackedData impleme
 
     @Override
     public void tick() {
-        if (!player.level().isClientSide) {
-            setYum(this.yum + 1);
-
-            DataAnchor.LOGGER.info("Server player yum: %s".formatted(this.yum));
-        } else {
-            DataAnchor.LOGGER.info("Client player yum: %s".formatted(this.yum));
-        }
+//        if (!player.level().isClientSide) {
+//            setYum(this.yum + 1);
+//
+//            DataAnchor.LOGGER.info("Server player yum: %s".formatted(this.yum));
+//        } else {
+//            DataAnchor.LOGGER.info("Client player yum: %s".formatted(this.yum));
+//        }
     }
 
    public void setYum(int yum) {

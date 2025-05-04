@@ -13,7 +13,6 @@ import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
 import dev.corgitaco.dataanchor.data.type.chunk.SyncedLevelChunkTrackedData;
-import dev.corgitaco.dataanchor.data.type.level.network.SyncLevelTrackedDataS2C;
 import dev.corgitaco.dataanchor.network.Packet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;

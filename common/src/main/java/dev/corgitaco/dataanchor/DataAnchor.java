@@ -9,17 +9,17 @@
 package dev.corgitaco.dataanchor;
 
 import com.mojang.logging.LogUtils;
+import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
+import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
 import dev.corgitaco.dataanchor.data.type.blockentity.network.SyncBlockEntityTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.chunk.network.SyncLevelChunkTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.entity.network.SyncEntityTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.level.network.SyncLevelTrackedDataS2C;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.S2CNetworkContainer;
-import dev.corgitaco.dataanchor.storage._2D.QuadTreeNearestPoint;
-import net.minecraft.core.Vec3i;
+import dev.corgitaco.dataanchor.test.data.player.TestSyncedPlayerTrackedData;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 
 public class DataAnchor {
@@ -41,36 +41,7 @@ public class DataAnchor {
      */
     public static void init() {
         registerPacketHandlers();
-        QuadTreeNearestPoint quadTreeNearestPoint = new QuadTreeNearestPoint();
-
-        quadTreeNearestPoint.setPoint(new Vec3i(0, 0, 0));
-        quadTreeNearestPoint.setPoint(new Vec3i(-10000, 0, -10000));
-        quadTreeNearestPoint.setPoint(new Vec3i(10000, 0, 10000));
-        quadTreeNearestPoint.setPoint(new Vec3i(-10000, 0, 10000));
-        quadTreeNearestPoint.setPoint(new Vec3i(10000, 0, -10000));
-
-
-        for (int i = 0; i < 120000; i++) {
-            RandomSource random = RandomSource.create();
-            int x = Mth.randomBetweenInclusive(random, -100000, 100000);
-            int z = Mth.randomBetweenInclusive(random, -100000, 100000);
-            if (Math.sqrt(x * x + z * z) < 5) {
-                continue;
-            }
-            quadTreeNearestPoint.setPoint(new Vec3i(x, 0, z));
-        }
-
-
-
-        long currentTimeMillis = System.currentTimeMillis();
-        Vec3i nearestPoint = quadTreeNearestPoint.getNearestPoint(new Vec3i(1, 0, 1), Vec3i::distSqr);
-        System.out.println("Time taken: " + (System.currentTimeMillis() - currentTimeMillis) + "ms");
-
-        if (nearestPoint != null) {
-            System.out.println("Nearest Point: " + nearestPoint);
-        } else {
-            System.out.println("No nearest point found.");
-        }    }
+    }
 
     private static void registerPacketHandlers() {
         NETWORK_CONTAINER.registerPacketHandler(
