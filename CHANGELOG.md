@@ -1,3 +1,6 @@
+# 2.0.0.6
+* Fixes.
+
 # 2.0.0.5
 * Fix a bad packet ID pertaining to syncing entity data.
 * Mark ServerBlockEntityTrackedData as ServerTrackedData.
