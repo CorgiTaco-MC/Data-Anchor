@@ -25,5 +25,6 @@ public class DataAnchorFabric implements ModInitializer {
         DataAnchor.init();
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> DataAnchorFabric.server = server);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> DataAnchorFabric.server = null);
     }
 }
