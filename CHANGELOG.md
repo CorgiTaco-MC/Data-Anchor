@@ -1,3 +1,6 @@
+# 2.0.0.7
+* Entity Sync Fixes
+
 # 2.0.0.6
 * Fixes.
 
