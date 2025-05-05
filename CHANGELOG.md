@@ -1,3 +1,6 @@
+# 2.0.0.8
+* Fix memory leak.
+
 # 2.0.0.7
 * Entity Sync Fixes
 
