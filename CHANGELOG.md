@@ -1,3 +1,6 @@
+# 1.0.0.17
+* Fix memory leak.
+
 # 1.0.0.16
 * Entity Sync Improvements.
 
