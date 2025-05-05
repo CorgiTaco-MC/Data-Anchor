@@ -32,6 +32,11 @@ public class C2SFabricPacketBroadcaster extends FabricPacketBroadcaster implemen
     }
 
     @Override
+    public ResourceLocation channelName(Class<? extends Packet> packetClass) {
+        return this.packetIds.get(packetClass);
+    }
+
+    @Override
     public <T extends Packet> void registerReceiver(ResourceLocation id, Function<FriendlyByteBuf, T> decode, Packet.Handle<T> handler) {
         registerServerReceiver(id, decode, handler);
     }

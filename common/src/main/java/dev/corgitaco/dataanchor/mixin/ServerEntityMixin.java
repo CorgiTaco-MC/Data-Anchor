@@ -8,11 +8,17 @@
 
 package dev.corgitaco.dataanchor.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import dev.corgitaco.dataanchor.data.SyncedTrackedData;
 import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.type.entity.EntityTrackedData;
-import dev.corgitaco.dataanchor.data.type.entity.PlayerTrackedData;
+import dev.corgitaco.dataanchor.network.Packet;
+import dev.corgitaco.dataanchor.network.broadcast.PacketBroadcaster;
+import io.netty.buffer.Unpooled;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -24,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
+import java.util.List;
 
 @Mixin(ServerEntity.class)
 public class ServerEntityMixin {
@@ -32,13 +39,17 @@ public class ServerEntityMixin {
     @Final
     private Entity entity;
 
-    @Inject(method = "addPairing", at = @At("RETURN"))
-    private void dataAnchor$addPairing(ServerPlayer player, CallbackInfo ci) {
+    @Inject(method = "addPairing", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerEntity;sendPairingData(Lnet/minecraft/server/level/ServerPlayer;Ljava/util/function/Consumer;)V"))
+    private void dataAnchor$addPairing(ServerPlayer player, CallbackInfo ci, @Local List<net.minecraft.network.protocol.Packet<ClientGamePacketListener>> list) {
         if (this.entity instanceof TrackedDataContainer trackedDataContainer) {
             Collection<TrackedDataKey<EntityTrackedData>> keys = trackedDataContainer.dataAnchor$getTrackedDataKeys();
             keys.forEach(key -> {
                 trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
                     if (trackedData instanceof SyncedTrackedData syncedTrackedData) {
+                        Packet packet = syncedTrackedData.syncPacket();
+                        FriendlyByteBuf friendlyByteBuf = new FriendlyByteBuf(Unpooled.buffer());
+                        packet.write(friendlyByteBuf);
+                        list.add(new ClientboundCustomPayloadPacket(PacketBroadcaster.S2C.channelName(packet.getClass()), friendlyByteBuf));
                         syncedTrackedData.syncToPlayer(player);
                     }
                 });

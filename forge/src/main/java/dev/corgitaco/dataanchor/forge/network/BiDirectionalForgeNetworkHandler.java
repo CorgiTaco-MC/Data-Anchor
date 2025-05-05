@@ -5,6 +5,7 @@ import dev.corgitaco.dataanchor.network.BiDirectionalNetworkContainer;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.BiDirectionalPacketBroadcaster;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -20,6 +21,11 @@ public class BiDirectionalForgeNetworkHandler extends ForgeNetworkHandler implem
     @Override
     public void registerPackets() {
         BiDirectionalNetworkContainer.BI_NAMESPACED_CONTAINERS.forEach((s, networkContainer) -> networkContainer.registerMessages(this::registerMessage));
+    }
+
+    @Override
+    public ResourceLocation channelName(Class<? extends Packet> packetClass) {
+        return this.channelNames.get(packetClass);
     }
 
     @Override

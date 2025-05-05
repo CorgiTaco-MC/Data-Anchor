@@ -8,6 +8,7 @@
 
 package dev.corgitaco.dataanchor.data.type.entity.network;
 
+import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.data.SyncedTrackedData;
 import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;

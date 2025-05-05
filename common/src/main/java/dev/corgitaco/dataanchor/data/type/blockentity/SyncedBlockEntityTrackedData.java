@@ -11,6 +11,7 @@ package dev.corgitaco.dataanchor.data.type.blockentity;
 import dev.corgitaco.dataanchor.data.SyncedTrackedData;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.type.blockentity.network.SyncBlockEntityTrackedDataS2C;
+import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.PacketBroadcaster;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,12 +24,17 @@ public abstract non-sealed class SyncedBlockEntityTrackedData extends BlockEntit
     @Override
     public void sync() {
         if (!blockEntity.getLevel().isClientSide) {
-            PacketBroadcaster.S2C.trackingChunk(new SyncBlockEntityTrackedDataS2C(blockEntity.getBlockPos(), trackedDataKey, writeToNetwork()), blockEntity.getLevel().getChunkAt(blockEntity.getBlockPos()));
+            PacketBroadcaster.S2C.trackingChunk(syncPacket(), blockEntity.getLevel().getChunkAt(blockEntity.getBlockPos()));
         }
     }
 
     @Override
     public void syncToPlayer(ServerPlayer player) {
-        PacketBroadcaster.S2C.sendToPlayer(new SyncBlockEntityTrackedDataS2C(blockEntity.getBlockPos(), trackedDataKey, writeToNetwork()), player);
+        PacketBroadcaster.S2C.sendToPlayer(syncPacket(), player);
+    }
+
+    @Override
+    public Packet syncPacket() {
+        return new SyncBlockEntityTrackedDataS2C(blockEntity.getBlockPos(), trackedDataKey, writeToNetwork());
     }
 }

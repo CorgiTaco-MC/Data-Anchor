@@ -11,6 +11,7 @@ package dev.corgitaco.dataanchor.data.type.entity;
 import dev.corgitaco.dataanchor.data.SyncedTrackedData;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.type.entity.network.SyncEntityTrackedDataS2C;
+import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.S2CPacketBroadcaster;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,6 +32,11 @@ public abstract non-sealed class SyncedEntityTrackedData extends EntityTrackedDa
 
     @Override
     public void syncToPlayer(ServerPlayer player) {
-        S2CPacketBroadcaster.S2C.sendToPlayer(new SyncEntityTrackedDataS2C(entity.getId(), this.trackedDataKey, writeToNetwork()), player);
+        // SyncPacket is called directly instead.
+    }
+
+    @Override
+    public Packet syncPacket() {
+        return new SyncEntityTrackedDataS2C(entity.getId(), this.trackedDataKey, writeToNetwork());
     }
 }

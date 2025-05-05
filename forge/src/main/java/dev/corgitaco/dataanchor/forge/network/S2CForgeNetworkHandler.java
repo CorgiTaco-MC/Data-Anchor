@@ -5,6 +5,7 @@ import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.S2CNetworkContainer;
 import dev.corgitaco.dataanchor.network.broadcast.S2CPacketBroadcaster;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -17,6 +18,11 @@ public class S2CForgeNetworkHandler extends ForgeNetworkHandler implements S2CPa
     @Override
     public void registerPackets() {
         S2CNetworkContainer.S2C_NAMESPACED_CONTAINERS.forEach((s, networkContainer) -> networkContainer.registerMessages(this::registerMessage));
+    }
+
+    @Override
+    public ResourceLocation channelName(Class<? extends Packet> packetClass) {
+        return this.channelNames.get(packetClass);
     }
 
     @Override

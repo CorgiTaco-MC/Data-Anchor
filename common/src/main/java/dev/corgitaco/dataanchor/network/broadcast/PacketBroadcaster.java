@@ -8,7 +8,9 @@
 
 package dev.corgitaco.dataanchor.network.broadcast;
 
+import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.util.ServiceUtil;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
@@ -20,4 +22,6 @@ public interface PacketBroadcaster {
 
 
     void registerPackets();
+
+    ResourceLocation channelName(Class<? extends Packet> packetClass);
 }

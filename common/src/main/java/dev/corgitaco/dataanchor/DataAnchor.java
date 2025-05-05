@@ -9,13 +9,17 @@
 package dev.corgitaco.dataanchor;
 
 import com.mojang.logging.LogUtils;
+import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
+import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
 import dev.corgitaco.dataanchor.data.type.blockentity.network.SyncBlockEntityTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.chunk.network.SyncLevelChunkTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.entity.network.SyncEntityTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.level.network.SyncLevelTrackedDataS2C;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.S2CNetworkContainer;
+import dev.corgitaco.dataanchor.test.data.player.TestSyncedPlayerTrackedData;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 
 public class DataAnchor {
@@ -38,6 +42,14 @@ public class DataAnchor {
     public static void init() {
         registerPacketHandlers();
     }
+    
+    public static final TrackedDataKey<TestSyncedPlayerTrackedData> DATA = TrackedDataRegistries.ENTITY.register(id("meow"), TestSyncedPlayerTrackedData.class, (key, obj) -> {
+        if (obj instanceof Player player) {
+            return new TestSyncedPlayerTrackedData(key, player);
+        }
+
+        return null;
+    });
 
     private static void registerPacketHandlers() {
         NETWORK_CONTAINER.registerPacketHandler("entity_tracked_data",

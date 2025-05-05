@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkInstance;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
@@ -24,17 +25,22 @@ public abstract class ForgeNetworkHandler {
     private static final String PROTOCOL_VERSION = "1";
 
     protected final Map<Class<? extends Packet>, SimpleChannel> channels = new ConcurrentHashMap<>();
+    protected final Map<Class<? extends Packet>, ResourceLocation> channelNames  = new ConcurrentHashMap<>();
 
     public ForgeNetworkHandler() {
     }
 
     public <T extends Packet> void registerMessage(ResourceLocation location, Packet.Handler<T> handler) {
-        channels.computeIfAbsent(handler.clazz(), aClass -> NetworkRegistry.newSimpleChannel(
+        SimpleChannel simpleChannel = channels.computeIfAbsent(handler.clazz(), aClass -> NetworkRegistry.newSimpleChannel(
                 location,
                 () -> PROTOCOL_VERSION,
                 PROTOCOL_VERSION::equals,
                 PROTOCOL_VERSION::equals
-        )).registerMessage(0, handler.clazz(), handler.write(), handler.read(), (t, contextSupplier) -> handle(t, contextSupplier, handler.handle()));
+        ));
+
+        channelNames.put(handler.clazz(), location);
+
+        simpleChannel.registerMessage(0, handler.clazz(), handler.write(), handler.read(), (t, contextSupplier) -> handle(t, contextSupplier, handler.handle()));
     }
 
     public <T extends Packet> void handle(T packet, Supplier<NetworkEvent.Context> ctx, Packet.Handle<T> handle) {

@@ -46,6 +46,11 @@ public class S2CFabricPacketBroadcaster extends FabricPacketBroadcaster implemen
     }
 
     @Override
+    public ResourceLocation channelName(Class<? extends Packet> packetClass) {
+        return this.packetIds.get(packetClass);
+    }
+
+    @Override
     public <T extends Packet> void registerReceiver(ResourceLocation id, Function<FriendlyByteBuf, T> decode, Packet.Handle<T> handler) {
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             ClientProxy.registerClientReceiver(id, decode, handler);
