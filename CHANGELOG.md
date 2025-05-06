@@ -1,3 +1,7 @@
+# 1.0.0.18
+* Fix a crash.
+* Add persistent flag for persistent player data.
+
 # 1.0.0.17
 * Fix memory leak.
 
