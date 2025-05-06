@@ -8,7 +8,6 @@
 
 package dev.corgitaco.dataanchor.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import dev.corgitaco.dataanchor.data.SyncedTrackedData;
 import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
@@ -30,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.function.Consumer;
 
 @Mixin(ServerEntity.class)
 public class ServerEntityMixin {
@@ -39,8 +38,22 @@ public class ServerEntityMixin {
     @Final
     private Entity entity;
 
-    @Inject(method = "addPairing", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerEntity;sendPairingData(Lnet/minecraft/server/level/ServerPlayer;Ljava/util/function/Consumer;)V"))
-    private void dataAnchor$addPairing(ServerPlayer player, CallbackInfo ci, @Local List<net.minecraft.network.protocol.Packet<ClientGamePacketListener>> list) {
+    @Inject(method = "addPairing", at = @At(value = "RETURN"))
+    private void dataAnchor$addPairing(ServerPlayer player, CallbackInfo ci) {
+        if (this.entity instanceof TrackedDataContainer trackedDataContainer) {
+            Collection<TrackedDataKey<EntityTrackedData>> keys = trackedDataContainer.dataAnchor$getTrackedDataKeys();
+            keys.forEach(key -> {
+                trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
+                    if (trackedData instanceof SyncedTrackedData syncedTrackedData) {
+                        syncedTrackedData.syncToPlayer(player);
+                    }
+                });
+            });
+        }
+    }
+
+    @Inject(method = "sendPairingData", at = @At("RETURN"))
+    private void dataAnchor$sendPairingData(ServerPlayer player, Consumer<net.minecraft.network.protocol.Packet<ClientGamePacketListener>> consumer, CallbackInfo ci) {
         if (this.entity instanceof TrackedDataContainer trackedDataContainer) {
             Collection<TrackedDataKey<EntityTrackedData>> keys = trackedDataContainer.dataAnchor$getTrackedDataKeys();
             keys.forEach(key -> {
@@ -49,7 +62,7 @@ public class ServerEntityMixin {
                         Packet packet = syncedTrackedData.syncPacket();
                         FriendlyByteBuf friendlyByteBuf = new FriendlyByteBuf(Unpooled.buffer());
                         packet.write(friendlyByteBuf);
-                        list.add(new ClientboundCustomPayloadPacket(PacketBroadcaster.S2C.channelName(packet.getClass()), friendlyByteBuf));
+                        consumer.accept(new ClientboundCustomPayloadPacket(PacketBroadcaster.S2C.channelName(packet.getClass()), friendlyByteBuf));
                         syncedTrackedData.syncToPlayer(player);
                     }
                 });
