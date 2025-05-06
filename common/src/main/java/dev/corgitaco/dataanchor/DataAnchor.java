@@ -42,14 +42,6 @@ public class DataAnchor {
     public static void init() {
         registerPacketHandlers();
     }
-    
-    public static final TrackedDataKey<TestSyncedPlayerTrackedData> DATA = TrackedDataRegistries.ENTITY.register(id("meow"), TestSyncedPlayerTrackedData.class, (key, obj) -> {
-        if (obj instanceof Player player) {
-            return new TestSyncedPlayerTrackedData(key, player);
-        }
-
-        return null;
-    });
 
     private static void registerPacketHandlers() {
         NETWORK_CONTAINER.registerPacketHandler("entity_tracked_data",
