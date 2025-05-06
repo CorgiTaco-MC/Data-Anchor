@@ -9,6 +9,8 @@
 package dev.corgitaco.dataanchor.data.type.entity;
 
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
+import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -16,15 +18,23 @@ public sealed abstract class PlayerTrackedData extends EntityTrackedData permits
 
     protected final TrackedDataKey<? extends PlayerTrackedData> trackedDataKey;
     protected final Player player;
+    private final boolean persistent;
 
     public PlayerTrackedData(TrackedDataKey<? extends PlayerTrackedData> trackedDataKey, Player player) {
+        this(trackedDataKey, player, false);
+    }
+
+    public PlayerTrackedData(TrackedDataKey<? extends PlayerTrackedData> trackedDataKey, Player player, boolean persistent) {
         super(trackedDataKey, player);
         this.trackedDataKey = trackedDataKey;
         this.player = player;
+        this.persistent = persistent;
     }
 
     public void copy(ServerPlayer oldPlayer, boolean keepEverything) {
-        // Do something when the player dies
+        if (persistent) {
+            TrackedDataRegistries.ENTITY.get(this.trackedDataKey, oldPlayer).ifPresent(data -> this.load(data.save()));
+        }
     }
 
     public void playerJoin() {

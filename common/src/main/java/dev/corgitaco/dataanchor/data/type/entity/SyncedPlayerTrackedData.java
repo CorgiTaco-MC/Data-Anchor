@@ -19,8 +19,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 public abstract non-sealed class SyncedPlayerTrackedData extends PlayerTrackedData implements SyncedTrackedData, ServerTrackedData, ClientTrackedData {
+
     public SyncedPlayerTrackedData(TrackedDataKey<? extends SyncedPlayerTrackedData> trackedDataKey, Player player) {
-        super(trackedDataKey, player);
+        this(trackedDataKey, player, false);
+    }
+
+    public SyncedPlayerTrackedData(TrackedDataKey<? extends SyncedPlayerTrackedData> trackedDataKey, Player player, boolean persistent) {
+        super(trackedDataKey, player, persistent);
     }
 
     @Override
