@@ -1,3 +1,6 @@
+# 2.0.0.9
+* Fix a crash.
+
 # 2.0.0.8
 * Fix memory leak.
 
