@@ -1,3 +1,6 @@
+# 2.0.0.10
+* Fix timing issues.
+
 # 2.0.0.9
 * Fix a crash.
 
