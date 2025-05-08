@@ -1,3 +1,6 @@
+# 1.0.0.19
+* Fix timing issues.
+
 # 1.0.0.18
 * Fix a crash.
 * Add persistent flag for persistent player data.
