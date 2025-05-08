@@ -1,3 +1,6 @@
+# 2.0.0.12
+* Fix respawn not being called.
+
 # 2.0.0.11
 * Fix bad mixin.
 
