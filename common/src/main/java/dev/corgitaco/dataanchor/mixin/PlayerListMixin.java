@@ -26,10 +26,10 @@ import java.util.Collection;
 public class PlayerListMixin {
 
 
-    @Inject(method = "respawn", at = @At("TAIL"))
+    @Inject(method = "respawn", at = @At("RETURN"))
     private void dataAnchor$restoreFrom(ServerPlayer player, boolean keepInventory, Entity.RemovalReason reason, CallbackInfoReturnable<ServerPlayer> cir) {
-        if (this instanceof TrackedDataContainer access) {
-            Collection<TrackedDataKey<ServerPlayerTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
+        if (cir.getReturnValue() instanceof TrackedDataContainer access) {
+            Collection<TrackedDataKey<PlayerTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
             keys.forEach(key -> {
                 access.dataAnchor$getTrackedData(key).ifPresent(data -> {
                     if (data instanceof PlayerTrackedData playerTrackedData) {
