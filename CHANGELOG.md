@@ -1,3 +1,6 @@
+# 2.0.0.11
+* Fix bad mixin.
+
 # 2.0.0.10
 * Fix timing issues.
 
