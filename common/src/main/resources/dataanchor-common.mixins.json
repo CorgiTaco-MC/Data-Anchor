@@ -16,7 +16,7 @@
     "ChunkMixin",
     "ServerEntityMixin",
     "ServerLevelMixin",
-    "ServerPlayerMixin"
+    "PlayerListMixin"
   ],
   "injectors": {
     "defaultRequire": 1
