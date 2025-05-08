@@ -10,7 +10,6 @@ package dev.corgitaco.dataanchor.data.type.entity;
 
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -31,7 +30,7 @@ public sealed abstract class PlayerTrackedData extends EntityTrackedData permits
         this.persistent = persistent;
     }
 
-    public void copy(ServerPlayer oldPlayer, boolean keepEverything) {
+    public void respawn(ServerPlayer oldPlayer, boolean keepEverything) {
         if (persistent) {
             TrackedDataRegistries.ENTITY.get(this.trackedDataKey, oldPlayer).ifPresent(data -> this.load(data.save()));
         }
