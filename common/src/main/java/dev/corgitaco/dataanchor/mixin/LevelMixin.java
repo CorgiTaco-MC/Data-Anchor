@@ -56,8 +56,7 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
     @Override
     public <E extends LevelTrackedData> Optional<E> dataAnchor$getTrackedData(TrackedDataKey<E> key) {
         if (!dataAnchor$lazyLoadedTrackedData) {
-            dataAnchor$createTrackedData();
-            dataAnchor$lazyLoadedTrackedData = true;
+            dataAnchor$ensureInitialized();
         }
 
         return this.dataAnchor$trackedDataContainer.dataAnchor$getTrackedData(key);
