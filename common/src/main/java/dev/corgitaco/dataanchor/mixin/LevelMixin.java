@@ -33,6 +33,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Mixin(Level.class)
 public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTrackedData>, InternalDirtyMarker, LevelAccessor {
@@ -42,14 +43,15 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
     @Shadow
     @Final
     public boolean isClientSide;
+
     @Unique
     private TrackedDataContainer<Level, LevelTrackedData> dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.LEVEL, (Level) (Object) this, isClientSide(), false);
 
     @Unique
-    private final List<TickableTrackedData> dataAnchor$tickableLevelData = new ArrayList<>();
+    private final List<TickableTrackedData> dataAnchor$tickableLevelData = new CopyOnWriteArrayList<>();
 
     @Unique
-    private boolean dataAnchor$lazyLoadedTrackedData = false;
+    private volatile boolean dataAnchor$lazyLoadedTrackedData = false;
 
     @Override
     public <E extends LevelTrackedData> Optional<E> dataAnchor$getTrackedData(TrackedDataKey<E> key) {
@@ -69,20 +71,31 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
             this.dataAnchor$trackedDataContainer.dataAnchor$createTrackedData();
         }
 
+        this.dataAnchor$tickableLevelData.clear();
+
         for (TrackedDataKey<LevelTrackedData> key : this.dataAnchor$trackedDataContainer.dataAnchor$getTrackedDataKeys()) {
             this.dataAnchor$trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(levelTrackedData -> {
                 if (levelTrackedData instanceof TickableTrackedData tickableData) {
-                    this.dataAnchor$tickableLevelData.add(tickableData);
+                    if (!this.dataAnchor$tickableLevelData.contains(tickableData)) {
+                        this.dataAnchor$tickableLevelData.add(tickableData);
+                    }
                 }
             });
+        }
+    }
+
+    @Unique
+    private synchronized void dataAnchor$ensureInitialized() {
+        if (!dataAnchor$lazyLoadedTrackedData) {
+            dataAnchor$createTrackedData();
+            dataAnchor$lazyLoadedTrackedData = true;
         }
     }
 
     @Override
     public Collection<TrackedDataKey<LevelTrackedData>> dataAnchor$getTrackedDataKeys() {
         if (!dataAnchor$lazyLoadedTrackedData) {
-            dataAnchor$createTrackedData();
-            dataAnchor$lazyLoadedTrackedData = true;
+            dataAnchor$ensureInitialized();
         }
         return this.dataAnchor$trackedDataContainer.dataAnchor$getTrackedDataKeys();
     }
