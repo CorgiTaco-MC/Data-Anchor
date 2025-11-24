@@ -1,3 +1,7 @@
+# 2.0.0.13
+* Thread safe data init.
+* Prevent duplicate tick listeners.
+
 # 2.0.0.12
 * Fix respawn not being called.
 
