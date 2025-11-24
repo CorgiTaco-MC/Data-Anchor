@@ -1,3 +1,7 @@
+# 1.0.0.20
+* Thread safe data init.
+* Prevent duplicate tick listeners.
+
 # 1.0.0.19
 * Fix timing issues.
 
