@@ -1,3 +1,7 @@
+# 3.0.0.2
+* Thread safe data init.
+* Prevent duplicate tick listeners.
+
 # 3.0.0.1
 * Fix a bad packet ID pertaining to syncing entity data.
 
