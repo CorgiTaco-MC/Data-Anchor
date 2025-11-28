@@ -8,11 +8,13 @@
 
 package dev.corgitaco.dataanchor.network;
 
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public abstract class NetworkContainer {
@@ -23,6 +25,15 @@ public abstract class NetworkContainer {
 
     public NetworkContainer(String namespace) {
         this.nameSpace = namespace;
+    }
+
+    public <T extends Packet> void registerPacketHandler(Class<T> packet) {
+        registerPacketHandler(new Packet.Handler<>(packet));
+    }
+
+    public <T extends Packet> void registerPacketHandler(Class<T> clazz, CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> serializer,
+                                                         Packet.Handle<T> handle) {
+        registerPacketHandler(new Packet.Handler<>(clazz, type, serializer, handle));
     }
 
     public <T extends Packet> void registerPacketHandler(Packet.Handler<T> packetHandle) {
