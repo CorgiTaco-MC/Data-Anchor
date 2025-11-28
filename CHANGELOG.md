@@ -1,3 +1,7 @@
+# 1.0.0.21
+* Networking backend improvements.
+* Minimize Packet registration boilerplate.
+
 # 1.0.0.20
 * Thread safe data init.
 * Prevent duplicate tick listeners.
