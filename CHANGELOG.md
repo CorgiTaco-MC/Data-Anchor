@@ -1,3 +1,7 @@
+# 3.0.0.3
+* Networking backend improvements.
+* Minimize Packet registration boilerplate.
+
 # 3.0.0.2
 * Thread safe data init.
 * Prevent duplicate tick listeners.
