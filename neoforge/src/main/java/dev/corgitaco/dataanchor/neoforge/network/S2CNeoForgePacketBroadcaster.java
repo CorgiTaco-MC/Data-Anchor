@@ -11,14 +11,19 @@ package dev.corgitaco.dataanchor.neoforge.network;
 import com.google.auto.service.AutoService;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.S2CPacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.S2CPacketRegister;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
-@AutoService(S2CPacketBroadcaster.class)
-public class S2CNeoForgePacketBroadcaster implements S2CPacketBroadcaster {
+@AutoService({S2CPacketBroadcaster.class, S2CPacketRegister.class})
+public class S2CNeoForgePacketBroadcaster implements S2CPacketBroadcaster, S2CPacketRegister {
     @Override
     public <MSG extends Packet> void sendToPlayer(MSG msg, ServerPlayer player) {
         PacketDistributor.sendToPlayer(player, msg);
@@ -30,13 +35,15 @@ public class S2CNeoForgePacketBroadcaster implements S2CPacketBroadcaster {
     }
 
     @Override
-    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ServerLevel dimension) {
-        PacketDistributor.sendToPlayersInDimension(dimension, msg);
+    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ResourceKey<Level> dimension) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        PacketDistributor.sendToPlayersInDimension(server.getLevel(dimension), msg);
     }
 
     @Override
-    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ServerLevel dimension, double x, double y, double z, double radius) {
-        PacketDistributor.sendToPlayersNear(dimension, null, x, y, z, radius, msg);
+    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ResourceKey<Level> dimension, double x, double y, double z, double radius) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        PacketDistributor.sendToPlayersNear(server.getLevel(dimension), null, x, y, z, radius, msg);
     }
 
     @Override

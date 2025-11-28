@@ -11,14 +11,22 @@ package dev.corgitaco.dataanchor.neoforge.network;
 import com.google.auto.service.AutoService;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.BiDirectionalPacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.BidirectionalPacketRegister;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
-@AutoService(BiDirectionalPacketBroadcaster.class)
-public class BidirectionalNeoForgePacketBroadcaster implements BiDirectionalPacketBroadcaster {
+@AutoService({BiDirectionalPacketBroadcaster.class, BidirectionalPacketRegister.class})
+public class BidirectionalNeoForgePacketBroadcaster implements BiDirectionalPacketBroadcaster, BidirectionalPacketRegister {
     @Override
     public <MSG extends Packet> void sendToServer(MSG msg) {
         PacketDistributor.sendToServer(msg);
@@ -35,13 +43,15 @@ public class BidirectionalNeoForgePacketBroadcaster implements BiDirectionalPack
     }
 
     @Override
-    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ServerLevel dimension) {
-        PacketDistributor.sendToPlayersInDimension(dimension, msg);
+    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ResourceKey<Level> dimension) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        PacketDistributor.sendToPlayersInDimension(server.getLevel(dimension), msg);
     }
 
     @Override
-    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ServerLevel dimension, double x, double y, double z, double radius) {
-        PacketDistributor.sendToPlayersNear(dimension, null, x, y, z, radius, msg);
+    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ResourceKey<Level> dimension, double x, double y, double z, double radius) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        PacketDistributor.sendToPlayersNear(server.getLevel(dimension), null, x, y, z, radius, msg);
     }
 
     @Override

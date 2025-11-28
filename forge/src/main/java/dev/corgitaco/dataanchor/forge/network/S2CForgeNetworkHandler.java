@@ -12,16 +12,16 @@ import com.google.auto.service.AutoService;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.S2CNetworkContainer;
 import dev.corgitaco.dataanchor.network.broadcast.S2CPacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.S2CPacketRegister;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.network.PacketDistributor;
 
-@AutoService(S2CPacketBroadcaster.class)
-public class S2CForgeNetworkHandler extends ForgeNetworkHandler implements S2CPacketBroadcaster {
+@AutoService({S2CPacketBroadcaster.class, S2CPacketRegister.class})
+public class S2CForgeNetworkHandler extends ForgeNetworkHandler implements S2CPacketBroadcaster, S2CPacketRegister {
 
     public S2CForgeNetworkHandler() {
         super(NetworkDirection.S2C);
@@ -43,13 +43,13 @@ public class S2CForgeNetworkHandler extends ForgeNetworkHandler implements S2CPa
     }
 
     @Override
-    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ServerLevel dimension) {
-        channels.get(msg.getClass()).send(msg, PacketDistributor.DIMENSION.with(dimension.dimension()));
+    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ResourceKey<Level> dimension) {
+        channels.get(msg.getClass()).send(msg, PacketDistributor.DIMENSION.with(dimension));
     }
 
     @Override
-    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ServerLevel dimension, double x, double y, double z, double radius) {
-        channels.get(msg.getClass()).send(msg, PacketDistributor.NEAR.with(new PacketDistributor.TargetPoint(x, y, z, radius, dimension.dimension())));
+    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ResourceKey<Level> dimension, double x, double y, double z, double radius) {
+        channels.get(msg.getClass()).send(msg, PacketDistributor.NEAR.with(new PacketDistributor.TargetPoint(x, y, z, radius, dimension)));
     }
 
     @Override
