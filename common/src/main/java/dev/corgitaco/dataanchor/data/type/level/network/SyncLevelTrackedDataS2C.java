@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 public record SyncLevelTrackedDataS2C(TrackedDataKey<SyncedLevelTrackedData> dataKey, CompoundTag tag) implements Packet {
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, SyncLevelTrackedDataS2C> STREAM_CODEC = CustomPacketPayload.codec(SyncLevelTrackedDataS2C::write, SyncLevelTrackedDataS2C::new);
+    public static final StreamCodec<RegistryFriendlyByteBuf, SyncLevelTrackedDataS2C> STREAM_CODEC = CustomPacketPayload.codec((syncLevelTrackedDataS2C, buf) -> syncLevelTrackedDataS2C.write(buf), SyncLevelTrackedDataS2C::new);
     public static final CustomPacketPayload.Type<SyncLevelTrackedDataS2C> TYPE = new CustomPacketPayload.Type<>(DataAnchor.id("level_tracked_data"));
 
 
