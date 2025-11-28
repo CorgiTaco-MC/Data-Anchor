@@ -1,3 +1,8 @@
+# 2.0.0.14
+* Networking backend improvements.
+* Minimize Packet registration boilerplate.
+
+
 # 2.0.0.13
 * Thread safe data init.
 * Prevent duplicate tick listeners.
