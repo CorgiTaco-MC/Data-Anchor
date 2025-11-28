@@ -13,6 +13,8 @@ import dev.corgitaco.dataanchor.fabric.DataAnchorFabric;
 import dev.corgitaco.dataanchor.network.BiDirectionalNetworkContainer;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.BiDirectionalPacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.BidirectionalPacketRegister;
+import io.netty.buffer.Unpooled;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -21,6 +23,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
@@ -28,10 +31,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 
-@AutoService(BiDirectionalPacketBroadcaster.class)
-public class BiDirectionalFabricPacketBroadcaster extends FabricPacketBroadcaster implements BiDirectionalPacketBroadcaster {
+@AutoService({BiDirectionalPacketBroadcaster.class, BidirectionalPacketRegister.class})
+public class BiDirectionalFabricPacketBroadcaster extends FabricPacketBroadcaster implements BiDirectionalPacketBroadcaster, BidirectionalPacketRegister {
 
     @Override
     public void registerPackets() {
@@ -66,17 +70,17 @@ public class BiDirectionalFabricPacketBroadcaster extends FabricPacketBroadcaste
     }
 
     @Override
-    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ServerLevel dimension) {
+    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ResourceKey<Level> dimension) {
         MinecraftServer server = DataAnchorFabric.server;
-        for (ServerPlayer player : server.getLevel(dimension.dimension()).players()) {
+        for (ServerPlayer player : server.getLevel(dimension).players()) {
             sendToPlayer(msg, player);
         }
     }
 
     @Override
-    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ServerLevel dimension, double x, double y, double z, double radius) {
+    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ResourceKey<Level> dimension, double x, double y, double z, double radius) {
         MinecraftServer server = DataAnchorFabric.server;
-        for (ServerPlayer player : server.getLevel(dimension.dimension()).players()) {
+        for (ServerPlayer player : server.getLevel(dimension).players()) {
             if (player.distanceToSqr(x, y, z) <= Mth.square(radius)) {
                 sendToPlayer(msg, player);
             }

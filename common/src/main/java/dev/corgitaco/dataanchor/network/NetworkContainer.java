@@ -8,6 +8,7 @@
 
 package dev.corgitaco.dataanchor.network;
 
+import dev.corgitaco.dataanchor.network.broadcast.PacketBroadcaster;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public abstract class NetworkContainer {
+public abstract class NetworkContainer implements PacketBroadcaster {
 
     private final Map<ResourceLocation, Packet.Handler<? extends Packet>> packets = new HashMap<>();
     private final String nameSpace;

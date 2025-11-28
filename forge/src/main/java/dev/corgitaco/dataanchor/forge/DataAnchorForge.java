@@ -10,6 +10,7 @@ package dev.corgitaco.dataanchor.forge;
 
 import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.network.broadcast.PacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.PacketRegister;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -27,6 +28,6 @@ public class DataAnchorForge {
     }
 
     public void commonSetup(final FMLCommonSetupEvent fmlCommonSetupEvent) {
-        PacketBroadcaster.ALL.forEach(PacketBroadcaster::registerPackets);
+        PacketRegister.ALL.forEach(PacketRegister::registerPackets);
     }
 }

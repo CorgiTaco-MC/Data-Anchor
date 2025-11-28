@@ -29,9 +29,13 @@ public interface S2CPacketBroadcaster extends PacketBroadcaster {
         sendToAllPlayersInDimension(msg, player.serverLevel());
     }
 
-    <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ServerLevel dimension);
+    default <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ServerLevel dimension) {
+        sendToAllPlayersInDimension(msg, dimension.dimension());
+    }
 
-    default <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ServerLevel dimension, BlockPos position, double radius) {
+    <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ResourceKey<Level> dimension);
+
+    default <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ResourceKey<Level> dimension, BlockPos position, double radius) {
         sendNearPositionInDimension(msg, dimension, position.getX() + 0.5, position.getY() + 0.5, position.getZ() + 0.5, radius);
     }
 
@@ -39,7 +43,11 @@ public interface S2CPacketBroadcaster extends PacketBroadcaster {
         sendNearPositionInDimension(msg, dimension, position.x(), position.y(), position.z(), radius);
     }
 
-    <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ServerLevel dimension, double x, double y, double z, double radius);
+    default <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ServerLevel dimension, double x, double y, double z, double radius) {
+        sendNearPositionInDimension(msg, dimension.dimension(), x, y, z, radius);
+    }
+
+    <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ResourceKey<Level> dimension, double x, double y, double z, double radius);
 
     <MSG extends Packet> void trackingEntity(MSG msg, Entity entity);
 

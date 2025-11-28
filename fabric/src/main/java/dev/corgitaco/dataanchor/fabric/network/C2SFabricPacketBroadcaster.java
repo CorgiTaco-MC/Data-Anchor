@@ -12,14 +12,17 @@ import com.google.auto.service.AutoService;
 import dev.corgitaco.dataanchor.network.C2SNetworkContainer;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.C2SPacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.C2SPacketRegister;
+import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 
-@AutoService(C2SPacketBroadcaster.class)
-public class C2SFabricPacketBroadcaster extends FabricPacketBroadcaster implements C2SPacketBroadcaster {
+@AutoService({C2SPacketBroadcaster.class, C2SPacketRegister.class})
+public class C2SFabricPacketBroadcaster extends FabricPacketBroadcaster implements C2SPacketBroadcaster, C2SPacketRegister {
 
     @Override
     public void registerPackets() {

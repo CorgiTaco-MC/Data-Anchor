@@ -12,6 +12,7 @@ import com.google.auto.service.AutoService;
 import dev.corgitaco.dataanchor.network.BiDirectionalNetworkContainer;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.BiDirectionalPacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.BidirectionalPacketRegister;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,8 +21,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.network.PacketDistributor;
 
-@AutoService(BiDirectionalPacketBroadcaster.class)
-public class BiDirectionalForgeNetworkHandler extends ForgeNetworkHandler implements BiDirectionalPacketBroadcaster {
+@AutoService({BiDirectionalPacketBroadcaster.class, BidirectionalPacketRegister.class})
+public class BiDirectionalForgeNetworkHandler extends ForgeNetworkHandler implements BiDirectionalPacketBroadcaster, BidirectionalPacketRegister {
 
     public BiDirectionalForgeNetworkHandler() {
         super(NetworkDirection.BIDIRECTIONAL);
@@ -48,13 +49,13 @@ public class BiDirectionalForgeNetworkHandler extends ForgeNetworkHandler implem
     }
 
     @Override
-    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ServerLevel dimension) {
-        channels.get(msg.getClass()).send(msg, PacketDistributor.DIMENSION.with(dimension.dimension()));
+    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ResourceKey<Level> dimension) {
+        channels.get(msg.getClass()).send(msg, PacketDistributor.DIMENSION.with(dimension));
     }
 
     @Override
-    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ServerLevel dimension, double x, double y, double z, double radius) {
-        channels.get(msg.getClass()).send(msg, PacketDistributor.NEAR.with(new PacketDistributor.TargetPoint(x, y, z, radius, dimension.dimension())));
+    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ResourceKey<Level> dimension, double x, double y, double z, double radius) {
+        channels.get(msg.getClass()).send(msg, PacketDistributor.NEAR.with(new PacketDistributor.TargetPoint(x, y, z, radius, dimension)));
     }
 
     @Override

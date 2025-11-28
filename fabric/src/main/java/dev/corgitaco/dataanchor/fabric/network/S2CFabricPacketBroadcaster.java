@@ -13,6 +13,8 @@ import dev.corgitaco.dataanchor.fabric.DataAnchorFabric;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.S2CNetworkContainer;
 import dev.corgitaco.dataanchor.network.broadcast.S2CPacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.S2CPacketRegister;
+import io.netty.buffer.Unpooled;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -20,6 +22,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
@@ -27,10 +30,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 
-@AutoService(S2CPacketBroadcaster.class)
-public class S2CFabricPacketBroadcaster extends FabricPacketBroadcaster implements S2CPacketBroadcaster {
+@AutoService({S2CPacketBroadcaster.class, S2CPacketRegister.class})
+public class S2CFabricPacketBroadcaster extends FabricPacketBroadcaster implements S2CPacketBroadcaster, S2CPacketRegister {
 
     @Override
     public void registerPackets() {
@@ -63,15 +67,17 @@ public class S2CFabricPacketBroadcaster extends FabricPacketBroadcaster implemen
     }
 
     @Override
-    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ServerLevel dimension) {
-        for (ServerPlayer player : dimension.players()) {
+    public <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ResourceKey<Level> dimension) {
+        MinecraftServer server = DataAnchorFabric.server;
+        for (ServerPlayer player : server.getLevel(dimension).players()) {
             sendToPlayer(msg, player);
         }
     }
 
     @Override
-    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ServerLevel dimension, double x, double y, double z, double radius) {
-        for (ServerPlayer player : dimension.players()) {
+    public <MSG extends Packet> void sendNearPositionInDimension(MSG msg, ResourceKey<Level> dimension, double x, double y, double z, double radius) {
+        MinecraftServer server = DataAnchorFabric.server;
+        for (ServerPlayer player : server.getLevel(dimension).players()) {
             if (player.distanceToSqr(x, y, z) <= Mth.square(radius)) {
                 sendToPlayer(msg, player);
             }

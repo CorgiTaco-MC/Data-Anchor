@@ -9,6 +9,8 @@
 package dev.corgitaco.dataanchor.fabric.network;
 
 import dev.corgitaco.dataanchor.network.Packet;
+import dev.corgitaco.dataanchor.network.broadcast.PacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.PacketRegister;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.RegistryFriendlyByteBuf;
