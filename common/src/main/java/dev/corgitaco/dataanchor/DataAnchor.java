@@ -44,35 +44,10 @@ public class DataAnchor {
     }
 
     private static void registerPacketHandlers() {
-        NETWORK_CONTAINER.registerPacketHandler("entity_tracked_data",
-                new Packet.Handler<>(
-                        SyncEntityTrackedDataS2C.class,
-                        SyncEntityTrackedDataS2C::write,
-                        SyncEntityTrackedDataS2C::new,
-                        SyncEntityTrackedDataS2C::handle)
-        );
-        NETWORK_CONTAINER.registerPacketHandler("chunk_tracked_data",
-                new Packet.Handler<>(
-                        SyncLevelChunkTrackedDataS2C.class,
-                        SyncLevelChunkTrackedDataS2C::write,
-                        SyncLevelChunkTrackedDataS2C::new,
-                        SyncLevelChunkTrackedDataS2C::handle)
-        );
-        NETWORK_CONTAINER.registerPacketHandler("level_tracked_data",
-                new Packet.Handler<>(
-                        SyncLevelTrackedDataS2C.class,
-                        SyncLevelTrackedDataS2C::write,
-                        SyncLevelTrackedDataS2C::new,
-                        SyncLevelTrackedDataS2C::handle)
-        );
-        NETWORK_CONTAINER.registerPacketHandler("block_entity_tracked_data",
-                new Packet.Handler<>(
-                        SyncBlockEntityTrackedDataS2C.class,
-                        SyncBlockEntityTrackedDataS2C::write,
-                        SyncBlockEntityTrackedDataS2C::new,
-                        SyncBlockEntityTrackedDataS2C::handle)
-        );
-
+        NETWORK_CONTAINER.registerPacketHandler("chunk_tracked_data", SyncLevelChunkTrackedDataS2C.class);
+        NETWORK_CONTAINER.registerPacketHandler("entity_tracked_data", SyncEntityTrackedDataS2C.class);
+        NETWORK_CONTAINER.registerPacketHandler("level_tracked_data", SyncLevelTrackedDataS2C.class);
+        NETWORK_CONTAINER.registerPacketHandler("block_entity_tracked_data", SyncBlockEntityTrackedDataS2C.class);
     }
 
     public static ResourceLocation id(String path) {

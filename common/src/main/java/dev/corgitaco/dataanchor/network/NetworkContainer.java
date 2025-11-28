@@ -8,11 +8,13 @@
 
 package dev.corgitaco.dataanchor.network;
 
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public abstract class NetworkContainer {
 
@@ -22,6 +24,17 @@ public abstract class NetworkContainer {
 
     public NetworkContainer(String namespace) {
         this.nameSpace = namespace;
+    }
+
+
+    public <T extends Packet> void registerPacketHandler(String name, Class<T> packet) {
+        registerPacketHandler(name, new Packet.Handler<>(packet));
+    }
+
+    public <T extends Packet> void registerPacketHandler(String name, Class<T> clazz, BiConsumer<T, FriendlyByteBuf> write,
+                                                  Function<FriendlyByteBuf, T> read,
+                                                  Packet.Handle<T> handle) {
+        registerPacketHandler(name, new Packet.Handler<>(clazz, write, read, handle));
     }
 
     public <T extends Packet> void registerPacketHandler(String name, Packet.Handler<T> packetHandle) {

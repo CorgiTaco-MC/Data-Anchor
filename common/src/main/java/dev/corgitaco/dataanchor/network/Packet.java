@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -25,6 +26,17 @@ public interface Packet {
     record Handler<T extends Packet>(Class<T> clazz, BiConsumer<T, FriendlyByteBuf> write,
                                      Function<FriendlyByteBuf, T> read,
                                      Handle<T> handle) {
+
+        public Handler(Class<T> clazz) {
+            this(clazz, Packet::write, friendlyByteBuf -> {
+                try {
+                    return clazz.getConstructor(FriendlyByteBuf.class).newInstance(friendlyByteBuf);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                         NoSuchMethodException e) {
+                    throw new RuntimeException("Packet class missing constructor method with single `FriendlyByteBuf` argument.", e);
+                }
+            }, Packet::handle);
+        }
     }
 
 
