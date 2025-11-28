@@ -9,11 +9,11 @@
 package dev.corgitaco.dataanchor.forge.network;
 
 import dev.corgitaco.dataanchor.network.Packet;
+import dev.corgitaco.dataanchor.network.register.PacketRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkInstance;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 

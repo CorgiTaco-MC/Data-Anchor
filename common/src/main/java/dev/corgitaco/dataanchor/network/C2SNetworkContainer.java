@@ -8,15 +8,19 @@
 
 package dev.corgitaco.dataanchor.network;
 
+import dev.corgitaco.dataanchor.network.broadcast.C2SPacketBroadcaster;
+import net.minecraft.resources.ResourceLocation;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class C2SNetworkContainer extends NetworkContainer {
+public class C2SNetworkContainer extends NetworkContainer implements C2SPacketBroadcaster {
     public static final Map<String, C2SNetworkContainer> C2S_NAMESPACED_CONTAINERS = new HashMap<>();
 
     public C2SNetworkContainer(String namespace) {
         super(namespace);
     }
+
     public static C2SNetworkContainer of(String namespace) {
         C2SNetworkContainer networkContainer = C2S_NAMESPACED_CONTAINERS.get(namespace);
         if (networkContainer != null) {
@@ -28,4 +32,13 @@ public class C2SNetworkContainer extends NetworkContainer {
         return networkContainer1;
     }
 
+    @Override
+    public <MSG extends Packet> void sendToServer(MSG msg) {
+        C2SPacketBroadcaster.C2S.sendToServer(msg);
+    }
+
+    @Override
+    public ResourceLocation channelName(Class<? extends Packet> packetClass) {
+        return C2SPacketBroadcaster.C2S.channelName(packetClass);
+    }
 }

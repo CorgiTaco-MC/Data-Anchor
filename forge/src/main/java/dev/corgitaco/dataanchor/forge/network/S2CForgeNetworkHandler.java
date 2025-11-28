@@ -4,6 +4,7 @@ import com.google.auto.service.AutoService;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.S2CNetworkContainer;
 import dev.corgitaco.dataanchor.network.broadcast.S2CPacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.S2CPacketRegister;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,8 +13,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.network.PacketDistributor;
 
-@AutoService(S2CPacketBroadcaster.class)
-public class S2CForgeNetworkHandler extends ForgeNetworkHandler implements S2CPacketBroadcaster {
+@AutoService({S2CPacketBroadcaster.class, S2CPacketRegister.class})
+public class S2CForgeNetworkHandler extends ForgeNetworkHandler implements S2CPacketBroadcaster, S2CPacketRegister {
 
     @Override
     public void registerPackets() {

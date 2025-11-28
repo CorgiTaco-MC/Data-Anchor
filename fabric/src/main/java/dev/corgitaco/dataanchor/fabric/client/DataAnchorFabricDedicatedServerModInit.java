@@ -9,11 +9,12 @@
 package dev.corgitaco.dataanchor.fabric.client;
 
 import dev.corgitaco.dataanchor.network.broadcast.PacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.PacketRegister;
 import net.fabricmc.api.DedicatedServerModInitializer;
 
 public class DataAnchorFabricDedicatedServerModInit implements DedicatedServerModInitializer {
     @Override
     public void onInitializeServer() {
-        PacketBroadcaster.ALL.forEach(PacketBroadcaster::registerPackets);
+        PacketRegister.ALL.forEach(PacketRegister::registerPackets);
     }
 }

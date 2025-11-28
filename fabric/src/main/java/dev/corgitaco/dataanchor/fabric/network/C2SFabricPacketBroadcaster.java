@@ -13,6 +13,7 @@ import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.network.C2SNetworkContainer;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.C2SPacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.C2SPacketRegister;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -23,8 +24,8 @@ import net.minecraft.world.level.Level;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-@AutoService(C2SPacketBroadcaster.class)
-public class C2SFabricPacketBroadcaster extends FabricPacketBroadcaster implements C2SPacketBroadcaster {
+@AutoService({C2SPacketBroadcaster.class, C2SPacketRegister.class})
+public class C2SFabricPacketBroadcaster extends FabricPacketBroadcaster implements C2SPacketBroadcaster, C2SPacketRegister {
 
     @Override
     public void registerPackets() {

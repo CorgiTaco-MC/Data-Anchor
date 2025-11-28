@@ -13,6 +13,7 @@ import dev.corgitaco.dataanchor.fabric.DataAnchorFabric;
 import dev.corgitaco.dataanchor.network.BiDirectionalNetworkContainer;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.BiDirectionalPacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.BidirectionalPacketRegister;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -33,8 +34,8 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-@AutoService(BiDirectionalPacketBroadcaster.class)
-public class BiDirectionalFabricPacketBroadcaster extends FabricPacketBroadcaster implements BiDirectionalPacketBroadcaster {
+@AutoService({BiDirectionalPacketBroadcaster.class, BidirectionalPacketRegister.class})
+public class BiDirectionalFabricPacketBroadcaster extends FabricPacketBroadcaster implements BiDirectionalPacketBroadcaster, BidirectionalPacketRegister {
 
     @Override
     public void registerPackets() {

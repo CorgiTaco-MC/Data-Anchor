@@ -4,10 +4,11 @@ import com.google.auto.service.AutoService;
 import dev.corgitaco.dataanchor.network.C2SNetworkContainer;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.C2SPacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.C2SPacketRegister;
 import net.minecraft.resources.ResourceLocation;
 
-@AutoService(C2SPacketBroadcaster.class)
-public class C2SForgeNetworkHandler extends ForgeNetworkHandler implements C2SPacketBroadcaster {
+@AutoService({C2SPacketBroadcaster.class, C2SPacketRegister.class})
+public class C2SForgeNetworkHandler extends ForgeNetworkHandler implements C2SPacketBroadcaster, C2SPacketRegister {
 
     @Override
     public void registerPackets() {

@@ -4,6 +4,7 @@ import com.google.auto.service.AutoService;
 import dev.corgitaco.dataanchor.network.BiDirectionalNetworkContainer;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.broadcast.BiDirectionalPacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.BidirectionalPacketRegister;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,8 +13,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.network.PacketDistributor;
 
-@AutoService(BiDirectionalPacketBroadcaster.class)
-public class BiDirectionalForgeNetworkHandler extends ForgeNetworkHandler implements BiDirectionalPacketBroadcaster {
+@AutoService({BiDirectionalPacketBroadcaster.class, BidirectionalPacketRegister.class})
+public class BiDirectionalForgeNetworkHandler extends ForgeNetworkHandler implements BiDirectionalPacketBroadcaster, BidirectionalPacketRegister {
 
     public BiDirectionalForgeNetworkHandler() {
     }

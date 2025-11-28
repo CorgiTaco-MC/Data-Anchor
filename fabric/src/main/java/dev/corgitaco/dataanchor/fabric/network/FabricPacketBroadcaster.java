@@ -9,6 +9,8 @@
 package dev.corgitaco.dataanchor.fabric.network;
 
 import dev.corgitaco.dataanchor.network.Packet;
+import dev.corgitaco.dataanchor.network.broadcast.PacketBroadcaster;
+import dev.corgitaco.dataanchor.network.register.PacketRegister;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 

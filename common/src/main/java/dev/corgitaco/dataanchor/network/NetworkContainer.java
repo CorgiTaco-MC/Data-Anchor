@@ -8,6 +8,7 @@
 
 package dev.corgitaco.dataanchor.network;
 
+import dev.corgitaco.dataanchor.network.broadcast.PacketBroadcaster;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public abstract class NetworkContainer {
+public abstract class NetworkContainer implements PacketBroadcaster {
 
     private final Map<ResourceLocation, Packet.Handler<? extends Packet>> packets = new HashMap<>();
     private final String nameSpace;
@@ -32,8 +33,8 @@ public abstract class NetworkContainer {
     }
 
     public <T extends Packet> void registerPacketHandler(String name, Class<T> clazz, BiConsumer<T, FriendlyByteBuf> write,
-                                                  Function<FriendlyByteBuf, T> read,
-                                                  Packet.Handle<T> handle) {
+                                                         Function<FriendlyByteBuf, T> read,
+                                                         Packet.Handle<T> handle) {
         registerPacketHandler(name, new Packet.Handler<>(clazz, write, read, handle));
     }
 
