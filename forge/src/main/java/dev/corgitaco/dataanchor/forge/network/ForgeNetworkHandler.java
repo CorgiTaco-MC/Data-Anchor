@@ -24,8 +24,8 @@ import java.util.function.Supplier;
 public abstract class ForgeNetworkHandler {
     private static final String PROTOCOL_VERSION = "1";
 
-    protected final Map<Class<? extends Packet>, SimpleChannel> channels = new ConcurrentHashMap<>();
-    protected final Map<Class<? extends Packet>, ResourceLocation> channelNames  = new ConcurrentHashMap<>();
+    protected static final Map<Class<? extends Packet>, SimpleChannel> channels = new ConcurrentHashMap<>();
+    protected static final Map<Class<? extends Packet>, ResourceLocation> channelNames  = new ConcurrentHashMap<>();
 
     public ForgeNetworkHandler() {
     }
