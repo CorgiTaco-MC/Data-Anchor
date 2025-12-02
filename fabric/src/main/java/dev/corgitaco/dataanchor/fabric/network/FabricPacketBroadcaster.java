@@ -21,8 +21,8 @@ import java.util.function.Function;
 
 public abstract class FabricPacketBroadcaster {
 
-    protected final Map<Class<? extends Packet>, BiConsumer<?, FriendlyByteBuf>> encoders = new ConcurrentHashMap<>();
-    protected final Map<Class<? extends Packet>, ResourceLocation> packetIds = new ConcurrentHashMap<>();
+    protected static final Map<Class<? extends Packet>, BiConsumer<?, FriendlyByteBuf>> encoders = new ConcurrentHashMap<>();
+    protected static final Map<Class<? extends Packet>, ResourceLocation> packetIds = new ConcurrentHashMap<>();
 
     protected final <T extends Packet> void register(ResourceLocation path, Packet.Handler<T> handler) {
         registerMessage(path, handler.clazz(), handler.write(), handler.read(), handler.handle());
