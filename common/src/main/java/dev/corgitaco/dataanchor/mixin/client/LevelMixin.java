@@ -13,6 +13,7 @@ import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.type.blockentity.BlockEntityTrackedData;
 import dev.corgitaco.dataanchor.data.type.chunk.ChunkTrackedData;
+import dev.corgitaco.dataanchor.util.TickableBlockEntityAccessor;
 import net.minecraft.client.multiplayer.ClientChunkCache;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -27,12 +28,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 @Mixin(Level.class)
 public abstract class LevelMixin implements LevelAccessor {
-
 
     @Shadow
     @Final
@@ -53,24 +54,28 @@ public abstract class LevelMixin implements LevelAccessor {
                         Collection<TrackedDataKey<ChunkTrackedData>> keys = dataContainer.dataAnchor$getTrackedDataKeys();
 
                         for (TrackedDataKey<ChunkTrackedData> key : keys) {
-                            Optional optional = dataContainer.dataAnchor$getTrackedData(key);
-                            if (optional.isPresent()) {
-                                if (optional.get() instanceof TickableTrackedData trackedData) {
-                                    trackedData.tick();
+                            dataContainer.dataAnchor$getTrackedData(key).ifPresent(data -> {
+                                if (data instanceof TickableTrackedData tickableData) {
+                                    tickableData.tick();
                                 }
-                            }
+                            });
                         }
                     }
 
-                    for (BlockEntity value : levelChunk.getBlockEntities().values()) {
-                        if (value instanceof TrackedDataContainer container) {
-                            Collection<TrackedDataKey<BlockEntityTrackedData>> keys = container.dataAnchor$getTrackedDataKeys();
-                            for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
-                                container.dataAnchor$getTrackedData(key).ifPresent(data -> {
-                                    if (data instanceof TickableTrackedData tickableData) {
-                                        tickableData.tick();
-                                    }
-                                });
+                    if (levelChunk instanceof TickableBlockEntityAccessor accessor) {
+                        List<BlockEntity> tickables = accessor.dataAnchor$getTickableBlockEntities();
+
+                        for (BlockEntity value : tickables) {
+                            if (value instanceof TrackedDataContainer dataContainer) {
+                                Collection<TrackedDataKey<BlockEntityTrackedData>> keys = dataContainer.dataAnchor$getTrackedDataKeys();
+
+                                for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
+                                    dataContainer.dataAnchor$getTrackedData(key).ifPresent(data -> {
+                                        if (data instanceof TickableTrackedData tickableData) {
+                                            tickableData.tick();
+                                        }
+                                    });
+                                }
                             }
                         }
                     }
