@@ -9,8 +9,12 @@
 package dev.corgitaco.dataanchor.util;
 
 import net.minecraft.world.level.block.entity.BlockEntity;
+
+import java.util.Collections;
 import java.util.List;
 
 public interface TickableBlockEntityAccessor {
-    List<BlockEntity> dataAnchor$getTickableBlockEntities();
+    default List<BlockEntity> dataAnchor$getTickableBlockEntities() {
+        return Collections.emptyList();
+    }
 }

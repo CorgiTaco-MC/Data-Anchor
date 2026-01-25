@@ -85,7 +85,7 @@ public abstract class LevelMixin implements LevelAccessor {
     }
 
     @Unique
-    private synchronized AtomicReferenceArray<LevelChunk> dataAnchor$getChunks(ClientChunkCache clientChunkCache) {
+    private AtomicReferenceArray<LevelChunk> dataAnchor$getChunks(ClientChunkCache clientChunkCache) {
         return clientChunkCache.storage.chunks;
     }
 }
