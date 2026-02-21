@@ -7,3 +7,6 @@ accessible field net/minecraft/client/multiplayer/ClientChunkCache storage Lnet/
 accessible field net/minecraft/client/multiplayer/ClientChunkCache$Storage chunks Ljava/util/concurrent/atomic/AtomicReferenceArray;
 accessible class net/minecraft/client/multiplayer/ClientChunkCache$Storage
 extendable class net/minecraft/client/multiplayer/ClientChunkCache$Storage
+
+accessible method net/minecraft/core/registries/BuiltInRegistries registerSimple (Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/registries/BuiltInRegistries$RegistryBootstrap;)Lnet/minecraft/core/Registry;
+accessible class net/minecraft/core/registries/BuiltInRegistries$RegistryBootstrap

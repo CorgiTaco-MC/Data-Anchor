@@ -9,21 +9,26 @@
 package dev.corgitaco.dataanchor.forge;
 
 import dev.corgitaco.dataanchor.DataAnchor;
+import dev.corgitaco.dataanchor.forge.registry.ForgeRegistryHelper;
 import dev.corgitaco.dataanchor.network.broadcast.PacketBroadcaster;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DataPackRegistryEvent;
 
 /**
  * Main class for the mod on the Forge platform.
  */
 @Mod(DataAnchor.MOD_ID)
 public class DataAnchorForge {
-    public DataAnchorForge() {
+    public DataAnchorForge(final FMLJavaModLoadingContext context) {
         DataAnchor.init();
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus modEventBus = context.getModEventBus();
         modEventBus.addListener(this::commonSetup);
+
+        ForgeRegistryHelper.CACHED.values().forEach(deferredRegister -> deferredRegister.register(modEventBus));
+        modEventBus.<DataPackRegistryEvent.NewRegistry>addListener(newRegistry -> ForgeRegistryHelper.DATAPACK_REGISTRIES.forEach(newRegistryConsumer -> newRegistryConsumer.accept(newRegistry)));
     }
 
     public void commonSetup(final FMLCommonSetupEvent fmlCommonSetupEvent) {
