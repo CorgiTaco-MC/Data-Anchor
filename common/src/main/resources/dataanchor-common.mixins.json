@@ -10,13 +10,14 @@
     "BlockEntityMixin",
     "ChunkAccessMixin",
     "ChunkMapMixin",
+    "ChunkMixin",
     "ChunkSerializerMixin",
     "EntityMixin",
+    "LevelChunkMixin",
     "LevelMixin",
-    "ChunkMixin",
+    "PlayerListMixin",
     "ServerEntityMixin",
-    "ServerLevelMixin",
-    "PlayerListMixin"
+    "ServerLevelMixin"
   ],
   "injectors": {
     "defaultRequire": 1

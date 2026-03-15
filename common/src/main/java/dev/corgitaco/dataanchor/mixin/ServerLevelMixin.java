@@ -17,6 +17,7 @@ import dev.corgitaco.dataanchor.data.type.entity.PlayerTrackedData;
 import dev.corgitaco.dataanchor.data.type.entity.SyncedPlayerTrackedData;
 import dev.corgitaco.dataanchor.data.type.level.LevelTrackedData;
 import dev.corgitaco.dataanchor.data.type.level.SyncedLevelTrackedData;
+import dev.corgitaco.dataanchor.util.TickableBlockEntityAccessor;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -36,6 +37,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
@@ -49,6 +51,7 @@ public abstract class ServerLevelMixin extends Level {
     private void dataAnchor$onTickChunk(LevelChunk chunk, int randomTickSpeed, CallbackInfo ci) {
         if (chunk instanceof TrackedDataContainer access) {
             Collection<TrackedDataKey<ChunkTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
+
             for (TrackedDataKey<ChunkTrackedData> key : keys) {
                 access.dataAnchor$getTrackedData(key).ifPresent(data -> {
                     if (data instanceof TickableTrackedData tickableData) {
@@ -59,21 +62,25 @@ public abstract class ServerLevelMixin extends Level {
         }
 
         if (chunk.getFullStatus().isOrAfter(FullChunkStatus.BLOCK_TICKING)) {
-            for (BlockEntity value : chunk.getBlockEntities().values()) {
-                if (value instanceof TrackedDataContainer access) {
-                    Collection<TrackedDataKey<BlockEntityTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
-                    for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
-                        access.dataAnchor$getTrackedData(key).ifPresent(data -> {
-                            if (data instanceof TickableTrackedData tickableData) {
-                                tickableData.tick();
-                            }
-                        });
+            if (chunk instanceof TickableBlockEntityAccessor accessor) {
+                List<BlockEntity> tickables = accessor.dataAnchor$getTickableBlockEntities();
+
+                for (BlockEntity value : tickables) {
+                    if (value instanceof TrackedDataContainer access) {
+                        Collection<TrackedDataKey<BlockEntityTrackedData>> keys = access.dataAnchor$getTrackedDataKeys();
+
+                        for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
+                            access.dataAnchor$getTrackedData(key).ifPresent(data -> {
+                                if (data instanceof TickableTrackedData tickableData) {
+                                    tickableData.tick();
+                                }
+                            });
+                        }
                     }
                 }
             }
         }
     }
-
 
     @Inject(method = "addRespawnedPlayer", at = @At("RETURN"))
     private void dataAnchor$addRespawnTeleport(ServerPlayer player, CallbackInfo ci) {
