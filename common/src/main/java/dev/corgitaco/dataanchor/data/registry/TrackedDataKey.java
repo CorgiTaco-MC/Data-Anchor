@@ -10,7 +10,7 @@ package dev.corgitaco.dataanchor.data.registry;
 
 import dev.corgitaco.dataanchor.data.TrackedData;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -18,15 +18,15 @@ import java.util.Map;
 
 public class TrackedDataKey<T extends TrackedData<?>> {
 
-    private static final Map<TrackedDataRegistry<?, ?>, Map<ResourceLocation, TrackedDataKey<?>>> TRACKED_DATA = new Reference2ObjectOpenHashMap<>();
+    private static final Map<TrackedDataRegistry<?, ?>, Map<Identifier, TrackedDataKey<?>>> TRACKED_DATA = new Reference2ObjectOpenHashMap<>();
 
-    private final ResourceLocation id;
+    private final Identifier id;
 
-    private TrackedDataKey(ResourceLocation id) {
+    private TrackedDataKey(Identifier id) {
         this.id = id;
     }
 
-    public static <E, T extends TrackedData<E>, KEY extends TrackedDataKey<T>> KEY of(TrackedDataRegistry<E, T> dataRegistry, Class<? extends T> clazz, ResourceLocation id) {
+    public static <E, T extends TrackedData<E>, KEY extends TrackedDataKey<T>> KEY of(TrackedDataRegistry<E, T> dataRegistry, Class<? extends T> clazz, Identifier id) {
         if (clazz.isInterface()) {
             throw new IllegalArgumentException("TrackedData class must not be an interface");
         }
@@ -51,11 +51,11 @@ public class TrackedDataKey<T extends TrackedData<?>> {
         }
     }
 
-    public static <E, T extends TrackedData<E>> TrackedDataKey<T> fromID(TrackedDataRegistry<E, T> dataRegistry, ResourceLocation id) {
+    public static <E, T extends TrackedData<E>> TrackedDataKey<T> fromID(TrackedDataRegistry<E, T> dataRegistry, Identifier id) {
         return (TrackedDataKey<T>) TRACKED_DATA.computeIfAbsent(dataRegistry, k -> new HashMap<>()).get(id);
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return id;
     }
 }

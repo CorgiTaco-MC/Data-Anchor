@@ -8,6 +8,7 @@
 
 package dev.corgitaco.dataanchor.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import dev.corgitaco.dataanchor.data.DirtyMarker;
 import dev.corgitaco.dataanchor.data.InternalDirtyMarker;
 import dev.corgitaco.dataanchor.data.TickableTrackedData;
@@ -65,7 +66,7 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
     @Override
     public void dataAnchor$createTrackedData() {
         if ((Object) this instanceof ServerLevel serverLevel) {
-            this.dataAnchor$trackedDataContainer = TrackedLevelSavedData.get(serverLevel);
+            this.dataAnchor$trackedDataContainer = serverLevel.getDataStorage().get(TrackedLevelSavedData.TYPE).init(serverLevel);
         } else {
             this.dataAnchor$trackedDataContainer.dataAnchor$createTrackedData();
         }
@@ -106,9 +107,9 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
         }
     }
 
-    @Inject(method = "tickBlockEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/TickingBlockEntity;tick()V"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void dataAnchor$onTickBlockEntitiesEnd(CallbackInfo ci, ProfilerFiller profilerFiller, Iterator iterator, boolean bl, TickingBlockEntity tickingBlockEntity) {
-        if (this.getBlockEntity(tickingBlockEntity.getPos()) instanceof TrackedDataContainer container) {
+    @Inject(method = "tickBlockEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/TickingBlockEntity;tick()V"))
+    private void dataAnchor$onTickBlockEntitiesEnd(CallbackInfo ci, @Local(name = "ticker") TickingBlockEntity ticker) {
+        if (this.getBlockEntity(ticker.getPos()) instanceof TrackedDataContainer container) {
             Collection<TrackedDataKey<BlockEntityTrackedData>> keys = container.dataAnchor$getTrackedDataKeys();
             for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
                 container.dataAnchor$getTrackedData(key).ifPresent(data -> {

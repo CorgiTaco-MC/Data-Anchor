@@ -8,15 +8,21 @@
 
 package dev.corgitaco.dataanchor.mixin;
 
+import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.data.TickableTrackedData;
 import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
 import dev.corgitaco.dataanchor.data.type.entity.EntityTrackedData;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -46,7 +52,7 @@ public abstract class EntityMixin implements TrackedDataContainer<Entity, Entity
 
 
     @Inject(method = "saveWithoutId", at = @At("RETURN"))
-    private void dataAnchor$saveWithoutId(CompoundTag compound, CallbackInfoReturnable<CompoundTag> cir) {
+    private void dataAnchor$saveWithoutId(ValueOutput output, CallbackInfo ci) {
         CompoundTag trackedData = new CompoundTag();
         Collection<TrackedDataKey<EntityTrackedData>> keys = this.dataAnchor$container.dataAnchor$getTrackedDataKeys();
         for (TrackedDataKey<EntityTrackedData> key : keys) {
@@ -57,19 +63,25 @@ public abstract class EntityMixin implements TrackedDataContainer<Entity, Entity
                 }
             });
         }
-        compound.put("TrackedData", trackedData);
+        if (output instanceof TagValueOutput output1) {
+            output1.buildResult().put("TrackedData", trackedData);
+        }
     }
 
     @Inject(method = "load", at = @At("RETURN"))
-    private void dataAnchor$load(CompoundTag loadTag, CallbackInfo ci) {
-        if (loadTag != null) {
-            if (loadTag.contains("TrackedData")) {
-                CompoundTag trackedData = loadTag.getCompound("TrackedData");
-                Collection<TrackedDataKey<EntityTrackedData>> keys = this.dataAnchor$container.dataAnchor$getTrackedDataKeys();
-                for (TrackedDataKey<EntityTrackedData> key : keys) {
-                    String tagKey = key.getId().toString();
-                    if (trackedData.contains(tagKey)) {
-                        this.dataAnchor$container.dataAnchor$getTrackedData(key).ifPresent(entityTrackedData -> entityTrackedData.load(trackedData.getCompound(tagKey)));
+    private void dataAnchor$load(ValueInput input, CallbackInfo ci) {
+
+        if (input instanceof TagValueInput input1) {
+            CompoundTag loadTag = input1.input;
+            if (loadTag != null) {
+                if (loadTag.contains("TrackedData")) {
+                    CompoundTag trackedData = loadTag.getCompound("TrackedData").orElseThrow();
+                    Collection<TrackedDataKey<EntityTrackedData>> keys = this.dataAnchor$container.dataAnchor$getTrackedDataKeys();
+                    for (TrackedDataKey<EntityTrackedData> key : keys) {
+                        String tagKey = key.getId().toString();
+                        if (trackedData.contains(tagKey)) {
+                            this.dataAnchor$container.dataAnchor$getTrackedData(key).ifPresent(entityTrackedData -> entityTrackedData.load(trackedData.getCompound(tagKey).orElseThrow()));
+                        }
                     }
                 }
             }

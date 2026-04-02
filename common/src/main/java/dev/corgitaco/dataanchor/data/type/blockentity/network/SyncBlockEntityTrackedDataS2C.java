@@ -28,16 +28,16 @@ import org.jetbrains.annotations.Nullable;
 public record SyncBlockEntityTrackedDataS2C(BlockPos pos, TrackedDataKey<? extends BlockEntityTrackedData> dataKey,
                                             CompoundTag tag) implements Packet {
     public static final StreamCodec<RegistryFriendlyByteBuf, SyncBlockEntityTrackedDataS2C> STREAM_CODEC = CustomPacketPayload.codec(SyncBlockEntityTrackedDataS2C::write, SyncBlockEntityTrackedDataS2C::new);
-    public static final CustomPacketPayload.Type<SyncBlockEntityTrackedDataS2C> TYPE = new CustomPacketPayload.Type<>(DataAnchor.id("block_entity_tracked_data"));
+    public static final Type<SyncBlockEntityTrackedDataS2C> TYPE = new Type<>(DataAnchor.id("block_entity_tracked_data"));
 
 
     public SyncBlockEntityTrackedDataS2C(FriendlyByteBuf buf) {
-        this(buf.readBlockPos(), TrackedDataKey.fromID(TrackedDataRegistries.BLOCK_ENTITY, buf.readResourceLocation()), buf.readNbt());
+        this(buf.readBlockPos(), TrackedDataKey.fromID(TrackedDataRegistries.BLOCK_ENTITY, buf.readIdentifier()), buf.readNbt());
     }
 
     public void write(FriendlyByteBuf buf) {
         buf.writeBlockPos(this.pos);
-        buf.writeResourceLocation(dataKey.getId());
+        buf.writeIdentifier(dataKey.getId());
         buf.writeNbt(this.tag);
     }
 

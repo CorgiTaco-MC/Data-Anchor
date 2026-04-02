@@ -25,8 +25,8 @@ public class TestSyncedLevelChunkTrackedData extends SyncedLevelChunkTrackedData
 
     @Override
     public void tick() {
-        if (get().getPos().x == 0 && get().getPos().z == 0) {
-            if (!get().getLevel().isClientSide) {
+        if (get().getPos().x() == 0 && get().getPos().z() == 0) {
+            if (!get().getLevel().isClientSide()) {
                 setTimer(this.timer + 1);
                 DataAnchor.LOGGER.info("Server chunk timer: %s".formatted(this.timer));
             } else {

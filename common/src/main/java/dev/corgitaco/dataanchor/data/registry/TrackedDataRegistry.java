@@ -11,24 +11,25 @@ package dev.corgitaco.dataanchor.data.registry;
 import dev.corgitaco.dataanchor.data.TrackedData;
 import dev.corgitaco.dataanchor.data.TrackedDataContainer;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class TrackedDataRegistry<O, T extends TrackedData<O>> {
 
-    public static final Map<ResourceLocation, TrackedDataRegistry<?, ?>> REGISTRIES = new HashMap<>();
+    public static final Map<Identifier, TrackedDataRegistry<?, ?>> REGISTRIES = new HashMap<>();
 
     private final Map<TrackedDataKey<T>, TrackedDataFactory<O, T>> factories = new Reference2ObjectOpenHashMap<>();
-    private final Set<ResourceLocation> usedIds = new HashSet<>();
-    private final ResourceLocation id;
+    private final Set<Identifier> usedIds = new HashSet<>();
+    private final Identifier id;
 
-    private TrackedDataRegistry(ResourceLocation id) {
+    private TrackedDataRegistry(Identifier id) {
         this.id = id;
     }
 
-    public static <O, T extends TrackedData<O>> TrackedDataRegistry<O, T> of(ResourceLocation id) {
+    public static <O, T extends TrackedData<O>> TrackedDataRegistry<O, T> of(Identifier id) {
         TrackedDataRegistry<?, ?> trackedDataRegistry = REGISTRIES.computeIfAbsent(id, key -> new TrackedDataRegistry<>(id));
         return (TrackedDataRegistry<O, T>) trackedDataRegistry;
     }
@@ -37,7 +38,7 @@ public class TrackedDataRegistry<O, T extends TrackedData<O>> {
         if (factories.get(key) != null) {
             throw new IllegalArgumentException("TrackedDataKey already registered in Tracked Data Registry \"%s\"!");
         } else {
-            ResourceLocation id = key.getId();
+            Identifier id = key.getId();
             if (usedIds.contains(id)) {
                 throw new IllegalArgumentException("TrackedDataKey with id \"%s\" already registered in Tracked Data Registry \"%s\"!".formatted(id, this.id));
             }
@@ -69,7 +70,7 @@ public class TrackedDataRegistry<O, T extends TrackedData<O>> {
         return factories;
     }
 
-    public <E extends T> TrackedDataKey<E> register(ResourceLocation id, Class<E> clazz, TrackedDataFactory<O, E> factory) {
+    public <E extends T> TrackedDataKey<E> register(Identifier id, Class<E> clazz, TrackedDataFactory<O, E> factory) {
         TrackedDataKey<E> key = (TrackedDataKey<E>) TrackedDataKey.of(this, clazz, id);
         if (factories.get(key) == null) {
             register(key, factory);

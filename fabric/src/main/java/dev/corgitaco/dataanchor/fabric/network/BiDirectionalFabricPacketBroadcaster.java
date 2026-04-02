@@ -40,8 +40,8 @@ public class BiDirectionalFabricPacketBroadcaster extends FabricPacketBroadcaste
 
     @Override
     protected <T extends Packet> void registerPayload(CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> serializer) {
-        PayloadTypeRegistry.playC2S().register(type, serializer);
-        PayloadTypeRegistry.playS2C().register(type, serializer);
+        PayloadTypeRegistry.serverboundPlay().register(type, serializer);
+        PayloadTypeRegistry.clientboundPlay().register(type, serializer);
     }
 
     @Override

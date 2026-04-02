@@ -26,7 +26,7 @@ public abstract non-sealed class SyncedLevelChunkTrackedData extends LevelChunkT
     @Override
     public void sync() {
         Level level = get().getLevel();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             S2CPacketBroadcaster.S2C.trackingChunk(syncPacket(), get());
         }
     }

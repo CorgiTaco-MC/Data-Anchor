@@ -18,23 +18,29 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ImposterProtoChunk;
 import net.minecraft.world.level.chunk.ProtoChunk;
-import net.minecraft.world.level.chunk.storage.ChunkSerializer;
 import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
+import net.minecraft.world.level.chunk.storage.SerializableChunkData;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Collection;
 
-@Mixin(ChunkSerializer.class)
+@Mixin(SerializableChunkData.class)
 public class ChunkSerializerMixin {
 
 
-    @Inject(method = "write", at = @At("RETURN"))
-    private static void dataAnchor$write(ServerLevel level, ChunkAccess chunk, CallbackInfoReturnable<CompoundTag> cir) {
+    @Shadow
+    @Final
+    private CompoundTag structureData;
+
+    @Inject(method = "copyOf", at = @At("RETURN"))
+    private static void dataAnchor$write(ServerLevel level, ChunkAccess chunk, CallbackInfoReturnable<SerializableChunkData> cir) {
         if (chunk instanceof TrackedDataContainer trackedDataContainer) {
-            CompoundTag tag = cir.getReturnValue();
+            CompoundTag tag = cir.getReturnValue().structureData();
 
             CompoundTag trackedDataTag = new CompoundTag();
             Collection<TrackedDataKey<ChunkTrackedData>> keys = trackedDataContainer.dataAnchor$getTrackedDataKeys();
@@ -54,20 +60,20 @@ public class ChunkSerializerMixin {
     }
 
     @Inject(method = "read", at = @At("RETURN"))
-    private static void dataAnchor$read(ServerLevel level, PoiManager poiManager, RegionStorageInfo regionStorageInfo, ChunkPos pos, CompoundTag tag, CallbackInfoReturnable<ProtoChunk> cir) {
+    private void dataAnchor$read(ServerLevel level, PoiManager poiManager, RegionStorageInfo regionInfo, ChunkPos pos, CallbackInfoReturnable<ProtoChunk> cir) {
         ChunkAccess returnValue = cir.getReturnValue();
         if (returnValue instanceof ImposterProtoChunk imposterProtoChunk) {
             returnValue = imposterProtoChunk.getWrapped();
         }
 
         if (returnValue instanceof TrackedDataContainer<?, ?> trackedDataContainer) {
-            CompoundTag trackedDataTag = tag.getCompound("TrackedData");
+            CompoundTag trackedDataTag = this.structureData.getCompound("TrackedData").orElseThrow();
             for (TrackedDataKey key : trackedDataContainer.dataAnchor$getTrackedDataKeys()) {
                 trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
                     if (trackedData instanceof ChunkTrackedData chunkTrackedData) {
                         String idString = key.getId().toString();
                         if (trackedDataTag.contains(idString)) {
-                            chunkTrackedData.load(trackedDataTag.getCompound(idString));
+                            chunkTrackedData.load(trackedDataTag.getCompound(idString).orElseThrow());
                         }
                     }
                 });

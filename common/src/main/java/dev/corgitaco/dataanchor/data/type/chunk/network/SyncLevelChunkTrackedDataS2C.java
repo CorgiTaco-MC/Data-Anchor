@@ -29,21 +29,21 @@ public record SyncLevelChunkTrackedDataS2C(TrackedDataKey<SyncedLevelChunkTracke
                                            CompoundTag tag) implements Packet {
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SyncLevelChunkTrackedDataS2C> STREAM_CODEC = CustomPacketPayload.codec(SyncLevelChunkTrackedDataS2C::write, SyncLevelChunkTrackedDataS2C::new);
-    public static final CustomPacketPayload.Type<SyncLevelChunkTrackedDataS2C> TYPE = new CustomPacketPayload.Type<>(DataAnchor.id("chunk_tracked_data"));
+    public static final Type<SyncLevelChunkTrackedDataS2C> TYPE = new Type<>(DataAnchor.id("chunk_tracked_data"));
     public SyncLevelChunkTrackedDataS2C(FriendlyByteBuf buf) {
-        this((TrackedDataKey) TrackedDataKey.fromID(TrackedDataRegistries.CHUNK, buf.readResourceLocation()), new ChunkPos(buf.readInt(), buf.readInt()), buf.readNbt());
+        this((TrackedDataKey) TrackedDataKey.fromID(TrackedDataRegistries.CHUNK, buf.readIdentifier()), new ChunkPos(buf.readInt(), buf.readInt()), buf.readNbt());
     }
 
     public void write(FriendlyByteBuf buf) {
-        buf.writeResourceLocation(dataKey.getId());
-        buf.writeInt(pos.x);
-        buf.writeInt(pos.z);
+        buf.writeIdentifier(dataKey.getId());
+        buf.writeInt(pos.x());
+        buf.writeInt(pos.z());
         buf.writeNbt(this.tag);
     }
 
     @Override
     public void handle(@Nullable Level level, @Nullable Player player) {
-        LevelChunk chunk = level.getChunk(pos.x, pos.z);
+        LevelChunk chunk = level.getChunk(pos.x(), pos.z());
         if (!chunk.isEmpty()) {
             if (chunk instanceof TrackedDataContainer access) {
                 access.dataAnchor$getTrackedData(this.dataKey).ifPresent(data -> {

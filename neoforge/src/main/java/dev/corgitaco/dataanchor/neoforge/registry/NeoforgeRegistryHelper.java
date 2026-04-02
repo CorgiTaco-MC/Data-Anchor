@@ -6,7 +6,7 @@ import dev.corgitaco.dataanchor.registry.RegistryHelper;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
@@ -23,7 +23,7 @@ public class NeoforgeRegistryHelper implements RegistryHelper{
     public static final Map<ResourceKey<?>, DeferredRegister> CACHED = new Reference2ObjectOpenHashMap<>();
 
     @Override
-    public <T> Supplier<T> register(Registry<T> registry, ResourceLocation location, Supplier<T> value) {
+    public <T> Supplier<T> register(Registry<T> registry, Identifier location, Supplier<T> value) {
         return CACHED.computeIfAbsent(registry.key(), key -> DeferredRegister.create(registry.key().location(), location.getNamespace())).register(location.getPath(), value);
     }
 

@@ -24,7 +24,7 @@ public interface S2CPacketBroadcaster extends PacketBroadcaster {
     <MSG extends Packet> void sendToAllPlayers(MSG msg);
 
     default <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ServerPlayer player) {
-        sendToAllPlayersInDimension(msg, player.serverLevel());
+        sendToAllPlayersInDimension(msg, player.level());
     }
 
     <MSG extends Packet> void sendToAllPlayersInDimension(MSG msg, ServerLevel dimension);

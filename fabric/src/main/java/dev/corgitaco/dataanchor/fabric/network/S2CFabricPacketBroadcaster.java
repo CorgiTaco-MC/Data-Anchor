@@ -39,7 +39,7 @@ public class S2CFabricPacketBroadcaster extends FabricPacketBroadcaster implemen
 
     @Override
     protected <T extends Packet> void registerPayload(CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> serializer) {
-        PayloadTypeRegistry.playS2C().register(type, serializer);
+        PayloadTypeRegistry.clientboundPlay().register(type, serializer);
     }
 
     @Override

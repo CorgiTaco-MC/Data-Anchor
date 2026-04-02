@@ -23,7 +23,7 @@ public abstract non-sealed class SyncedBlockEntityTrackedData extends BlockEntit
 
     @Override
     public void sync() {
-        if (!blockEntity.getLevel().isClientSide) {
+        if (!blockEntity.getLevel().isClientSide()) {
             PacketBroadcaster.S2C.trackingChunk(syncPacket(), blockEntity.getLevel().getChunkAt(blockEntity.getBlockPos()));
         }
     }

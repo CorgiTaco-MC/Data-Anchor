@@ -8,7 +8,7 @@
 
 package dev.corgitaco.dataanchor.network;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 
 public abstract class NetworkContainer {
 
-    private final Map<ResourceLocation, Packet.Handler<? extends Packet>> packets = new HashMap<>();
+    private final Map<Identifier, Packet.Handler<? extends Packet>> packets = new HashMap<>();
     private final String nameSpace;
     private boolean locked = false;
 
@@ -26,7 +26,7 @@ public abstract class NetworkContainer {
 
     public <T extends Packet> void registerPacketHandler(Packet.Handler<T> packetHandle) {
         if (!locked) {
-            ResourceLocation id = packetHandle.type().id();
+            Identifier id = packetHandle.type().id();
             if (!id.getNamespace().equals(this.nameSpace)) {
                 throw new IllegalArgumentException("Network Container for namespace \"%s\" cannot register packet with namespace \"%s\", expected namespace \"%s\"".formatted(this.nameSpace, id, this.nameSpace));
             }

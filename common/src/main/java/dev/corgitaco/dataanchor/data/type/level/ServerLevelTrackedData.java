@@ -27,7 +27,7 @@ public abstract non-sealed class ServerLevelTrackedData extends LevelTrackedData
 
     @Override
     public void markDirty() {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             if (level instanceof InternalDirtyMarker dirtyMarker) {
                 dirtyMarker.dataAnchor$markDirty();
             }

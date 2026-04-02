@@ -8,6 +8,8 @@
 
 package dev.corgitaco.dataanchor.data.type.level;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import dev.corgitaco.dataanchor.DataAnchor;
 import dev.corgitaco.dataanchor.data.InternalDirtyMarker;
 import dev.corgitaco.dataanchor.data.ServerTrackedData;
@@ -22,16 +24,32 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.level.storage.SavedDataStorage;
 
 import java.util.*;
 
 public class TrackedLevelSavedData extends SavedData implements TrackedDataContainer<Level, LevelTrackedData> {
-    public static final String DATA_NAME = DataAnchor.MOD_ID + "_saved_tracked_data";
+    public static final String DATA_NAME = "saved_tracked_data";
+    private CompoundTag tag;
 
+
+    public static Codec<TrackedLevelSavedData> makeCodec() {
+        return CompoundTag.CODEC.flatXmap(tag -> {
+            TrackedLevelSavedData data = new TrackedLevelSavedData(tag);
+            return DataResult.success(data);
+        }, data -> DataResult.success(data.save(data.serverLevel.registryAccess())));
+    }
+
+    public static final Codec<TrackedLevelSavedData> CODEC = makeCodec();
+
+    public static final SavedDataType<TrackedLevelSavedData> TYPE = new SavedDataType<TrackedLevelSavedData>(
+            DataAnchor.id(DATA_NAME),
+            TrackedLevelSavedData::new,
+            CODEC, DataFixTypes.LEVEL);
     private final Map<TrackedDataKey<LevelTrackedData>, LevelTrackedData> trackedDataMap = new Reference2ReferenceOpenHashMap<>();
     private final List<TickableTrackedData> tickableData = new ArrayList<>();
-    private final ServerLevel serverLevel;
+    private ServerLevel serverLevel;
 
 
     @Override
@@ -44,28 +62,28 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
         }
     }
 
-    private TrackedLevelSavedData(ServerLevel serverLevel, CompoundTag tag) {
+    public TrackedLevelSavedData() {}
+
+    public TrackedLevelSavedData(CompoundTag tag) {
+        this.tag = tag;
+    }
+
+    public TrackedLevelSavedData init(ServerLevel serverLevel) {
         this.serverLevel = serverLevel;
         dataAnchor$createTrackedData();
         for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
             String idString = entry.getKey().getId().toString();
-            if (tag.contains(idString, 10)) {
-                entry.getValue().load(tag.getCompound(idString));
+            if (tag.contains(idString)) {
+                entry.getValue().load(tag.getCompound(idString).orElseThrow());
             }
         }
+        this.tag = null;
+        return this;
     }
 
-    private TrackedLevelSavedData(ServerLevel serverLevel) {
-        this(serverLevel, new CompoundTag());
-    }
 
-    public static TrackedLevelSavedData get(ServerLevel world) {
-        DimensionDataStorage data = world.getDataStorage();
-        return data.computeIfAbsent(new Factory<TrackedLevelSavedData>(() -> new TrackedLevelSavedData(world), (compoundTag, provider) -> new TrackedLevelSavedData(world, compoundTag), DataFixTypes.SAVED_DATA_MAP_DATA), DATA_NAME);
-    }
-
-    @Override
-    public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider registries) {
+    public CompoundTag save(HolderLookup.Provider registries) {
+        CompoundTag compoundTag = new CompoundTag();
         for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
             CompoundTag save = entry.getValue().save();
             if (save != null) {

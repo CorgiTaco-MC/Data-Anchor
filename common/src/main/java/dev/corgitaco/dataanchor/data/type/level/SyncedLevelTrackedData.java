@@ -28,7 +28,7 @@ public abstract non-sealed class SyncedLevelTrackedData extends LevelTrackedData
 
     @Override
     public void sync() {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             S2CPacketBroadcaster.S2C.sendToAllPlayersInDimension(syncPacket(), (ServerLevel) get());
         }
     }
@@ -45,7 +45,7 @@ public abstract non-sealed class SyncedLevelTrackedData extends LevelTrackedData
 
     @Override
     public void markDirty() {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             if (level instanceof InternalDirtyMarker dirtyMarker) {
                 dirtyMarker.dataAnchor$markDirty();
             }

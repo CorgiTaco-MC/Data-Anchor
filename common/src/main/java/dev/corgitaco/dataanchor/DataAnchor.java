@@ -13,13 +13,19 @@ import dev.corgitaco.dataanchor.data.registry.TrackedDataKey;
 import dev.corgitaco.dataanchor.data.registry.TrackedDataRegistries;
 import dev.corgitaco.dataanchor.data.type.blockentity.network.SyncBlockEntityTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.chunk.network.SyncLevelChunkTrackedDataS2C;
+import dev.corgitaco.dataanchor.data.type.entity.SyncedPlayerTrackedData;
 import dev.corgitaco.dataanchor.data.type.entity.network.SyncEntityTrackedDataS2C;
 import dev.corgitaco.dataanchor.data.type.level.network.SyncLevelTrackedDataS2C;
 import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.S2CNetworkContainer;
+import dev.corgitaco.dataanchor.test.data.TestSyncedBlockEntityTrackedData;
+import dev.corgitaco.dataanchor.test.data.chunk.TestSyncedLevelChunkTrackedData;
+import dev.corgitaco.dataanchor.test.data.level.TestSyncedLevelTrackedData;
 import dev.corgitaco.dataanchor.test.data.player.TestSyncedPlayerTrackedData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.EnderChestBlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.slf4j.Logger;
 
 public class DataAnchor {
@@ -42,6 +48,32 @@ public class DataAnchor {
     public static void init() {
         registerPacketHandlers();
     }
+
+    public static final TrackedDataKey<TestSyncedPlayerTrackedData> TEST_PLAYER_TRACKED_DATA_KEY = TrackedDataRegistries.ENTITY.register(id("test_player_tracked_data"), TestSyncedPlayerTrackedData.class, (key, entity) -> {
+        if (entity instanceof Player player) {
+            return new TestSyncedPlayerTrackedData(key, player);
+        }
+
+        return null;
+    });
+
+    public static final TrackedDataKey<TestSyncedBlockEntityTrackedData> TEST_SYNCED_BLOCK_ENTITY_TRACKED_DATA_KEY = TrackedDataRegistries.BLOCK_ENTITY.register(id("test_block_entity_tracked_data"), TestSyncedBlockEntityTrackedData.class, (key, blockEntity) -> {
+        if (blockEntity instanceof EnderChestBlockEntity enderChestBlockEntity) {
+            return new TestSyncedBlockEntityTrackedData(key, enderChestBlockEntity);
+        }
+
+        return null;
+    });
+
+    public static final TrackedDataKey<TestSyncedLevelTrackedData> TEST_LEVEL_TRACKED_DATA_KEY = TrackedDataRegistries.LEVEL.register(id("test_level_tracked_data"), TestSyncedLevelTrackedData.class, TestSyncedLevelTrackedData::new);
+
+    public static final TrackedDataKey<TestSyncedLevelChunkTrackedData> TEST_SYNCED_LEVEL_CHUNK_TRACKED_DATA_KEY = TrackedDataRegistries.CHUNK.register(id("test_synced_level_chunk_tracked_data_key"), TestSyncedLevelChunkTrackedData.class, (key, chunkAccess) -> {
+        if (chunkAccess instanceof LevelChunk levelChunk) {
+            return new TestSyncedLevelChunkTrackedData(key, levelChunk);
+        }
+        return null;
+    });
+
 
     private static void registerPacketHandlers() {
         NETWORK_CONTAINER.registerPacketHandler(
@@ -77,7 +109,7 @@ public class DataAnchor {
 
     }
 
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 }

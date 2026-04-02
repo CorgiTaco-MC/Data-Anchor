@@ -8,13 +8,13 @@ import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Supplier;
 
 @AutoService(RegistryHelper.class)
 public class FabricRegistryHelper implements RegistryHelper {
-    public <T> Supplier<T> register(Registry<T> registry, ResourceLocation id, Supplier<T> value) {
+    public <T> Supplier<T> register(Registry<T> registry, Identifier id, Supplier<T> value) {
         T value1 = Registry.register(registry, id, value.get());
         return () -> value1;
     }
@@ -22,7 +22,7 @@ public class FabricRegistryHelper implements RegistryHelper {
 
     @Override
     public <T> Supplier<Registry<T>> createSimpleBuiltin(ResourceKey<Registry<T>> registryKey) {
-        MappedRegistry<T> registry = FabricRegistryBuilder.createSimple(registryKey).buildAndRegister();
+        MappedRegistry<T> registry = FabricRegistryBuilder.create(registryKey).buildAndRegister();
         return () -> registry;
     }
 

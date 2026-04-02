@@ -25,7 +25,7 @@ public class TestSyncedBlockEntityTrackedData extends SyncedBlockEntityTrackedDa
 
     @Override
     public void tick() {
-        if (!blockEntity.getLevel().isClientSide) {
+        if (!blockEntity.getLevel().isClientSide()) {
             setYum(this.yum + 1);
 
             DataAnchor.LOGGER.info("Server block entity yum: %s".formatted(this.yum));

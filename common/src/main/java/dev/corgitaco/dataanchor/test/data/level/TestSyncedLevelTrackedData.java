@@ -25,7 +25,7 @@ public class TestSyncedLevelTrackedData extends SyncedLevelTrackedData implement
     @Override
     public void tick() {
         if (level.dimension() == Level.OVERWORLD) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 setYum(this.yum + 1);
 
                 DataAnchor.LOGGER.info("Server level yum: %s".formatted(this.yum));

@@ -21,6 +21,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.PalettedContainerFactory;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +41,7 @@ public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, Chunk
     TrackedDataContainer<ChunkAccess, ChunkTrackedData> dataAnchor$trackedDataContainer;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void dataAnchor$onInit(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry biomeRegistry, long inhabitedTime, LevelChunkSection[] sections, BlendingData blendingData, CallbackInfo ci) {
+    private void dataAnchor$onInit(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, PalettedContainerFactory containerFactory, long inhabitedTime, LevelChunkSection[] sections, BlendingData blendingData, CallbackInfo ci) {
         if (levelHeightAccessor instanceof ServerLevelAccessor) {
             this.dataAnchor$trackedDataContainer = TrackedDataContainer.makeBasicContainer(TrackedDataRegistries.CHUNK, (ChunkAccess) (Object) this, false);
         } else {
@@ -65,7 +66,7 @@ public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, Chunk
     }
 
     @Override
-    public @Nullable BlockState dataAnchor$getInterceptorState(BlockPos pos, BlockState original, @Nullable BlockState lastState, boolean isMoving) {
+    public @Nullable BlockState dataAnchor$getInterceptorState(BlockPos pos, BlockState original, @Nullable BlockState lastState, int flags) {
         BlockState replacement = lastState;
         Collection<TrackedDataKey<ChunkTrackedData>> collection = dataAnchor$getTrackedDataKeys();
         for (TrackedDataKey<ChunkTrackedData> dataAnchor$getTrackedDataKey : collection) {
@@ -73,7 +74,7 @@ public class ChunkAccessMixin implements TrackedDataContainer<ChunkAccess, Chunk
             if (trackedData.isPresent()) {
                 ChunkTrackedData chunkTrackedData = trackedData.get();
                 if (chunkTrackedData instanceof ChunkBlockStateInterceptor chunkBlockStateInterceptor) {
-                    replacement = chunkBlockStateInterceptor.getNewState(pos, original, replacement, isMoving);
+                    replacement = chunkBlockStateInterceptor.getNewState(pos, original, replacement, flags);
                 }
             }
         }

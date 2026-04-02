@@ -14,8 +14,8 @@ public class ChunkMixin implements ChunkBlockStateInterceptor.Internal {
 
 
     @WrapMethod(method = "setBlockState")
-    private BlockState dataAnchor$IncterceptSetBlockState(BlockPos pos, BlockState originalState, boolean isMoving, Operation<BlockState> original) {
-        BlockState replacement = dataAnchor$getInterceptorState(pos, originalState, originalState, isMoving);
-        return original.call(pos, replacement, isMoving);
+    private BlockState dataAnchor$IncterceptSetBlockState(BlockPos pos, BlockState state, int flags, Operation<BlockState> original) {
+        BlockState replacement = dataAnchor$getInterceptorState(pos, state, state, flags);
+        return original.call(pos, replacement, flags);
     }
 }

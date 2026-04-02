@@ -7,12 +7,12 @@ import org.jetbrains.annotations.Nullable;
 public interface ChunkBlockStateInterceptor {
 
     @Nullable
-    default BlockState getNewState(BlockPos pos, BlockState original, @Nullable BlockState lastState, boolean isMoving) {
+    default BlockState getNewState(BlockPos pos, BlockState original, @Nullable BlockState lastState, int flags) {
         return original;
     }
 
     interface Internal {
-        default BlockState dataAnchor$getInterceptorState(BlockPos pos, BlockState original, @Nullable BlockState lastState, boolean isMoving) {
+        default BlockState dataAnchor$getInterceptorState(BlockPos pos, BlockState original, @Nullable BlockState lastState, int flags) {
             return original;
         }
     }

@@ -16,14 +16,14 @@ Simple mod with helpful data attaching and networking utilities including attach
 [[dependencies.dataanchor]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.1,)"
+versionRange = "[26.1,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.dataanchor]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.21.1]"
+versionRange = "[26.1,)"
 ordering = "NONE"
 side = "BOTH"
 
