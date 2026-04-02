@@ -3,6 +3,8 @@ plugins {
     id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" apply false
     // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
     id("net.neoforged.moddev") version "2.0.141" apply false
+
+    kotlin("jvm") version "2.3.0"
 }
 
 subprojects {
@@ -13,4 +15,8 @@ subprojects {
             add("annotationProcessor", "com.google.auto.service:auto-service:1.1.1")
         }
     }
+}
+
+repositories {
+    mavenCentral()
 }
