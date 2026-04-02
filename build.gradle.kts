@@ -1,16 +1,16 @@
 plugins {
     // see https://fabricmc.net/develop/ for new versions
-    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT' apply false
+    id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT" apply false
     // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
-    id 'net.neoforged.moddev' version '2.0.141' apply false
+    id("net.neoforged.moddev") version "2.0.141" apply false
 }
 
 subprojects {
     // Only configure Java dependency buckets after the Java plugin is applied.
     pluginManager.withPlugin("java") {
         dependencies {
-            compileOnly("com.google.auto.service:auto-service:1.1.1")
-            annotationProcessor("com.google.auto.service:auto-service:1.1.1")
+            add("compileOnly", "com.google.auto.service:auto-service:1.1.1")
+            add("annotationProcessor", "com.google.auto.service:auto-service:1.1.1")
         }
     }
 }
