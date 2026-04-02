@@ -15,13 +15,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 @AutoService(BiDirectionalPacketBroadcaster.class)
 public class BidirectionalNeoForgePacketBroadcaster implements BiDirectionalPacketBroadcaster {
     @Override
     public <MSG extends Packet> void sendToServer(MSG msg) {
-        PacketDistributor.sendToServer(msg);
+        ClientPacketDistributor.sendToServer(msg);
     }
 
     @Override
@@ -31,7 +32,7 @@ public class BidirectionalNeoForgePacketBroadcaster implements BiDirectionalPack
 
     @Override
     public <MSG extends Packet> void sendToAllPlayers(MSG msg) {
-        PacketDistributor.sendToServer(msg);
+        ClientPacketDistributor.sendToServer(msg);
     }
 
     @Override

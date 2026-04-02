@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 @AutoService(S2CPacketBroadcaster.class)
@@ -26,7 +27,7 @@ public class S2CNeoForgePacketBroadcaster implements S2CPacketBroadcaster {
 
     @Override
     public <MSG extends Packet> void sendToAllPlayers(MSG msg) {
-        PacketDistributor.sendToServer(msg);
+        ClientPacketDistributor.sendToServer(msg);
     }
 
     @Override

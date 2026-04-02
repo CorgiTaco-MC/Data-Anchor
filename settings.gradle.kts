@@ -1,5 +1,6 @@
 pluginManagement {
     repositories {
+        maven("https://maven.firstdark.dev/releases")
         gradlePluginPortal()
         mavenCentral()
         exclusiveContent {

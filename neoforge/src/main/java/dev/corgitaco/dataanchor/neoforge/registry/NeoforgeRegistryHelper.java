@@ -24,7 +24,7 @@ public class NeoforgeRegistryHelper implements RegistryHelper{
 
     @Override
     public <T> Supplier<T> register(Registry<T> registry, Identifier location, Supplier<T> value) {
-        return CACHED.computeIfAbsent(registry.key(), key -> DeferredRegister.create(registry.key().location(), location.getNamespace())).register(location.getPath(), value);
+        return CACHED.computeIfAbsent(registry.key(), key -> DeferredRegister.create(registry.key().identifier(), location.getNamespace())).register(location.getPath(), value);
     }
 
     public static final List<Consumer<NewRegistryEvent>> NEW_REGISTRIES = new ArrayList<>();
