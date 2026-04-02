@@ -117,13 +117,20 @@ publishing {
         }
     }
     repositories {
-        val localMavenUrl = System.getenv("local_maven_url")
-        if (!localMavenUrl.isNullOrBlank()) {
-            maven {
-                url = uri(localMavenUrl)
+        maven {
+            val releasesRepoUrl = "https://maven.jt-dev.tech/releases"
+            val snapshotsRepoUrl = "https://maven.jt-dev.tech/snapshots"
+            val versionString = project.version.toString()
+            val isSnapshot = versionString.endsWith("SNAPSHOT") || versionString.startsWith("0")
+
+            url = uri(if (isSnapshot) snapshotsRepoUrl else releasesRepoUrl)
+            name = "JTDev"
+
+            credentials {
+                username = project.properties["repoLogin"]?.toString()
+                password = project.properties["repoPassword"]?.toString()
             }
         }
-    }
-}
+    }}
 
 
