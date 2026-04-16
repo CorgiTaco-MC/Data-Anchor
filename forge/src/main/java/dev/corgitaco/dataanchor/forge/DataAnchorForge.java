@@ -29,6 +29,7 @@ public class DataAnchorForge {
 
         ForgeRegistryHelper.CACHED.values().forEach(deferredRegister -> deferredRegister.register(modEventBus));
         modEventBus.<DataPackRegistryEvent.NewRegistry>addListener(newRegistry -> ForgeRegistryHelper.DATAPACK_REGISTRIES.forEach(newRegistryConsumer -> newRegistryConsumer.accept(newRegistry)));
+        ForgeRegistryHelper.CACHED.forEach((resourceKey, deferredRegister) -> deferredRegister.register(modEventBus));
     }
 
     public void commonSetup(final FMLCommonSetupEvent fmlCommonSetupEvent) {

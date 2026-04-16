@@ -25,5 +25,6 @@ public class DataAnchorNeoForge {
 
         eventBus.addListener(DataPackRegistryEvent.NewRegistry.class, newRegistry -> NeoforgeRegistryHelper.DATAPACK_REGISTRIES.forEach(newRegistryConsumer -> newRegistryConsumer.accept(newRegistry)));
         eventBus.addListener(NewRegistryEvent.class, newRegistry -> NeoforgeRegistryHelper.NEW_REGISTRIES.forEach(newRegistryConsumer -> newRegistryConsumer.accept(newRegistry)));
+        NeoforgeRegistryHelper.CACHED.forEach((resourceKey, deferredRegister) -> deferredRegister.register(eventBus));
     }
 }
