@@ -53,6 +53,7 @@ public interface TrackedDataContainer<O, T extends TrackedData<O>> {
             @Override
             public void dataAnchor$createTrackedData() {
                 registry.factories().forEach((key, factory) -> {
+                    if (trackedDataMap.containsKey(key)) return;
                     T trackedData = factory.create(key, o);
                     if (trackedData != null) {
                         if (isClient) {

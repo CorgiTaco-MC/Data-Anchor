@@ -28,7 +28,7 @@ public class C2SFabricPacketBroadcaster extends FabricPacketBroadcaster implemen
 
     @Override
     protected <T extends Packet> void registerPayload(CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> serializer) {
-        PayloadTypeRegistry.clientboundPlay().register(type, serializer);
+        PayloadTypeRegistry.serverboundPlay().register(type, serializer);
     }
 
     @Override

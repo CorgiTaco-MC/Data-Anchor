@@ -67,14 +67,12 @@ public class ChunkSerializerMixin {
         }
 
         if (returnValue instanceof TrackedDataContainer<?, ?> trackedDataContainer) {
-            CompoundTag trackedDataTag = this.structureData.getCompound("TrackedData").orElseThrow();
+            CompoundTag trackedDataTag = this.structureData.getCompound("TrackedData").orElse(new CompoundTag());
             for (TrackedDataKey key : trackedDataContainer.dataAnchor$getTrackedDataKeys()) {
                 trackedDataContainer.dataAnchor$getTrackedData(key).ifPresent(trackedData -> {
                     if (trackedData instanceof ChunkTrackedData chunkTrackedData) {
                         String idString = key.getId().toString();
-                        if (trackedDataTag.contains(idString)) {
-                            chunkTrackedData.load(trackedDataTag.getCompound(idString).orElseThrow());
-                        }
+                        trackedDataTag.getCompound(idString).ifPresent(chunkTrackedData::load);
                     }
                 });
             }

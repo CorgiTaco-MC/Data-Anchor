@@ -76,15 +76,13 @@ public class BlockEntityMixin implements TrackedDataContainer<BlockEntity, Block
         if (cir.getReturnValue() instanceof TrackedDataContainer container) {
             container.dataAnchor$createTrackedData();
             if (tag.contains("TrackedData")) {
-                CompoundTag trackedData = tag.getCompound("TrackedData").orElseThrow();
+                CompoundTag trackedData = tag.getCompound("TrackedData").orElse(new CompoundTag());
                 Collection<TrackedDataKey<BlockEntityTrackedData>> keys = container.dataAnchor$getTrackedDataKeys();
                 for (TrackedDataKey<BlockEntityTrackedData> key : keys) {
                     container.dataAnchor$getTrackedData(key).ifPresent(data -> {
                         if (data instanceof BlockEntityTrackedData blockEntityTrackedData) {
                             String idString = key.getId().toString();
-                            if (trackedData.contains(idString)) {
-                                blockEntityTrackedData.load(trackedData.getCompound(idString).orElseThrow());
-                            }
+                            trackedData.getCompound(idString).ifPresent(blockEntityTrackedData::load);
                         }
                     });
                 }

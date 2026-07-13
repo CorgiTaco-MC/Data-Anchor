@@ -71,10 +71,10 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
     public TrackedLevelSavedData init(ServerLevel serverLevel) {
         this.serverLevel = serverLevel;
         dataAnchor$createTrackedData();
-        for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
-            String idString = entry.getKey().getId().toString();
-            if (tag.contains(idString)) {
-                entry.getValue().load(tag.getCompound(idString).orElseThrow());
+        if (tag != null) {
+            for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
+                String idString = entry.getKey().getId().toString();
+                tag.getCompound(idString).ifPresent(entry.getValue()::load);
             }
         }
         this.tag = null;
@@ -105,6 +105,7 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
     @Override
     public void dataAnchor$createTrackedData() {
         TrackedDataRegistries.LEVEL.factories().forEach((key, factory) -> {
+            if (trackedDataMap.containsKey(key)) return;
             LevelTrackedData trackedData = factory.create(key, this.serverLevel);
             if (trackedData instanceof ServerTrackedData) {
                 if (trackedData instanceof TickableTrackedData tickableData) {
