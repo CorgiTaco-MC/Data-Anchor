@@ -66,7 +66,7 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
     @Override
     public void dataAnchor$createTrackedData() {
         if ((Object) this instanceof ServerLevel serverLevel) {
-            this.dataAnchor$trackedDataContainer = serverLevel.getDataStorage().get(TrackedLevelSavedData.TYPE).init(serverLevel);
+            this.dataAnchor$trackedDataContainer = serverLevel.getDataStorage().computeIfAbsent(TrackedLevelSavedData.TYPE).init(serverLevel);
         } else {
             this.dataAnchor$trackedDataContainer.dataAnchor$createTrackedData();
         }
