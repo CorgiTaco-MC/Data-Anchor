@@ -27,7 +27,7 @@ import java.util.function.Function;
 
 public abstract class ForgeNetworkHandler {
 
-    protected final Map<Class<? extends Packet>, Channel<CustomPacketPayload>> channels = new ConcurrentHashMap<>();
+    protected static final Map<Class<? extends Packet>, Channel<CustomPacketPayload>> channels = new ConcurrentHashMap<>();
     private final NetworkDirection networkDirection;
 
     public ForgeNetworkHandler(NetworkDirection networkDirection) {

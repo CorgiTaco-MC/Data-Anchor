@@ -1,3 +1,6 @@
+# 3.0.0.4
+* Fix 1.21.5 crashes by making packet registry static
+
 # 3.0.0.3
 * Networking backend improvements.
 * Minimize Packet registration boilerplate.
