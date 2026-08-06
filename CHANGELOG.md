@@ -1,3 +1,9 @@
+# 1.0.0.22
+* Fix a crash when joining a world with synced level data.
+  The packet encoder registry was per-instance, but the broadcaster is loaded
+  separately as a service for sending and for registration, so the two got
+  different instances and sends found no encoder. The registry is now shared.
+
 # 1.0.0.21
 * Networking backend improvements.
 * Minimize Packet registration boilerplate.
