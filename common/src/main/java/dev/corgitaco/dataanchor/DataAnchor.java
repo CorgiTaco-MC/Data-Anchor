@@ -49,30 +49,30 @@ public class DataAnchor {
         registerPacketHandlers();
     }
 
-    public static final TrackedDataKey<TestSyncedPlayerTrackedData> TEST_PLAYER_TRACKED_DATA_KEY = TrackedDataRegistries.ENTITY.register(id("test_player_tracked_data"), TestSyncedPlayerTrackedData.class, (key, entity) -> {
-        if (entity instanceof Player player) {
-            return new TestSyncedPlayerTrackedData(key, player);
-        }
-
-        return null;
-    });
-
-    public static final TrackedDataKey<TestSyncedBlockEntityTrackedData> TEST_SYNCED_BLOCK_ENTITY_TRACKED_DATA_KEY = TrackedDataRegistries.BLOCK_ENTITY.register(id("test_block_entity_tracked_data"), TestSyncedBlockEntityTrackedData.class, (key, blockEntity) -> {
-        if (blockEntity instanceof EnderChestBlockEntity enderChestBlockEntity) {
-            return new TestSyncedBlockEntityTrackedData(key, enderChestBlockEntity);
-        }
-
-        return null;
-    });
-
-    public static final TrackedDataKey<TestSyncedLevelTrackedData> TEST_LEVEL_TRACKED_DATA_KEY = TrackedDataRegistries.LEVEL.register(id("test_level_tracked_data"), TestSyncedLevelTrackedData.class, TestSyncedLevelTrackedData::new);
-
-    public static final TrackedDataKey<TestSyncedLevelChunkTrackedData> TEST_SYNCED_LEVEL_CHUNK_TRACKED_DATA_KEY = TrackedDataRegistries.CHUNK.register(id("test_synced_level_chunk_tracked_data_key"), TestSyncedLevelChunkTrackedData.class, (key, chunkAccess) -> {
-        if (chunkAccess instanceof LevelChunk levelChunk) {
-            return new TestSyncedLevelChunkTrackedData(key, levelChunk);
-        }
-        return null;
-    });
+//    public static final TrackedDataKey<TestSyncedPlayerTrackedData> TEST_PLAYER_TRACKED_DATA_KEY = TrackedDataRegistries.ENTITY.register(id("test_player_tracked_data"), TestSyncedPlayerTrackedData.class, (key, entity) -> {
+//        if (entity instanceof Player player) {
+//            return new TestSyncedPlayerTrackedData(key, player);
+//        }
+//
+//        return null;
+//    });
+//
+//    public static final TrackedDataKey<TestSyncedBlockEntityTrackedData> TEST_SYNCED_BLOCK_ENTITY_TRACKED_DATA_KEY = TrackedDataRegistries.BLOCK_ENTITY.register(id("test_block_entity_tracked_data"), TestSyncedBlockEntityTrackedData.class, (key, blockEntity) -> {
+//        if (blockEntity instanceof EnderChestBlockEntity enderChestBlockEntity) {
+//            return new TestSyncedBlockEntityTrackedData(key, enderChestBlockEntity);
+//        }
+//
+//        return null;
+//    });
+//
+//    public static final TrackedDataKey<TestSyncedLevelTrackedData> TEST_LEVEL_TRACKED_DATA_KEY = TrackedDataRegistries.LEVEL.register(id("test_level_tracked_data"), TestSyncedLevelTrackedData.class, TestSyncedLevelTrackedData::new);
+//
+//    public static final TrackedDataKey<TestSyncedLevelChunkTrackedData> TEST_SYNCED_LEVEL_CHUNK_TRACKED_DATA_KEY = TrackedDataRegistries.CHUNK.register(id("test_synced_level_chunk_tracked_data_key"), TestSyncedLevelChunkTrackedData.class, (key, chunkAccess) -> {
+//        if (chunkAccess instanceof LevelChunk levelChunk) {
+//            return new TestSyncedLevelChunkTrackedData(key, levelChunk);
+//        }
+//        return null;
+//    });
 
 
     private static void registerPacketHandlers() {
