@@ -1,3 +1,6 @@
+# 2.0.0.16
+* Fix Forge MC Version Requirement
+
 # 2.0.0.15
 * Fix 1.21.1 crashes by making packet registry static
 
