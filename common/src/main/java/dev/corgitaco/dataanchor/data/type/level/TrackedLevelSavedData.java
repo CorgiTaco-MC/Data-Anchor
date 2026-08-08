@@ -77,7 +77,7 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
                 entry.getValue().load(tag.getCompound(idString).orElseThrow());
             }
         }
-        this.tag = null;
+        this.tag = new CompoundTag();
         return this;
     }
 

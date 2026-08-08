@@ -1,3 +1,6 @@
+# 4.0.0.1
+* Fix level data crashing
+
 # 4.0.0.0
 * Port to 26.1.2
 
