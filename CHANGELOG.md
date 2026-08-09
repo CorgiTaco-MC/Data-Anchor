@@ -1,3 +1,6 @@
+# 4.0.0.3
+* Fixes pertaining to level data.
+
 # 4.0.0.1
 * Fix level data crashing
 
