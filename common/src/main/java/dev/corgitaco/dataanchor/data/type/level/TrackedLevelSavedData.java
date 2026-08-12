@@ -71,13 +71,13 @@ public class TrackedLevelSavedData extends SavedData implements TrackedDataConta
     public TrackedLevelSavedData init(ServerLevel serverLevel) {
         this.serverLevel = serverLevel;
         dataAnchor$createTrackedData();
-        for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
-            String idString = entry.getKey().getId().toString();
-            if (tag.contains(idString)) {
-                entry.getValue().load(tag.getCompound(idString).orElseThrow());
+        if (this.tag != null) {
+            for (Map.Entry<TrackedDataKey<LevelTrackedData>, LevelTrackedData> entry : trackedDataMap.entrySet()) {
+                String idString = entry.getKey().getId().toString();
+                this.tag.getCompound(idString).ifPresent(entry.getValue()::load);
             }
+            this.tag = null;
         }
-        this.tag = null;
         return this;
     }
 
