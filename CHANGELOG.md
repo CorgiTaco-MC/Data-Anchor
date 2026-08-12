@@ -1,3 +1,6 @@
+# 5.0.0.3
+* Fix Loading Chunk data if data anchor information does not yet exist.
+
 # 5.0.0.2
 * Even more level data fixes
 
