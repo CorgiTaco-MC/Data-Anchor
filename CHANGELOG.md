@@ -1,3 +1,6 @@
+# 3.0.0.1
+* Fix Loading Chunk data if data anchor information does not yet exist.
+
 # 3.0.0.0
 * Port to 26.1
 
