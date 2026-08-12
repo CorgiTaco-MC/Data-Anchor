@@ -20,6 +20,7 @@ import dev.corgitaco.dataanchor.network.Packet;
 import dev.corgitaco.dataanchor.network.S2CNetworkContainer;
 import dev.corgitaco.dataanchor.test.data.TestSyncedBlockEntityTrackedData;
 import dev.corgitaco.dataanchor.test.data.chunk.TestSyncedLevelChunkTrackedData;
+import dev.corgitaco.dataanchor.test.data.entity.TestSyncedEntityTrackedData;
 import dev.corgitaco.dataanchor.test.data.level.TestSyncedLevelTrackedData;
 import dev.corgitaco.dataanchor.test.data.player.TestSyncedPlayerTrackedData;
 import net.minecraft.resources.Identifier;
@@ -55,6 +56,14 @@ public class DataAnchor {
 //        }
 //
 //        return null;
+//    });
+//
+//    public static final TrackedDataKey<TestSyncedEntityTrackedData> TEST_ENTITY_TRACKED_DATA_KEY = TrackedDataRegistries.ENTITY.register(id("test_entity_tracked_data"), TestSyncedEntityTrackedData.class, (key, entity) -> {
+//        if (entity instanceof Player) {
+//            return null;
+//        }
+//
+//        return new TestSyncedEntityTrackedData(key, entity);
 //    });
 //
 //    public static final TrackedDataKey<TestSyncedBlockEntityTrackedData> TEST_SYNCED_BLOCK_ENTITY_TRACKED_DATA_KEY = TrackedDataRegistries.BLOCK_ENTITY.register(id("test_block_entity_tracked_data"), TestSyncedBlockEntityTrackedData.class, (key, blockEntity) -> {

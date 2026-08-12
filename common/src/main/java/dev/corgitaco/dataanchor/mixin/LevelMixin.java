@@ -102,6 +102,10 @@ public abstract class LevelMixin implements TrackedDataContainer<Level, LevelTra
 
     @Inject(method = "tickBlockEntities", at = @At("RETURN"))
     private void onTickBlockEntities(CallbackInfo ci) {
+        if (!dataAnchor$lazyLoadedTrackedData) {
+            dataAnchor$ensureInitialized();
+        }
+
         for (TickableTrackedData tickableLevelDatum : this.dataAnchor$tickableLevelData) {
             tickableLevelDatum.tick();
         }

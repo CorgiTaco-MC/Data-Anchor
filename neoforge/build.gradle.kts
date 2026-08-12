@@ -27,6 +27,12 @@ neoForge {
             sourceSet(sourceSets.main.get())
         }
     }
+    runs {
+        create("server") {
+            server()
+            gameDirectory.set(file("run"))
+        }
+    }
 }
 
 sourceSets.named("main") {
