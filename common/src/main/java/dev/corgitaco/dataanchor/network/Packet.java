@@ -39,9 +39,10 @@ public interface Packet extends CustomPacketPayload {
         StreamDecoder<RegistryFriendlyByteBuf, T> packetRead = friendlyByteBuf -> {
             try {
                 return clazz.getConstructor(FriendlyByteBuf.class).newInstance(friendlyByteBuf);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                     NoSuchMethodException e) {
+            } catch (NoSuchMethodException e) {
                 throw new RuntimeException("Packet class missing constructor method with single `FriendlyByteBuf` argument.", e);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException("Failed to decode packet " + clazz.getName(), e.getCause() != null ? e.getCause() : e);
             }
         };
 
