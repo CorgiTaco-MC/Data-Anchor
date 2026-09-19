@@ -1,3 +1,7 @@
+# 5.0.0.4
+* Fix Block Entity Loading for mods who lazy load them.
+* Fix packet reading.
+
 # 5.0.0.3
 * Fix Loading Chunk data if data anchor information does not yet exist.
 
