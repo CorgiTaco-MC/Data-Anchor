@@ -1,3 +1,7 @@
+# 1.0.0.23
+* Fix Block Entity Loading for mods who lazy load them.
+* Fix packet reading.
+
 # 1.0.0.22
 * Fix 1.20.1 crashes by making packet registry static
 
