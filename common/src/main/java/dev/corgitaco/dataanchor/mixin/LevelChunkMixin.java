@@ -39,7 +39,7 @@ public class LevelChunkMixin implements TickableBlockEntityAccessor {
 
     @Inject(method = "setBlockEntity", at = @At("HEAD"))
     private void dataAnchor$onSetBlockEntityHead(BlockEntity blockEntity, CallbackInfo ci) {
-        BlockEntity oldBlockEntity = ((LevelChunk) (Object) this).getBlockEntity(blockEntity.getBlockPos());
+        BlockEntity oldBlockEntity = ((LevelChunk) (Object) this).getBlockEntities().get(blockEntity.getBlockPos());
         if (oldBlockEntity != null) {
             synchronized (dataAnchor$tickableBlockEntities) {
                 dataAnchor$tickableBlockEntities.remove(oldBlockEntity);
@@ -80,7 +80,7 @@ public class LevelChunkMixin implements TickableBlockEntityAccessor {
 
     @Inject(method = "removeBlockEntity", at = @At("HEAD"))
     private void dataAnchor$onRemoveBlockEntity(BlockPos pos, CallbackInfo ci) {
-        BlockEntity blockEntity = ((LevelChunk) (Object) this).getBlockEntity(pos);
+        BlockEntity blockEntity = ((LevelChunk) (Object) this).getBlockEntities().get(pos);
         if (blockEntity != null) {
             synchronized (dataAnchor$tickableBlockEntities) {
                 dataAnchor$tickableBlockEntities.remove(blockEntity);
