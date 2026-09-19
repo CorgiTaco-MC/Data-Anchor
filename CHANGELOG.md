@@ -1,3 +1,7 @@
+# 3.0.0.5
+* Fix Block Entity Loading for mods who lazy load them.
+* Fix packet reading.
+
 # 3.0.0.4
 * Fix 1.21.5 crashes by making packet registry static
 
