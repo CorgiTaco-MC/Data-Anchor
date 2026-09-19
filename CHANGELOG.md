@@ -1,3 +1,6 @@
+# 6.0.0.0
+* Port to 26.3
+
 # 5.0.0.4
 * Fix Block Entity Loading for mods who lazy load them.
 * Fix packet reading.
