@@ -1,3 +1,7 @@
+# 3.0.0.2
+* Fix Block Entity Loading for mods who lazy load them.
+* Fix packet reading.
+
 # 3.0.0.1
 * Fix Loading Chunk data if data anchor information does not yet exist.
 
