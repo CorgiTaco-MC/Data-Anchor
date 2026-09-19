@@ -1,3 +1,7 @@
+# 2.0.0.17
+* Fix Block Entity Loading for mods who lazy load them.
+* Fix packet reading.
+
 # 2.0.0.16
 * Fix Forge MC Version Requirement
 
