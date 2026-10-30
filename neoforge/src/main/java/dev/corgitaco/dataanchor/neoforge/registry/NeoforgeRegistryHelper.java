@@ -7,8 +7,8 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NewDatapackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.neoforged.neoforge.registries.RegistryBuilder;
 
@@ -35,10 +35,10 @@ public class NeoforgeRegistryHelper implements RegistryHelper{
         return () -> ts;
     }
 
-    public static final List<Consumer<DataPackRegistryEvent.NewRegistry>> DATAPACK_REGISTRIES = new ArrayList<>();
+    public static final List<Consumer<NewDatapackRegistryEvent>> DATAPACK_REGISTRIES = new ArrayList<>();
 
     @Override
     public <T> void registerDatapackRegistry(ResourceKey<Registry<T>> key, Supplier<Codec<T>> codec) {
-        DATAPACK_REGISTRIES.add(newRegistry -> newRegistry.dataPackRegistry(key, codec.get()));
+        DATAPACK_REGISTRIES.add(newRegistry -> newRegistry.worldRegistry(key, codec.get()));
     }
 }

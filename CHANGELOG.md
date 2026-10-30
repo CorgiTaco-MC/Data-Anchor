@@ -1,3 +1,6 @@
+# 6.0.0.1
+* Fix Neoforge load.
+
 # 6.0.0.0
 * Port to 26.3
 
