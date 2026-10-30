@@ -1,3 +1,6 @@
+# 6.0.0.2
+* Fix race condition
+
 # 6.0.0.1
 * Fix Neoforge load.
 
