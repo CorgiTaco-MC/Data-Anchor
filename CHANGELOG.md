@@ -1,3 +1,6 @@
+# 3.0.0.3
+* Fix race condition
+
 # 3.0.0.2
 * Fix Block Entity Loading for mods who lazy load them.
 * Fix packet reading.
