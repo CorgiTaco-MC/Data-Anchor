@@ -9,15 +9,14 @@
 package dev.corgitaco.dataanchor.network.broadcast;
 
 import dev.corgitaco.dataanchor.network.Packet;
-import dev.corgitaco.dataanchor.util.ServiceUtil;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
 public interface PacketBroadcaster {
-    S2CPacketBroadcaster S2C = ServiceUtil.load(S2CPacketBroadcaster.class);
-    C2SPacketBroadcaster C2S = ServiceUtil.load(C2SPacketBroadcaster.class);
-    BiDirectionalPacketBroadcaster BI = ServiceUtil.load(BiDirectionalPacketBroadcaster.class);
+    S2CPacketBroadcaster S2C = S2CPacketBroadcaster.INSTANCE;
+    C2SPacketBroadcaster C2S = C2SPacketBroadcaster.INSTANCE;
+    BiDirectionalPacketBroadcaster BI = BiDirectionalPacketBroadcaster.INSTANCE;
 
     ResourceLocation channelName(Class<? extends Packet> packetClass);
 }

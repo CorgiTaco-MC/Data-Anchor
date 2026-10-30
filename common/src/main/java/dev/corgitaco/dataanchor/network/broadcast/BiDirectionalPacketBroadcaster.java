@@ -8,6 +8,8 @@
 
 package dev.corgitaco.dataanchor.network.broadcast;
 
+import dev.corgitaco.dataanchor.util.ServiceUtil;
+
 public interface BiDirectionalPacketBroadcaster extends S2CPacketBroadcaster, C2SPacketBroadcaster {
-    BiDirectionalPacketBroadcaster INSTANCE = BI;
+    BiDirectionalPacketBroadcaster INSTANCE = ServiceUtil.load(BiDirectionalPacketBroadcaster.class);
 }
