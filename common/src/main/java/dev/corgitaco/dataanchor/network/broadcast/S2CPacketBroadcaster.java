@@ -9,6 +9,7 @@
 package dev.corgitaco.dataanchor.network.broadcast;
 
 import dev.corgitaco.dataanchor.network.Packet;
+import dev.corgitaco.dataanchor.util.ServiceUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Position;
 import net.minecraft.resources.ResourceKey;
@@ -19,7 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 
 public interface S2CPacketBroadcaster extends PacketBroadcaster {
-    S2CPacketBroadcaster INSTANCE = S2C;
+    S2CPacketBroadcaster INSTANCE = ServiceUtil.load(S2CPacketBroadcaster.class);
 
     <MSG extends Packet> void sendToPlayer(MSG msg, ServerPlayer player);
 
