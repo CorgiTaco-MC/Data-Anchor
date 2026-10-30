@@ -9,9 +9,10 @@
 package dev.corgitaco.dataanchor.network.broadcast;
 
 import dev.corgitaco.dataanchor.network.Packet;
+import dev.corgitaco.dataanchor.util.ServiceUtil;
 
 public interface C2SPacketBroadcaster extends PacketBroadcaster {
-    C2SPacketBroadcaster INSTANCE = C2S;
+    C2SPacketBroadcaster INSTANCE = ServiceUtil.load(C2SPacketBroadcaster.class);
 
     <MSG extends Packet> void sendToServer(MSG msg);
 }
